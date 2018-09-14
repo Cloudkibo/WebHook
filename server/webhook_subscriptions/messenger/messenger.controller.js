@@ -2,7 +2,7 @@ const init = require('./initWebhooks')
 const Validator = require('jsonschema').Validator
 const _cloneDeep = require('lodash/cloneDeep')
 const validator = new Validator()
-const logger = require('./../../../components/logger')
+const logger = require('./../../components/logger')
 const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
 
 exports.verifyHook = function (req, res) {

@@ -30,12 +30,7 @@ const all = {
   process.env.IP ||
   undefined,
 
-  sendgrid: {
-    username: 'cloudkibo',
-    password: 'cl0udk1b0'
-  },
-
-  domain: `${process.env.DOMAIN || 'https://staging.kibopush.com'}`,
+  domain: `${process.env.DOMAIN || 'https://webhook.cloudkibo.com'}`,
 
   mongo: {
     options: {
@@ -47,7 +42,7 @@ const all = {
 
   pubsubhubbub: {
     secret: process.env.SESSION_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
-    callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/pubsub/webhook`
+    callbackUrl: `${process.env.DOMAIN || 'https://webhook.cloudkibo.com'}/api/autoposting/pubsub/webhook`
   },
 
   twitter: {

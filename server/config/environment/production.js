@@ -5,12 +5,6 @@
 // Production specific configuration
 // ==================================
 module.exports = {
-  // MySQL connection options
-  mongo: {
-    uri: process.env.MONGO_URI || 'mongodb://localhost/webhook-prod'
-  },
-  seedDB: false,
-
   facebook: {
     clientID: process.env.FACEBOOK_ID,
     clientSecret: process.env.FACEBOOK_SECRET,
