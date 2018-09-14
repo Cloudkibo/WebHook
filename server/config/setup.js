@@ -33,13 +33,7 @@ module.exports = function (app, httpapp, config) {
 
   if (config.env === 'production') {
     httpapp.get('*', (req, res) => {
-      res.redirect(`https://webhooks.kibopush.com${req.url}`)
-    })
-  }
-
-  if (config.env === 'staging') {
-    httpapp.get('*', (req, res) => {
-      res.redirect(`https://webhooks.kibopush.com${req.url}`)
+      res.redirect(`${config.domain}${req.url}`)
     })
   }
 
