@@ -1,4 +1,4 @@
-const TAG = 'webhook_subscriptions/wordpress/shopifyWebhook.js'
+const TAG = 'webhook_subscriptions/wordpress/webhook.js'
 const logger = require('../../components/logger')
 const callApi = require('../../utility/api.caller.service')
 
