@@ -6,6 +6,7 @@ const http = require('http')
 const https = require('https')
 const fs = require('fs')
 const logger = require('./../components/logger')
+const initWebhooks = require('../webhook_subscriptions/messenger/registerWebhooks')
 
 const TAG = 'config/setup.js'
 
@@ -40,6 +41,7 @@ module.exports = function (app, httpapp, config) {
   server.listen(config.port, config.ip, () => {
     logger.serverLog(TAG, `KiboPush server STARTED on ${
       config.port} in ${config.env} mode`)
+    initWebhooks.registeryInit()
   })
 
   httpsServer.listen(config.secure_port, () => {
@@ -49,5 +51,6 @@ module.exports = function (app, httpapp, config) {
 
   if (config.env === 'production' || config.env === 'staging') {
     console.log('KiboHook server STARTED on %s in %s mode', config.port, config.env)
+    //  initWebhooks.registeryInit()
   }
 }
