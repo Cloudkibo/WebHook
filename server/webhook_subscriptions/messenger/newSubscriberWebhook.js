@@ -1,7 +1,11 @@
 const TAG = 'webhook_subscriptions/messenger/newSubscriberWebhook.js'
 const logger = require('../../components/logger')
+const callApi = require('../../utility/api.caller.service')
 
 exports.newSubscriberWebhook = (payload) => {
-  logger.serverLog(TAG,
-    `in newSubscriberWebhook ${JSON.stringify(payload)}`)
+  if (!payload.entry[0].messaging[0].prior_message && !payload.entry[0].messaging[0].message && !payload.entry[0].messaging[0].postback) {
+    logger.serverLog(TAG,
+      `in newSubscriberWebhook ${JSON.stringify(payload)}`)
+    callApi.callApi('messengerEvents/subscriber', 'post', payload)
+  }
 }

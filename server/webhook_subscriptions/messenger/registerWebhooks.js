@@ -9,7 +9,7 @@ const surveyResponseValidation = require('./surveyResponseSchema')
 const autopostingValidation = require('./autopostingSchema')
 const seenValidation = require('./seenSchema')
 const chatPluginValidation = require('./chatPluginSchema')
-const shopifyValidation = require('./shopifySchema')
+const shopifyValidation = require('./shopifyAndAdminSchema')
 
 const commentWebhook = require('./commentWebhook')
 const customerMatchingWebhook = require('./customerMatchingWebhook')
@@ -20,7 +20,7 @@ const surveyResponseWebhook = require('./surveyResponseWebhook')
 const autopostingWebhook = require('./autopostingWebhook')
 const seenWebhook = require('./seenWebhook')
 const chatPluginWebhook = require('./chatPluginWebhook')
-const shopifyWebhook = require('./shopifyWebhook')
+const shopifyWebhook = require('./shopifyAndAdminWebhook')
 
 function initRegistry () {
   init.registerCallback(validationSchema.testSchema, (payload) => { console.log('Sample Webhook Called') })
@@ -33,7 +33,7 @@ function initRegistry () {
   init.registerCallback(autopostingValidation.autopostingSchema, (payload) => { autopostingWebhook.autopostingWebhook(payload) })
   init.registerCallback(seenValidation.seenSchema, (payload) => { seenWebhook.seenWebhook(payload) })
   init.registerCallback(chatPluginValidation.chatPluginSchema, (payload) => { chatPluginWebhook.chatPluginWebhook(payload) })
-  init.registerCallback(shopifyValidation.shopifySchema, (payload) => { shopifyWebhook.shopifyWebhook(payload) })
+  init.registerCallback(shopifyValidation.shopifyAndAdminSchema, (payload) => { shopifyWebhook.shopifyAndAdminSchema(payload) })
 }
 
 exports.registeryInit = () => {

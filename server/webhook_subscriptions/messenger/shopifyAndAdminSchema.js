@@ -1,4 +1,4 @@
-exports.shopifySchema = {
+exports.shopifyAndAdminSchema = {
   'type': 'object',
   'properties': {
     'object': {
