@@ -51,7 +51,8 @@ const all = {
     consumer_token: process.env.TWITTER_TOKEN,
     consumer_token_secret: process.env.TWITTER_TOKEN_SECRET,
     callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/twitter`
-  }
+  },
+  API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api' : 'http://localhost:3000/api'
 }
 
 module.exports = _.merge(
