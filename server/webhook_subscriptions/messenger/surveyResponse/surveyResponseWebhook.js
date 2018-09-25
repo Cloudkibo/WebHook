@@ -1,6 +1,6 @@
 const TAG = 'webhook_subscriptions/messenger/surveyResponseWebhook.js'
-const logger = require('../../components/logger')
-const callApi = require('../../utility/api.caller.service')
+const logger = require('../../../components/logger')
+const callApi = require('../../../utility/api.caller.service')
 
 exports.surveyResponseWebhook = (payload) => {
   if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>') {

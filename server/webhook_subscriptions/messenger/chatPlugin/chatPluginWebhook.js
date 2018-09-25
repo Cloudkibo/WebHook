@@ -1,6 +1,6 @@
 const TAG = 'webhook_subscriptions/messenger/chatPluginWebhook.js'
-const logger = require('../../components/logger')
-const callApi = require('../../utility/api.caller.service')
+const logger = require('../../../components/logger')
+const callApi = require('../../../utility/api.caller.service')
 
 exports.chatPluginWebhook = (payload) => {
   logger.serverLog(TAG,

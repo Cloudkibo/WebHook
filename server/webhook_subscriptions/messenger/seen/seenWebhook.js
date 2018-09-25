@@ -1,6 +1,6 @@
 const TAG = 'webhook_subscriptions/messenger/seenWebhook.js'
-const logger = require('../../components/logger')
-const callApi = require('../../utility/api.caller.service')
+const logger = require('../../../components/logger')
+const callApi = require('../../../utility/api.caller.service')
 
 exports.seenWebhook = (payload) => {
   logger.serverLog(TAG,
