@@ -13,10 +13,10 @@ const all = {
   root: path.normalize(`${__dirname}/../../..`),
 
   // Server port
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 8000,
 
   // Secure Server port
-  secure_port: process.env.SECURE_PORT || 8443,
+  secure_port: process.env.SECURE_PORT || 8444,
 
   // pubsubhubbub port
   pubsub_port: process.env.PUBSUB_PORT || 1337,
@@ -51,7 +51,8 @@ const all = {
     consumer_token: process.env.TWITTER_TOKEN,
     consumer_token_secret: process.env.TWITTER_TOKEN_SECRET,
     callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/twitter`
-  }
+  },
+  API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api' : 'http://localhost:3000/api'
 }
 
 module.exports = _.merge(
