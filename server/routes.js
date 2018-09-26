@@ -10,7 +10,10 @@ module.exports = function (app) {
 
   // app.use('/api/v1/things', require('./api/v1/thing'))
   app.use('/webhooks/messenger', require('./webhook_subscriptions/messenger'))
-  // app.use('/webhooks/wordpress', require('./webhook_subscriptions/wordpress'))
+
+  app.use('/api/twitter', require('./webhook_subscriptions/twitter'))
+
+  app.use('/webhooks/wordpress', require('./webhook_subscriptions/wordpress'))
 
   app.route('/:url(api|auth)/*').get((req, res) => {
     res.status(404).send({url: `${req.originalUrl} not found`})

@@ -30,6 +30,8 @@ const all = {
   process.env.IP ||
   undefined,
 
+  kibo_ip: process.env.KIBOPUSH_IP || 'http://localhost:3000',
+
   domain: `${process.env.DOMAIN || 'https://webhook.cloudkibo.com'}`,
 
   mongo: {
@@ -46,12 +48,13 @@ const all = {
   },
 
   twitter: {
-    consumer_key: process.env.TWITTER_CONSUMER_KEY,
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-    consumer_token: process.env.TWITTER_TOKEN,
-    consumer_token_secret: process.env.TWITTER_TOKEN_SECRET,
+    consumer_key: process.env.TWITTER_CONSUMER_KEY || 'f83b0cd6ccb20142185616dsf54dsf4',
+    consumer_secret: process.env.TWITTER_CONSUMER_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
+    consumer_token: process.env.TWITTER_TOKEN || 'f83b0cd6ccb20142185616dsf54dsf4',
+    consumer_token_secret: process.env.TWITTER_TOKEN_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
     callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/twitter`
   },
+
   API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api' : 'http://localhost:3000/api'
 }
 
