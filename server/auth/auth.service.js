@@ -11,6 +11,7 @@ const compose = require('composable-middleware')
 // const _ = require('lodash')
 
 const logger = require('../components/logger')
+const config = require('../config/environment')
 
 const TAG = 'auth/auth.service.js'
 
@@ -24,7 +25,7 @@ function isAuthorizedWebHookTrigger () {
     logger.serverLog(TAG, ip)
     logger.serverLog(TAG, 'This is middleware')
     logger.serverLog(TAG, req.body)
-    if (ip === '162.243.215.177') next()
+    if (ip === config.kibo_ip) next()
     else res.send(403)
   })
 }

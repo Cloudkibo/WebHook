@@ -15,15 +15,24 @@ exports.verifyHook = function (req, res) {
 
 exports.webhook = function (req, res) {
   try {
-    init.getRegistry().map((entry) => {
-      if (validator.validate(req.body, entry.schema).valid) {
-        entry.callback(_cloneDeep(req.body))
-      }
-    })
+    let webhookCalled = webhookHandler(req.body)
     // @TODO : Need to fix the response mechanism
-    return res.status(200).json({})
+    return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`)
     return res.status(500).json({status: 'failed', err: e})
   }
 }
+
+function webhookHandler (body) {
+  let webhookCalled = false
+  init.getRegistry().map((entry) => {
+    if (validator.validate(body, entry.schema).valid) {
+      entry.callback(_cloneDeep(body))
+      webhookCalled = true
+    }
+  })
+  return webhookCalled
+}
+
+exports.webhookHandler = webhookHandler
