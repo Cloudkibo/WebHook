@@ -6,7 +6,11 @@ const http = require('http')
 const https = require('https')
 const fs = require('fs')
 const logger = require('./../components/logger')
-const initWebhooks = require('../webhook_subscriptions/messenger/registerWebhooks')
+const initMessengerWebhooks = require('../webhook_subscriptions/messenger/registerWebhooks')
+
+const initTwitterWebhooks = require('../webhook_subscriptions/twitter/registerWebhooks')
+
+const initWordpressWebhooks = require('../webhook_subscriptions/wordpress/registerWebhooks')
 
 const TAG = 'config/setup.js'
 
@@ -41,7 +45,9 @@ module.exports = function (app, httpapp, config) {
   server.listen(config.port, config.ip, () => {
     logger.serverLog(TAG, `KiboPush server STARTED on ${
       config.port} in ${config.env} mode`)
-    initWebhooks.registeryInit()
+    initMessengerWebhooks.registeryInit()
+    initTwitterWebhooks.registeryInit()
+    initWordpressWebhooks.registeryInit()
   })
 
   httpsServer.listen(config.secure_port, () => {
