@@ -27,11 +27,21 @@ module.exports = function (app, httpapp, config) {
 
     }
   }
+  if (config.env === 'staging') {
+    try {
+      options = {
+        ca: fs.readFileSync('/root/certs/kibocdn.ca-bundle'),
+        key: fs.readFileSync('/root/certs/kibocdn.key'),
+        cert: fs.readFileSync('/root/certs/kibocdn.crt')
+      }
+    } catch (e) {
 
+    }
+  }
   const server = http.createServer(httpapp)
   const httpsServer = https.createServer(options, app)
 
-  if (config.env === 'production') {
+  if (config.env === 'production' || config.env === 'staging') {
     httpapp.get('*', (req, res) => {
       res.redirect(`${config.domain}${req.url}`)
     })
