@@ -74,8 +74,6 @@ function connect () {
           return
         }
         webhookHandler(tweet)
-      }).catch((err) => {
-        logger.serverLog(TAG, `error retrieving twitter auto posting table ${err}`)
       })
     }
   })
