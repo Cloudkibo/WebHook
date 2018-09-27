@@ -57,6 +57,7 @@ function webhookHandler (body) {
 let stream
 
 function connect () {
+  logger.serverLog(TAG, `connect functio called`)
   callApi.callApi('twitterEvents/findAutoposting', 'get').then((response) => {
     let autoposting = response.payload
     if (autoposting.length > 0) {
@@ -81,6 +82,7 @@ function connect () {
 }
 
 function restart () {
+  logger.serverLog(TAG, `KiboPush called me`)
   if (stream) stream.stop()
   connect()
 }
