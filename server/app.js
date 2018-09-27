@@ -20,4 +20,8 @@ require('./config/express')(appObj)
 require('./config/setup')(app, httpApp, config)
 // require('./config/integrations/pubsubhubbub')()
 require('./webhook_subscriptions/twitter/twitter.controller').connect()
+
+require('./webhook_subscriptions/messenger/registerWebhooks').registeryInit()
+require('./webhook_subscriptions/twitter/registerWebhooks').registeryInit()
+require('./webhook_subscriptions/wordpress/registerWebhooks').registeryInit()
 require('./routes')(appObj)
