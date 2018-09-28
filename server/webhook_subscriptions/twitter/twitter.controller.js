@@ -73,7 +73,7 @@ function connect () {
         if (tweet.in_reply_to_status_id !== null || tweet.in_reply_to_user_id !== null || tweet.in_reply_to_screen_name !== null) {
           return
         }
-        logger.serverLog(TAG, `received new tweet`)
+        logger.serverLog(TAG, `received new tweet ${JSON.stringify(tweet)}`)
         webhookHandler(tweet)
       })
     }
