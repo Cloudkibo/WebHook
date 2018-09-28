@@ -36,6 +36,11 @@ exports.webhook = function (req, res) {
   try {
     let webhookCalled = webhookHandler(req.body)
     // @TODO : Need to fix the response mechanism
+    if (webhookCalled) {
+      logger.serverLog(TAG, `webhook called`)
+    } else {
+      logger.serverLog(TAG, `No webhook for the given request schema`)
+    }
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`)
@@ -73,7 +78,7 @@ function connect () {
         if (tweet.in_reply_to_status_id !== null || tweet.in_reply_to_user_id !== null || tweet.in_reply_to_screen_name !== null) {
           return
         }
-        logger.serverLog(TAG, `received new tweet`)
+        logger.serverLog(TAG, `received new tweet ${JSON.stringify(tweet)}`)
         webhookHandler(tweet)
       })
     }
