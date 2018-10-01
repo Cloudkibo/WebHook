@@ -29,7 +29,7 @@ exports.webhook = function (req, res) {
 function webhookHandler (body) {
   let webhookCalled = false
   init.getRegistry().map((entry) => {
-    if (validator.validate(body, entry.schema).valid) {
+    if (validator.validate(body, entry.schema).valid && !webhookCalled) {
       entry.callback(_cloneDeep(body))
       webhookCalled = true
     }
