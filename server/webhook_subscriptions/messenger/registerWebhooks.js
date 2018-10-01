@@ -25,6 +25,7 @@ const changePageNameWebhook = require('./changePageName/changePageNameWebhook')
 
 function initRegistry () {
   // init.registerCallback(validationSchema.testSchema, (payload) => { console.log('Sample Webhook Called') })
+  init.registerCallback(seenValidation.seenSchema, (payload) => { seenWebhook.seenWebhook(payload) })
   init.registerCallback(commentValidation.commentSchema, (payload) => { commentWebhook.commentWebhook(payload) })
   init.registerCallback(customerMatchingValidation.customerMatchingSchema, (payload) => { customerMatchingWebhook.customerMatchingWebhook(payload) })
   init.registerCallback(pollResponseValidation.pollResponseSchema, (payload) => { pollResponseWebhook.pollResponseWebhook(payload) })
@@ -32,7 +33,6 @@ function initRegistry () {
   init.registerCallback(newSubscriberValidation.newSubscriberSchema, (payload) => { newSubscriberWebhook.newSubscriberWebhook(payload) })
   init.registerCallback(surveyResponseValidation.surveyResponseSchema, (payload) => { surveyResponseWebhook.surveyResponseWebhook(payload) })
   init.registerCallback(autopostingValidation.autopostingSchema, (payload) => { autopostingWebhook.autopostingWebhook(payload) })
-  init.registerCallback(seenValidation.seenSchema, (payload) => { seenWebhook.seenWebhook(payload) })
   init.registerCallback(chatPluginValidation.chatPluginSchema, (payload) => { chatPluginWebhook.chatPluginWebhook(payload) })
   init.registerCallback(shopifyValidation.shopifyAndAdminSchema, (payload) => { shopifyWebhook.shopifyAndAdminSchema(payload) })
   init.registerCallback(changePageNameValidation.changePageNameSchema, (payload) => { changePageNameWebhook.changePageNameWebhook(payload) })
