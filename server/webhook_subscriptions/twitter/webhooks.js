@@ -3,11 +3,11 @@ const logger = require('../../components/logger')
 const callApi = require('../../utility/api.caller.service')
 
 exports.simpleTweet = (payload) => {
-  logger.serverLog(TAG, `in simpleTweet ${JSON.stringify(payload)}`)
+  logger.serverLog(TAG, `in simpleTweet`)
   callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload)
 }
 
 exports.mediaTweet = (payload) => {
-  logger.serverLog(TAG, `in mediaTweet Webhook ${JSON.stringify(payload)}`)
+  logger.serverLog(TAG, `in mediaTweet Webhook`)
   callApi.callApi('twitterEvents/twitterAutopostingMedia', 'post', payload)
 }
