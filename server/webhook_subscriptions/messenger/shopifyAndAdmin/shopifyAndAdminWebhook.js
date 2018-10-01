@@ -11,5 +11,11 @@ exports.shopifyAndAdminWebhook = (payload) => {
     logger.serverLog(TAG,
       `in addAdminAsSubscriberWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('facebookEvents/addAdminAsSubscriber', 'post', payload)
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+          })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
   }
 }
