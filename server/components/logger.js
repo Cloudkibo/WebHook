@@ -23,9 +23,10 @@ const config = require('../config/environment/index')
 exports.serverLog = function (label, data, hideFromProduction) {
   const namespace = `kibopush:${label}`
   const debug = require('debug')(namespace)
+  console.log(`${namespace} - ${data}`)
   if (config.env === 'development' || config.env === 'test') {
-    debug(`${namespace} - ${data}`)
-    console.log(`${namespace} - ${data}`)
+    debug(data)
+    // console.log(`${namespace} - ${data}`)
     // todo use log levels like info, warn, error and debug
     // logger.info(`${namespace} - ${data}`)
   } else {
