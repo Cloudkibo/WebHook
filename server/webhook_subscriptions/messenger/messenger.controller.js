@@ -17,7 +17,9 @@ exports.webhook = function (req, res) {
   logger.serverLog(TAG, `something received from facebook`)
   try {
     let webhookCalled = webhookHandler(req.body)
+
     logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`)
+
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
