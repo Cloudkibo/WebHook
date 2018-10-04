@@ -51,12 +51,18 @@ function webhookHandler (body) {
       webhookCalled = true
     }
   })
+  if (webhookCalled) {
+    logger.serverLog(TAG, `webhook called`)
+  } else {
+    logger.serverLog(TAG, `No webhook for the given request schema`)
+  }
   return webhookCalled
 }
 
 let stream
 
 function connect () {
+  logger.serverLog(TAG, `connect functio called`)
   callApi.callApi('twitterEvents/findAutoposting', 'get').then((response) => {
     let autoposting = response.payload
     if (autoposting.length > 0) {
@@ -72,15 +78,15 @@ function connect () {
         if (tweet.in_reply_to_status_id !== null || tweet.in_reply_to_user_id !== null || tweet.in_reply_to_screen_name !== null) {
           return
         }
+        logger.serverLog(TAG, `received new tweet`)
         webhookHandler(tweet)
-      }).catch((err) => {
-        logger.serverLog(TAG, `error retrieving twitter auto posting table ${err}`)
       })
     }
   })
 }
 
 function restart () {
+  logger.serverLog(TAG, `KiboPush called me`)
   if (stream) stream.stop()
   connect()
 }

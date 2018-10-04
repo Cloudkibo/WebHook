@@ -4,12 +4,8 @@ const twitterSchemas = require('../twitter/schemas')
 const twitterWebhooks = require('../twitter/webhooks')
 
 function initRegistry () {
-  init.registerCallback(twitterSchemas.simpleTweetWithURLandText, (payload) => { twitterWebhooks.simpleTweetWithURLandText(payload) })
-  init.registerCallback(twitterSchemas.tweetWithURLOnly, (payload) => { twitterWebhooks.tweetWithURLOnly(payload) })
-  init.registerCallback(twitterSchemas.tweetwithLinkandTextAndImage, (payload) => { twitterWebhooks.tweetwithLinkandTextAndImage(payload) })
-  init.registerCallback(twitterSchemas.imageOnly, (payload) => { twitterWebhooks.imageOnly(payload) })
-  init.registerCallback(twitterSchemas.tweetMultipleImages, (payload) => { twitterWebhooks.tweetMultipleImages(payload) })
-  init.registerCallback(twitterSchemas.tweetVideo, (payload) => { twitterWebhooks.tweetVideo(payload) })
+  init.registerCallback(twitterSchemas.simpleTweet, (payload) => { twitterWebhooks.simpleTweet(payload) })
+  init.registerCallback(twitterSchemas.mediaTweet, (payload) => { twitterWebhooks.mediaTweet(payload) })
 }
 
 exports.registeryInit = () => {
