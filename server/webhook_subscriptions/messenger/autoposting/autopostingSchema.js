@@ -51,7 +51,6 @@ exports.autopostingSchema = {
                         }
                       },
                       'required': [
-                        'share_id',
                         'item',
                         'sender_name',
                         'sender_id',
