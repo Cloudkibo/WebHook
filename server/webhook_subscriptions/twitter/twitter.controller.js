@@ -51,6 +51,11 @@ function webhookHandler (body) {
       webhookCalled = true
     }
   })
+  if (webhookCalled) {
+    logger.serverLog(TAG, `webhook called`)
+  } else {
+    logger.serverLog(TAG, `No webhook for the given request schema`)
+  }
   return webhookCalled
 }
 

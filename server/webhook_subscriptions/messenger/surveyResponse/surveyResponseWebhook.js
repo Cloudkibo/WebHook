@@ -9,14 +9,44 @@ exports.surveyResponseWebhook = (payload) => {
     let resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
     if (resp.survey_id) {
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload)
+            .then((response) => {
+              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+            })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
     } else if (resp.unsubscribe) {
       callApi.callApi('messengerEvents/unsubscribe', 'post', payload)
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+      })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
     } else if (resp.action === 'subscribe') {
       callApi.callApi('messengerEvents/subscribeToSequence', 'post', payload)
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+      })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
     } else if (resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload)
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+      })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
     } else {
       callApi.callApi('messengerEvents/menu', 'post', payload)
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+      })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
     }
   }
 }

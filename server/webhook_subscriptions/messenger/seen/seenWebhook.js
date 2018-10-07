@@ -6,4 +6,10 @@ exports.seenWebhook = (payload) => {
   logger.serverLog(TAG,
     `in seenWebhook ${JSON.stringify(payload)}`)
   callApi.callApi('messengerEvents/seen', 'post', payload)
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
 }
