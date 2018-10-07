@@ -16,7 +16,9 @@ exports.verifyHook = function (req, res) {
 
 exports.webhook = function (req, res) {
   try {
+    logger.serverLog(TAG, 'in wordpress webhook')
     let webhookCalled = webhookHandler(req.body)
+    logger.serverLog(TAG, `schema found: ${webhookCalled}`)
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {

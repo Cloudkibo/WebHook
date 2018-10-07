@@ -7,5 +7,11 @@ exports.changePageNameWebhook = (payload) => {
     logger.serverLog(TAG,
       `in changePageNameWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('facebookEvents/changePageName', 'post', payload)
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+          })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
   }
 }

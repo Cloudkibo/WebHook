@@ -6,4 +6,10 @@ exports.pollResponseWebhook = (payload) => {
   logger.serverLog(TAG,
     `in pollResponseWebhook ${JSON.stringify(payload)}`)
   callApi.callApi('messengerEvents/pollResponse', 'post', payload)
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
 }
