@@ -1,18 +1,12 @@
 const fetch = require('isomorphic-fetch')
-const logger = require('../components/logger')
 const config = require('../config/environment/index')
 
-exports.callApi = (endpoint, method = 'get', body, apiUrl) => {
+exports.callApi = (endpoint, method = 'get', body) => {
   console.log('endpoint', endpoint)
   let headers = {
     'content-type': 'application/json'
   }
-  var redirectUrl = getRedirectUrl(apiUrl)
-  if (redirectUrl === '') {
-    logger.serverLog('Empty apiUrl parameter')
-    return
-  }
-  return fetch(`${redirectUrl}/${endpoint}`, {
+  return fetch(`${config.API_URL}/${endpoint}`, {
     headers,
     method,
     body: JSON.stringify(body)
@@ -29,16 +23,4 @@ exports.callApi = (endpoint, method = 'get', body, apiUrl) => {
       response => response,
       error => error
     )
-}
-
-function getRedirectUrl (apiUrl) {
-  var redirectUrl = ''
-  if (apiUrl === 'kibochat') {
-    redirectUrl = config.API_URL_KIBOCHAT
-  } else if (apiUrl === 'kiboengage') {
-    redirectUrl = config.API_URL_KIBOENGAGE
-  } else if (apiUrl === 'accounts') {
-    redirectUrl = config.API_URL_ACCOUNTS
-  }
-  return redirectUrl
 }

@@ -55,11 +55,7 @@ const all = {
     callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/twitter`
   },
 
-  API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api' : 'http://localhost:3000/api',
-  API_URL_ACCOUNTS: process.env.NODE_ENV === 'production' ? 'https://accounts.cloudkibo.com/api/v1' : process.env.NODE_ENV === 'staging' ? 'https://saccounts.cloudkibo.com/api/v1' : 'http://localhost:3001/api/v1',
-  API_URL_KIBOCHAT: process.env.NODE_ENV === 'production' ? 'https://kibochat.cloudkibo.com/api/v1' : process.env.NODE_ENV === 'staging' ? 'https://skibochat.cloudkibo.com/api/v1' : 'http://localhost:3000/api/v1',
-  API_URL_KIBOENGAGE: process.env.NODE_ENV === 'production' ? 'https://kiboengage.cloudkibo.com/api/v1' : process.env.NODE_ENV === 'staging' ? 'https://skiboengage.cloudkibo.com/api/v1' : 'http://localhost:3000/api/v1'
-
+  API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api' : 'http://localhost:3000/api'
 }
 
 module.exports = _.merge(

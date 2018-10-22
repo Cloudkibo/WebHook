@@ -6,11 +6,11 @@ exports.shopifyAndAdminWebhook = (payload) => {
   if (payload.entry[0].messaging[0].optin.ref === 'SHOPIFY') {
     logger.serverLog(TAG,
       `in shopifyWebhook ${JSON.stringify(payload)}`)
-    callApi.callApi('facebookEvents/shopify', 'post', payload, 'kibocommerce')
+    callApi.callApi('facebookEvents/shopify', 'post', payload)
   } else {
     logger.serverLog(TAG,
       `in addAdminAsSubscriberWebhook ${JSON.stringify(payload)}`)
-    callApi.callApi('facebookEvents/addAdminAsSubscriber', 'post', payload, 'kibocommerce')
+    callApi.callApi('facebookEvents/addAdminAsSubscriber', 'post', payload)
           .then((response) => {
             logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
           })

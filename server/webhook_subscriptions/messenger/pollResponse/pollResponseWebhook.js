@@ -5,7 +5,7 @@ const callApi = require('../../../utility/api.caller.service')
 exports.pollResponseWebhook = (payload) => {
   logger.serverLog(TAG,
     `in pollResponseWebhook ${JSON.stringify(payload)}`)
-  callApi.callApi('messengerEvents/pollResponse', 'post', payload, 'kiboengage')
+  callApi.callApi('messengerEvents/pollResponse', 'post', payload)
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
         })

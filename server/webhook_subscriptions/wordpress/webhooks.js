@@ -4,7 +4,7 @@ const callApi = require('../../utility/api.caller.service')
 
 exports.publishPost = (payload) => {
   logger.serverLog(TAG, `in publishPostWebhook ${JSON.stringify(payload)}`)
-  callApi.callApi('wordpressEvents/wordpress', 'post', payload, 'kiboengage')
+  callApi.callApi('wordpressEvents/wordpress', 'post', payload)
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
         })
