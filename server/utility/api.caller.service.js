@@ -1,44 +1,40 @@
-const fetch = require('isomorphic-fetch')
-const config = require('../config/environment/index')
+const requestPromise = require('request-promise')
+const config = require('../../../config/environment/index')
+const logger = require('../../../components/logger')
+const TAG = 'api/v1/utility/index.js'
+const util = require('util')
 
-exports.callApi = (endpoint, method = 'get', body) => {
-  return callApiHelper(endpoint, method, body)
-}
-
-exports.callAccountsApi = (endpoint, method = 'get', body) => {
-  return callApiHelper(endpoint, method, body, 'accounts')
-}
-
-exports.callChatApi = (endpoint, method = 'get', body) => {
-  return callApiHelper(endpoint, method, body, 'chat')
-}
-
-let callApiHelper = (endpoint, method = 'get', body, type) => {
-  console.log('endpoint', endpoint)
+exports.callApi = (endpoint, method = 'get', body, type = 'kibopush', token) => {
   let headers = {
-    'content-type': 'application/json'
+    'content-type': 'application/json',
+    'Authorization': token
   }
-  let apiUrl = config.API_URL
+  let uri
   if (type === 'accounts') {
-    apiUrl = config.ACCOUNT_URL
-  } else if (type === 'chat') {
-    apiUrl = config.CHAT_URL
+    uri = `${config.ACCOUNTS_URL}${endpoint}`
+  } else if (type === 'kibopush') {
+    uri = `${config.API_URL}${endpoint}`
+  } else if (type === 'kibochat') {
+    uri = `${config.CHAT_URL}${endpoint}`
+  } else if (type === 'kiboengage') {
+    uri = `${config.ENGAGE_URL}${endpoint}`
   }
-  return fetch(`${apiUrl}/${endpoint}`, {
+  let options = {
+    method: method.toUpperCase(),
+    uri: uri,
     headers,
-    method,
-    body: JSON.stringify(body)
-  }).then(response => {
-    return response
-  }).then(response => response.json().then(json => ({ json, response })))
-    .then(({ json, response }) => {
-      if (!response.ok) {
-        return Promise.reject(json)
+    body,
+    json: true
+  }
+  logger.serverLog(TAG, `requestPromise body ${util.inspect(body)}`)
+  return requestPromise(options).then(response => {
+    logger.serverLog(TAG, `response from accounts ${util.inspect(response)}`)
+    return new Promise((resolve, reject) => {
+      if (response.status === 'success') {
+        resolve(response.payload)
+      } else {
+        reject(response.payload)
       }
-      return json
     })
-    .then(
-      response => response,
-      error => error
-    )
+  })
 }
