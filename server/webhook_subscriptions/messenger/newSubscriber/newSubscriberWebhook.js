@@ -31,6 +31,7 @@ exports.newSubscriberWebhook = (payload) => {
                 logger.serverLog(TAG, `Failed to update phone number ${JSON.stringify(err)}`)
               })
           }
+          console.log('page.userId', JSON.stringify(page.userId))
           needle.get(
             `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.userId.facebookInfo.fbToken}`,
             (err, resp2) => {
