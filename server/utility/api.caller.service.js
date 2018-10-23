@@ -1,6 +1,6 @@
 const requestPromise = require('request-promise')
-const config = require('../../../config/environment/index')
-const logger = require('../../../components/logger')
+const config = require('../config/environment/index')
+const logger = require('../components/logger')
 const TAG = 'api/v1/utility/index.js'
 const util = require('util')
 
@@ -12,12 +12,13 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
   let uri
   if (type === 'accounts') {
     uri = `${config.ACCOUNTS_URL}${endpoint}`
-  } else if (type === 'kibopush') {
-    uri = `${config.API_URL}${endpoint}`
   } else if (type === 'kibochat') {
     uri = `${config.CHAT_URL}${endpoint}`
   } else if (type === 'kiboengage') {
     uri = `${config.ENGAGE_URL}${endpoint}`
+  } else {
+    uri = `${config.API_URL}${endpoint}`
+    console.log('config.API_URL', config.API_URL)
   }
   let options = {
     method: method.toUpperCase(),
@@ -26,6 +27,7 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
     body,
     json: true
   }
+
   logger.serverLog(TAG, `requestPromise body ${util.inspect(body)}`)
   return requestPromise(options).then(response => {
     logger.serverLog(TAG, `response from accounts ${util.inspect(response)}`)
