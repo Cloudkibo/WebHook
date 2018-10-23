@@ -64,7 +64,7 @@ let stream
 function connect () {
   logger.serverLog(TAG, `connect functio called`)
   callApi.callApi('twitterEvents/findAutoposting').then((response) => {
-    let autoposting = response.payload
+    let autoposting = response
     if (autoposting.length > 0) {
       let arrUsers = []
       for (let i = 0; i < autoposting.length; i++) {

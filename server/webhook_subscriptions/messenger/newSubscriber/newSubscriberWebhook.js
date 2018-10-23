@@ -38,6 +38,7 @@ exports.newSubscriberWebhook = (payload) => {
               if (err) {
                 logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
               }
+              logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
               let pageAccessToken = resp2.body.access_token
               const options = {
                 url: `https://graph.facebook.com/v2.6/${sender}?access_token=${pageAccessToken}`,
@@ -45,6 +46,7 @@ exports.newSubscriberWebhook = (payload) => {
                 method: 'GET'
 
               }
+              logger.serverLog(TAG, `option.url: ${JSON.stringify(options.url)}`)
               needle.get(options.url, options, (error, response) => {
                 logger.serverLog(TAG, `Subscriber response git from facebook: ${JSON.stringify(response.body)}`)
                 const subscriber = response.body
