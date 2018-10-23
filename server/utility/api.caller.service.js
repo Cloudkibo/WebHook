@@ -4,10 +4,10 @@ const logger = require('../../../components/logger')
 const TAG = 'api/v1/utility/index.js'
 const util = require('util')
 
-exports.callApi = (endpoint, method = 'get', body, type = 'kibopush', token) => {
+exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
   let headers = {
     'content-type': 'application/json',
-    'Authorization': token
+    'is_kibo_product': true
   }
   let uri
   if (type === 'accounts') {

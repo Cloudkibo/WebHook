@@ -23,7 +23,7 @@ exports.newSubscriberWebhook = (payload) => {
       .then(pages => {
         pages.forEach((page) => {
           if (subscriberSource === 'customer_matching') {
-            callApi.callApi(`phone/update`, 'put', {query: {number: payload.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}})
+            callApi.callApi(`phone/update`, 'put', {query: {number: payload.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
               .then(phonenumberupdated => {
                 logger.serverLog(TAG, `phone number updated successfully ${JSON.stringify(phonenumberupdated)}`)
               })
@@ -73,27 +73,27 @@ exports.newSubscriberWebhook = (payload) => {
 
                   if (subscriber === null) {
                         // subscriber not found, create subscriber
-                    callApi.callApi(`company/${page.companyId}`)
+                    callApi.callApi(`companyUser/query`, 'post', {companyId: page.companyId}, 'accounts')
                           .then(company => {
-                            callApi.callApi(`featureUsage/getPlanUsage`, 'post', {planId: company.planId})
+                            callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
                               .then(planUsage => {
                                 planUsage = planUsage[0]
-                                callApi.callApi(`featureUsage/getCompanyUsage`, 'post', {companyId: page.companyId})
+                                callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId})
                                   .then(companyUsage => {
                                     companyUsage = companyUsage[0]
                                     if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
                                       // webhookUtility.limitReachedNotification('subscribers', company)
                                     } else {
-                                      callApi.callApi(`subscribers`, 'post', payload)
+                                      callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                         .then(subscriberCreated => {
-                                          callApi.callApi(`featureUsage/updateCompanyUsage`, 'post', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}})
+                                          callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                             .then(updated => {
                                               logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
                                             })
                                             .catch(err => {
                                               logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
                                             })
-                                          callApi.callApi(`webhooks/query`, 'post', { pageId: pageId })
+                                          callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
                                             .then(webhook => {
                                               if (webhook && webhook.isEnabled) {
                                                 needle.get(webhook.webhook_url, (err, r) => {
@@ -124,7 +124,7 @@ exports.newSubscriberWebhook = (payload) => {
                                           }
                                           if (!(event.postback &&
                                             event.postback.title === 'Get Started')) {
-                                            callApi.callApi('sessions', 'post', payload)
+                                            callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
                                           }
                                           // require('./../../../config/socketio')
                                           //   .sendMessageToClient({
@@ -158,14 +158,14 @@ exports.newSubscriberWebhook = (payload) => {
                     if (!subscriber.isSubscribed) {
                       // subscribing the subscriber again in case he
                       // or she unsubscribed and removed chat
-                      callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}})
+                      callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
                         .then(subscriber => {
                           logger.serverLog(TAG, subscriber)
                         })
                     }
                     if (!(event.postback &&
                       event.postback.title === 'Get Started')) {
-                      callApi.callApi('sessions', 'post', payload)
+                      callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
                     }
                   }
                 } else {
@@ -185,7 +185,7 @@ exports.newSubscriberWebhook = (payload) => {
 }
 
 function updateList (phoneNumber, sender, page) {
-  callApi.callApi(`phone/query`, 'post', {number: phoneNumber, hasSubscribed: true, pageId: page, companyId: page.companyId})
+  callApi.callApi(`phone/query`, 'post', {number: phoneNumber, hasSubscribed: true, pageId: page, companyId: page.companyId}, 'accounts')
     .then(number => {
       if (number.length > 0) {
         let subscriberFindCriteria = {
@@ -195,13 +195,13 @@ function updateList (phoneNumber, sender, page) {
           phoneNumber: phoneNumber,
           pageId: page._id
         }
-        callApi.callApi(`subscribers/query`, 'post', subscriberFindCriteria)
+        callApi.callApi(`subscribers/query`, 'post', subscriberFindCriteria, 'accounts')
           .then(subscribers => {
             let temp = []
             for (let i = 0; i < subscribers.length; i++) {
               temp.push(subscribers[i]._id)
             }
-            callApi.callApi(`lists/update`, 'put', {query: { listName: number[0].fileName, companyId: page.companyId }, newPayload: {content: temp}, options: {}})
+            callApi.callApi(`lists/update`, 'put', {query: { listName: number[0].fileName, companyId: page.companyId }, newPayload: {content: temp}, options: {}}, 'accounts')
               .then(savedList => {
                 logger.serverLog(TAG, `list updated successfully ${JSON.stringify(savedList)}`)
               })
