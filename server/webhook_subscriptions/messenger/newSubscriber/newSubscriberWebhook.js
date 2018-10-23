@@ -33,7 +33,7 @@ exports.newSubscriberWebhook = (payload) => {
           }
           console.log('page.userId', JSON.stringify(page.userId))
           needle.get(
-            `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.userId.facebookInfo.fbToken}`,
+            `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
             (err, resp2) => {
               if (err) {
                 logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
