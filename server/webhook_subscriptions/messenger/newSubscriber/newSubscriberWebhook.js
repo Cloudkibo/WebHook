@@ -8,8 +8,8 @@ exports.newSubscriberWebhook = (payload) => {
   if (!payload.entry[0].messaging[0].prior_message && payload.entry[0].messaging[0].message && !payload.entry[0].messaging[0].message.attachments && !payload.entry[0].messaging[0].postback && !payload.entry[0].messaging[0].delivery) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
-    for (let i = 0; i < payload.body.entry[0].messaging.length; i++) {
-      const event = payload.body.entry[0].messaging[i]
+    for (let i = 0; i < payload.entry[0].messaging.length; i++) {
+      const event = payload.entry[0].messaging[i]
       const sender = event.sender.id
       const pageId = event.recipient.id
       if (event.message && event.message.tags && event.message.tags.source === 'customer_chat_plugin') {
@@ -23,7 +23,7 @@ exports.newSubscriberWebhook = (payload) => {
       .then(pages => {
         pages.forEach((page) => {
           if (subscriberSource === 'customer_matching') {
-            callApi.callAccountsApi(`phone/update`, 'put', {query: {number: payload.body.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}})
+            callApi.callAccountsApi(`phone/update`, 'put', {query: {number: payload.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}})
               .then(phonenumberupdated => {
                 logger.serverLog(TAG, `phone number updated successfully ${JSON.stringify(phonenumberupdated)}`)
               })
