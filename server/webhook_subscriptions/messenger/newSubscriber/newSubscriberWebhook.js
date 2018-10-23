@@ -46,7 +46,7 @@ exports.newSubscriberWebhook = (payload) => {
                 method: 'GET'
 
               }
-              logger.serverLog(TAG, `option.url: ${JSON.stringify(options.url)}`)
+              logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
               needle.get(options.url, options, (error, response) => {
                 logger.serverLog(TAG, `Subscriber response git from facebook: ${JSON.stringify(response.body)}`)
                 const subscriber = response.body
