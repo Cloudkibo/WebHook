@@ -6,7 +6,7 @@ exports.changePageNameWebhook = (payload) => {
   if (payload.entry[0].changes[0].field === 'name') {
     logger.serverLog(TAG,
       `in changePageNameWebhook ${JSON.stringify(payload)}`)
-    callApi.callApi('facebookEvents/changePageName', 'post', payload)
+    callApi.callApi('facebookEvents/changePageName', 'post', payload, 'kiboengage')
           .then((response) => {
             logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
           })
