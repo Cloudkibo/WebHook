@@ -18,7 +18,6 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
     uri = `${config.ENGAGE_URL}${endpoint}`
   } else {
     uri = `${config.API_URL}${endpoint}`
-    console.log('config.API_URL', config.API_URL)
   }
   let options = {
     method: method.toUpperCase(),
