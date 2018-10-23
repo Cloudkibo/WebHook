@@ -27,7 +27,7 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
     json: true
   }
 
-  logger.serverLog(TAG, `requestPromise body ${util.inspect(body)}`)
+  logger.serverLog(TAG, `requestPromise body ${util.inspect(options)}`)
   return requestPromise(options).then(response => {
     logger.serverLog(TAG, `response from accounts ${util.inspect(response)}`)
     return new Promise((resolve, reject) => {

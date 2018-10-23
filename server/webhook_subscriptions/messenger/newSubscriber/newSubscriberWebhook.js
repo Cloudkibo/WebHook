@@ -168,6 +168,7 @@ exports.newSubscriberWebhook = (payload) => {
                     }
                     if (!(event.postback &&
                       event.postback.title === 'Get Started')) {
+                      console.log('going to kibochat', payload)
                       callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
                     }
                   }
