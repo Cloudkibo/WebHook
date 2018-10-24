@@ -128,6 +128,7 @@ exports.newSubscriberWebhook = (payload) => {
                                           if (!(event.postback &&
                                             event.postback.title === 'Get Started')) {
                                             callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
+                                            callApi.callApi('messengerEvents/subscriber', 'post', payload)
                                           }
                                           // require('./../../../config/socketio')
                                           //   .sendMessageToClient({
