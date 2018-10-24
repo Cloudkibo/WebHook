@@ -5,6 +5,7 @@ const needle = require('needle')
 
 exports.newSubscriberWebhook = (payload) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payload)}`)
+  callApi.callApi('messengerEvents/subscriber', 'post', payload)
   if (!payload.entry[0].messaging[0].prior_message && payload.entry[0].messaging[0].message && !payload.entry[0].messaging[0].message.attachments && !payload.entry[0].messaging[0].postback && !payload.entry[0].messaging[0].delivery) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
@@ -128,7 +129,6 @@ exports.newSubscriberWebhook = (payload) => {
                                           if (!(event.postback &&
                                             event.postback.title === 'Get Started')) {
                                             callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
-                                            callApi.callApi('messengerEvents/subscriber', 'post', payload)
                                           }
                                           // require('./../../../config/socketio')
                                           //   .sendMessageToClient({
