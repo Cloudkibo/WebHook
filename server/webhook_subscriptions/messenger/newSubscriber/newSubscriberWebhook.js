@@ -87,7 +87,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                         if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
                                           // webhookUtility.limitReachedNotification('subscribers', company)
                                         } else {
-                                          callApi.callApi(`subscribers`, 'post', payload, 'accounts')
+                                          callApi.callApi(`subscribers/create`, 'post', payload, 'accounts')
                                             .then(subscriberCreated => {
                                               callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                                 .then(updated => {
