@@ -78,7 +78,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                       console.log('subscriberFound at top', subscriberFound)
                       if (subscriberFound.length === 0) {
                             // subscriber not found, create subscriber
-                        callApi.callApi(`companyprofile/query`, 'post', {companyId: page.companyId}, 'accounts')
+                        callApi.callApi(`companyprofile/query`, 'post', {_id: page.companyId}, 'accounts')
                               .then(company => {
                                 callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
                                   .then(planUsage => {
