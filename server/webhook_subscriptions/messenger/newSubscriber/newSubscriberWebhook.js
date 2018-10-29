@@ -73,105 +73,111 @@ exports.newSubscriberWebhook = (payloadBody) => {
                   } else if (subscriberSource === 'chat_plugin') {
                     payload.source = 'chat_plugin'
                   }
-
-                  if (subscriber === null) {
-                        // subscriber not found, create subscriber
-                    callApi.callApi(`companyUser/query`, 'post', {companyId: page.companyId}, 'accounts')
-                          .then(company => {
-                            callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
-                              .then(planUsage => {
-                                planUsage = planUsage[0]
-                                callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId})
-                                  .then(companyUsage => {
-                                    companyUsage = companyUsage[0]
-                                    if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
-                                      // webhookUtility.limitReachedNotification('subscribers', company)
-                                    } else {
-                                      callApi.callApi(`subscribers`, 'post', payload, 'accounts')
-                                        .then(subscriberCreated => {
-                                          callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
-                                            .then(updated => {
-                                              logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
-                                            })
-                                            .catch(err => {
-                                              logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
-                                            })
-                                          callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
-                                            .then(webhook => {
-                                              if (webhook && webhook.isEnabled) {
-                                                needle.get(webhook.webhook_url, (err, r) => {
-                                                  if (err) {
-                                                    logger.serverLog(TAG, err)
-                                                  } else if (r.statusCode === 200) {
-                                                    if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-                                                      var data = {
-                                                        subscription_type: 'NEW_SUBSCRIBER',
-                                                        payload: JSON.stringify({ subscriber: subscriber, recipient: pageId, sender: sender })
+                  callApi.callApi(`subscribers/query`, 'post', { _id: page._id, connected: true }, 'accounts')
+                    .then(subscriberFound => {
+                      subscriberFound = subscriberFound[0]
+                      if (subscriberFound === null) {
+                            // subscriber not found, create subscriber
+                        callApi.callApi(`companyprofile/query`, 'post', {companyId: page.companyId}, 'accounts')
+                              .then(company => {
+                                callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
+                                  .then(planUsage => {
+                                    planUsage = planUsage[0]
+                                    callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId})
+                                      .then(companyUsage => {
+                                        companyUsage = companyUsage[0]
+                                        if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
+                                          // webhookUtility.limitReachedNotification('subscribers', company)
+                                        } else {
+                                          callApi.callApi(`subscribers`, 'post', payload, 'accounts')
+                                            .then(subscriberCreated => {
+                                              callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
+                                                .then(updated => {
+                                                  logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
+                                                })
+                                                .catch(err => {
+                                                  logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
+                                                })
+                                              callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
+                                                .then(webhook => {
+                                                  if (webhook && webhook.isEnabled) {
+                                                    needle.get(webhook.webhook_url, (err, r) => {
+                                                      if (err) {
+                                                        logger.serverLog(TAG, err)
+                                                      } else if (r.statusCode === 200) {
+                                                        if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
+                                                          var data = {
+                                                            subscription_type: 'NEW_SUBSCRIBER',
+                                                            payload: JSON.stringify({ subscriber: subscriber, recipient: pageId, sender: sender })
+                                                          }
+                                                          needle.post(webhook.webhook_url, data,
+                                                            (error, response) => {
+                                                              if (error) logger.serverLog(TAG, err)
+                                                            })
+                                                        }
+                                                      } else {
+                                                        // webhookUtility.saveNotification(webhook)
                                                       }
-                                                      needle.post(webhook.webhook_url, data,
-                                                        (error, response) => {
-                                                          if (error) logger.serverLog(TAG, err)
-                                                        })
-                                                    }
-                                                  } else {
-                                                    // webhookUtility.saveNotification(webhook)
+                                                    })
                                                   }
                                                 })
+                                                .catch(err => {
+                                                  logger.serverLog(TAG, err)
+                                                })
+                                              if (subscriberSource === 'customer_matching') {
+                                                updateList(phoneNumber, sender, page)
                                               }
+                                              if (!(event.postback &&
+                                                event.postback.title === 'Get Started')) {
+                                                callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
+                                              }
+                                              // require('./../../../config/socketio')
+                                              //   .sendMessageToClient({
+                                              //     room_id: page.companyId,
+                                              //     body: {
+                                              //       action: 'dashboard_updated',
+                                              //       payload: {
+                                              //         subscriber_id: subscriberCreated._id,
+                                              //         company_id: page.companyId
+                                              //       }
+                                              //     }
+                                              //   })
                                             })
                                             .catch(err => {
-                                              logger.serverLog(TAG, err)
+                                              logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
                                             })
-                                          if (subscriberSource === 'customer_matching') {
-                                            updateList(phoneNumber, sender, page)
-                                          }
-                                          if (!(event.postback &&
-                                            event.postback.title === 'Get Started')) {
-                                            callApi.callApi('messengerEvents/sessions', 'post', payloadBody, 'kibochat')
-                                          }
-                                          // require('./../../../config/socketio')
-                                          //   .sendMessageToClient({
-                                          //     room_id: page.companyId,
-                                          //     body: {
-                                          //       action: 'dashboard_updated',
-                                          //       payload: {
-                                          //         subscriber_id: subscriberCreated._id,
-                                          //         company_id: page.companyId
-                                          //       }
-                                          //     }
-                                          //   })
-                                        })
-                                        .catch(err => {
-                                          logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
-                                        })
-                                    }
+                                        }
+                                      })
+                                      .catch(err => {
+                                        logger.serverLog(TAG, `Failed to fetch company usage ${JSON.stringify(err)}`)
+                                      })
                                   })
                                   .catch(err => {
-                                    logger.serverLog(TAG, `Failed to fetch company usage ${JSON.stringify(err)}`)
+                                    logger.serverLog(TAG, `Failed to fetch plan usage ${JSON.stringify(err)}`)
                                   })
                               })
                               .catch(err => {
-                                logger.serverLog(TAG, `Failed to fetch plan usage ${JSON.stringify(err)}`)
+                                logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
                               })
-                          })
-                          .catch(err => {
-                            logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
-                          })
-                  } else {
-                    if (!subscriber.isSubscribed) {
-                      // subscribing the subscriber again in case he
-                      // or she unsubscribed and removed chat
-                      callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
-                        .then(subscriber => {
-                          logger.serverLog(TAG, subscriber)
-                        })
-                    }
-                    if (!(event.postback &&
-                      event.postback.title === 'Get Started')) {
-                      console.log('going to kibochat', payload)
-                      callApi.callApi('messengerEvents/sessions', 'post', payloadBody, 'kibochat')
-                    }
-                  }
+                      } else {
+                        if (!subscriber.isSubscribed) {
+                          // subscribing the subscriber again in case he
+                          // or she unsubscribed and removed chat
+                          callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
+                            .then(subscriber => {
+                              logger.serverLog(TAG, subscriber)
+                            })
+                        }
+                        if (!(event.postback &&
+                          event.postback.title === 'Get Started')) {
+                          console.log('going to kibochat', payload)
+                          callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
+                        }
+                      }
+                    })
+                    .catch(err => {
+                      logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
+                    })
                 } else {
                   if (error) {
                     logger.serverLog(TAG, `ERROR in fetching subscriber info ${JSON.stringify(error)}`)
