@@ -76,8 +76,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                   callApi.callApi(`subscribers/query`, 'post', { _id: page._id, connected: true }, 'accounts')
                     .then(subscriberFound => {
                       console.log('subscriberFound at top', subscriberFound)
-                      subscriberFound = subscriberFound[0]
-                      if (subscriberFound === null) {
+                      if (subscriberFound.length === 0) {
                             // subscriber not found, create subscriber
                         callApi.callApi(`companyprofile/query`, 'post', {companyId: page.companyId}, 'accounts')
                               .then(company => {
@@ -162,7 +161,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                 logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
                               })
                       } else {
-                        if (!subscriber.isSubscribed) {
+                        subscriberFound = subscriberFound[0]
+                        if (!subscriberFound.isSubscribed) {
                           // subscribing the subscriber again in case he
                           // or she unsubscribed and removed chat
                           callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
