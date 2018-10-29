@@ -56,8 +56,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                     lastName: subscriber.last_name,
                     locale: subscriber.locale,
                     gender: subscriber.gender,
-                    userId: page.userId._id,
-                    provider: 'facebook',
                     timezone: subscriber.timezone,
                     profilePic: subscriber.profile_pic,
                     companyId: page.companyId,
