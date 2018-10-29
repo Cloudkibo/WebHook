@@ -71,7 +71,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                   } else if (subscriberSource === 'chat_plugin') {
                     payload.source = 'chat_plugin'
                   }
-                  callApi.callApi(`subscribers/query`, 'post', { _id: page._id, connected: true }, 'accounts')
+                  callApi.callApi(`subscribers/query`, 'post', {senderId: sender, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
                       console.log('subscriberFound at top', subscriberFound)
                       if (subscriberFound.length === 0) {
