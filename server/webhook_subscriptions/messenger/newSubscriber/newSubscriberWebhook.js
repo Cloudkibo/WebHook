@@ -20,7 +20,9 @@ exports.newSubscriberWebhook = (payloadBody) => {
         phoneNumber = event.prior_message.identifier
       }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+      console.log('pageId', pageId)
       .then(pages => {
+        console.log('pages fetched', pages)
         pages.forEach((page) => {
           if (subscriberSource === 'customer_matching') {
             callApi.callApi(`phone/update`, 'put', {query: {number: payloadBody.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
