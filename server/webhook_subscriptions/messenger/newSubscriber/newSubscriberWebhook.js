@@ -75,6 +75,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                   }
                   callApi.callApi(`subscribers/query`, 'post', { _id: page._id, connected: true }, 'accounts')
                     .then(subscriberFound => {
+                      console.log('subscriberFound at top', subscriberFound)
                       subscriberFound = subscriberFound[0]
                       if (subscriberFound === null) {
                             // subscriber not found, create subscriber
@@ -129,6 +130,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                               }
                                               if (!(event.postback &&
                                                 event.postback.title === 'Get Started')) {
+                                                console.log('in subscriberCreated', subscriberCreated)
                                                 callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
                                               }
                                               // require('./../../../config/socketio')
@@ -170,7 +172,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                         }
                         if (!(event.postback &&
                           event.postback.title === 'Get Started')) {
-                          console.log('going to kibochat', payload)
+                          console.log('in subscriberFound', subscriberFound)
                           callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
                         }
                       }
