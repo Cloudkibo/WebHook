@@ -21,7 +21,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
       }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
       .then(pages => {
-        console.log('pages fetched', pages)
         pages.forEach((page) => {
           if (subscriberSource === 'customer_matching') {
             callApi.callApi(`phone/update`, 'put', {query: {number: payloadBody.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
@@ -32,7 +31,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                 logger.serverLog(TAG, `Failed to update phone number ${JSON.stringify(err)}`)
               })
           }
-          console.log('page.userId', JSON.stringify(page.userId))
           needle.get(
             `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
             (err, resp2) => {
@@ -74,7 +72,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                   }
                   callApi.callApi(`subscribers/query`, 'post', {senderId: sender, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
-                      console.log('subscriberFound at top', subscriberFound)
                       if (subscriberFound.length === 0) {
                             // subscriber not found, create subscriber
                         callApi.callApi(`companyprofile/query`, 'post', {_id: page.companyId}, 'accounts')
@@ -128,7 +125,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                               }
                                               if (!(event.postback &&
                                                 event.postback.title === 'Get Started')) {
-                                                console.log('in subscriberCreated', subscriberCreated)
                                                 callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
                                               }
                                               // require('./../../../config/socketio')
@@ -171,7 +167,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                         }
                         if (!(event.postback &&
                           event.postback.title === 'Get Started')) {
-                          console.log('in subscriberFound', subscriberFound)
                           callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
                         }
                       }
