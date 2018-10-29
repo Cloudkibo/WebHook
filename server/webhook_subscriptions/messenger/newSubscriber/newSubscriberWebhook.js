@@ -83,7 +83,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                 callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
                                   .then(planUsage => {
                                     planUsage = planUsage[0]
-                                    callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId})
+                                    callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId}, 'accounts')
                                       .then(companyUsage => {
                                         companyUsage = companyUsage[0]
                                         if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
