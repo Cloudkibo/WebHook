@@ -20,7 +20,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
         phoneNumber = event.prior_message.identifier
       }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
-      console.log('pageId', pageId)
       .then(pages => {
         console.log('pages fetched', pages)
         pages.forEach((page) => {
