@@ -3,14 +3,13 @@ const logger = require('../../../components/logger')
 const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
 
-exports.newSubscriberWebhook = (payload) => {
-  logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payload)}`)
-  callApi.callApi('messengerEvents/subscriber', 'post', payload)
-  if (!payload.entry[0].messaging[0].prior_message && payload.entry[0].messaging[0].message && !payload.entry[0].messaging[0].message.attachments && !payload.entry[0].messaging[0].postback && !payload.entry[0].messaging[0].delivery) {
+exports.newSubscriberWebhook = (payloadBody) => {
+  logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
+  if (!payloadBody.entry[0].messaging[0].prior_message && payloadBody.entry[0].messaging[0].message && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
-    for (let i = 0; i < payload.entry[0].messaging.length; i++) {
-      const event = payload.entry[0].messaging[i]
+    for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
+      const event = payloadBody.entry[0].messaging[i]
       const sender = event.sender.id
       const pageId = event.recipient.id
       if (event.message && event.message.tags && event.message.tags.source === 'customer_chat_plugin') {
@@ -24,7 +23,7 @@ exports.newSubscriberWebhook = (payload) => {
       .then(pages => {
         pages.forEach((page) => {
           if (subscriberSource === 'customer_matching') {
-            callApi.callApi(`phone/update`, 'put', {query: {number: payload.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
+            callApi.callApi(`phone/update`, 'put', {query: {number: payloadBody.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
               .then(phonenumberupdated => {
                 logger.serverLog(TAG, `phone number updated successfully ${JSON.stringify(phonenumberupdated)}`)
               })
@@ -128,7 +127,7 @@ exports.newSubscriberWebhook = (payload) => {
                                           }
                                           if (!(event.postback &&
                                             event.postback.title === 'Get Started')) {
-                                            callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
+                                            callApi.callApi('messengerEvents/sessions', 'post', payloadBody, 'kibochat')
                                           }
                                           // require('./../../../config/socketio')
                                           //   .sendMessageToClient({
@@ -170,7 +169,7 @@ exports.newSubscriberWebhook = (payload) => {
                     if (!(event.postback &&
                       event.postback.title === 'Get Started')) {
                       console.log('going to kibochat', payload)
-                      callApi.callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
+                      callApi.callApi('messengerEvents/sessions', 'post', payloadBody, 'kibochat')
                     }
                   }
                 } else {
