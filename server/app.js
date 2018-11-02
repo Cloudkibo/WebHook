@@ -19,7 +19,7 @@ const appObj = (config.env === 'production' || config.env === 'staging') ? app :
 require('./config/express')(appObj)
 require('./config/setup')(app, httpApp, config)
 // require('./config/integrations/pubsubhubbub')()
-//  require('./webhook_subscriptions/twitter/twitter.controller').connect()
+require('./webhook_subscriptions/twitter/twitter.controller').connect()
 
 require('./webhook_subscriptions/messenger/registerWebhooks').registeryInit()
 require('./webhook_subscriptions/twitter/registerWebhooks').registeryInit()
