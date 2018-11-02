@@ -52,7 +52,7 @@ const all = {
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
     consumer_token: process.env.TWITTER_TOKEN || 'f83b0cd6ccb20142185616dsf54dsf4',
     consumer_token_secret: process.env.TWITTER_TOKEN_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
-    callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/twitter`
+    callbackUrl: 'https://swebhooks.cloudkibo.com/api/twitter'
   },
 
   API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api/' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api/' : 'http://localhost:3000/api/',
