@@ -63,7 +63,7 @@ let stream
 
 function connect () {
   logger.serverLog(TAG, `connect functio called`)
-  callApi.callApi('twitterEvents/findAutoposting').then((response) => {
+  callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
     let autoposting = response
     if (autoposting.length > 0) {
       let arrUsers = []
