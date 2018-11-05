@@ -5,6 +5,7 @@ const needle = require('needle')
 
 exports.newSubscriberWebhook = (payloadBody) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
+  callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
   if (!payloadBody.entry[0].messaging[0].prior_message && payloadBody.entry[0].messaging[0].message && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
