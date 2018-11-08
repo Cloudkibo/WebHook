@@ -82,7 +82,9 @@ function connect () {
         }
         webhookHandler(tweet)
       })
-      stream.on('error', console.error)
+      stream.on('error', error => {
+        logger.serverLog('Stream Error', error)
+      })
     }
   })
   .catch(error => {
