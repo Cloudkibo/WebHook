@@ -30,7 +30,7 @@ function initRegistry () {
   init.registerCallback(seenValidation.seenSchema, (payload) => { seenWebhook.seenWebhook(payload) })
   init.registerCallback(deliveryValidation.deliverySchema, (payload) => { deliveryWebhook.deliveryWebhook(payload) })
   init.registerCallback(commentValidation.commentSchema, (payload) => { commentWebhook.commentWebhook(payload) })
-  init.registerCallback(customerMatchingValidation.customerMatchingSchema, (payload) => { customerMatchingWebhook.customerMatchingWebhook(payload) })
+  // init.registerCallback(customerMatchingValidation.customerMatchingSchema, (payload) => { customerMatchingWebhook.customerMatchingWebhook(payload) })
   init.registerCallback(pollResponseValidation.pollResponseSchema, (payload) => { pollResponseWebhook.pollResponseWebhook(payload) })
   init.registerCallback(getStartedValidation.getStartedSchema, (payload) => { getStartedWebhook.getStartedWebhook(payload) })
   init.registerCallback(newSubscriberValidation.newSubscriberSchema, (payload) => { newSubscriberWebhook.newSubscriberWebhook(payload) })
