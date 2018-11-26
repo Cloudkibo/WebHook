@@ -13,7 +13,7 @@ const shopifyValidation = require('./shopifyAndAdmin/shopifyAndAdminSchema')
 const changePageNameValidation = require('./changePageName/changePageNameSchema')
 
 const commentWebhook = require('./comment/commentWebhook')
-const customerMatchingWebhook = require('./customerMatching/customerMatchingWebhook')
+// const customerMatchingWebhook = require('./customerMatching/customerMatchingWebhook')
 const pollResponseWebhook = require('./pollResponse/pollResponseWebhook')
 const getStartedWebhook = require('./getStarted/getStartedWebhook')
 const newSubscriberWebhook = require('./newSubscriber/newSubscriberWebhook')
