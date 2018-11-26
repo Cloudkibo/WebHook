@@ -27,7 +27,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
       .then(pages => {
         pages.forEach((page) => {
           if (subscriberSource === 'customer_matching') {
-            callApi.callApi(`phone/update`, 'put', {query: {number: payloadBody.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
+            callApi.callApi(`phone/update`, 'post', {query: {number: payloadBody.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
               .then(phonenumberupdated => {
                 logger.serverLog(TAG, `phone number updated successfully ${JSON.stringify(phonenumberupdated)}`)
               })
