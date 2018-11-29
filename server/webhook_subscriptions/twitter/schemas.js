@@ -7,7 +7,7 @@ exports.simpleTweet = {
   'type': 'object',
   'properties': {
     'id': {
-      'type': 'integer'
+      'type': 'string'
     },
     'text': {
       'type': 'string'
