@@ -3,6 +3,12 @@ const logger = require('../../../components/logger')
 const callApi = require('../../../utility/api.caller.service')
 
 exports.getStartedWebhook = (payload) => {
+  if (payload.entry[0].messaging[0].postback.referral) {
+    // This will send postback referal for messenger code
+    logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`)
+    callApi.callApi('messenger_code/webhook', 'post', payload.entry[0].messaging[0], 'accounts')
+  }
+
   if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>') {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
