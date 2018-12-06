@@ -63,8 +63,9 @@ let stream
 
 function connect () {
   logger.serverLog(TAG, `connect functio called`)
-  callApi.callApi('twitterEvents/findAutoposting', 'get').then((response) => {
-    let autoposting = response.payload
+  callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
+    console.log('Autoposting Response', response)
+    let autoposting = response
     if (autoposting.length > 0) {
       let arrUsers = []
       for (let i = 0; i < autoposting.length; i++) {
@@ -75,13 +76,19 @@ function connect () {
         {follow: arrUsers})
 
       stream.on('tweet', tweet => {
+        logger.serverLog(TAG, `received new tweet`)
         if (tweet.in_reply_to_status_id !== null || tweet.in_reply_to_user_id !== null || tweet.in_reply_to_screen_name !== null) {
           return
         }
-        logger.serverLog(TAG, `received new tweet`)
         webhookHandler(tweet)
       })
+      stream.on('error', error => {
+        logger.serverLog('Stream Error', error)
+      })
     }
+  })
+  .catch(error => {
+    logger.serverLog(TAG, `Error in fetching autoposting ${error}`)
   })
 }
 

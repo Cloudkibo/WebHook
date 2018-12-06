@@ -48,14 +48,20 @@ const all = {
   },
 
   twitter: {
-    consumer_key: process.env.TWITTER_CONSUMER_KEY || 'f83b0cd6ccb20142185616dsf54dsf4',
-    consumer_secret: process.env.TWITTER_CONSUMER_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
-    consumer_token: process.env.TWITTER_TOKEN || 'f83b0cd6ccb20142185616dsf54dsf4',
-    consumer_token_secret: process.env.TWITTER_TOKEN_SECRET || 'f83b0cd6ccb20142185616dsf54dsf4',
-    callbackUrl: `${process.env.DOMAIN || 'https://staging.kibopush.com'}/api/autoposting/twitter`
+    consumer_key: process.env.TWITTER_CONSUMER_KEY || '593k5gKrh5iJZ9Yfj7DwMhD6P',
+    consumer_secret: process.env.TWITTER_CONSUMER_SECRET || 'FiAaaa3z6ZPSQd1A954UaErHYkk0h51LoYNJpYCd9JQH5UEPjG',
+    consumer_token: process.env.TWITTER_TOKEN || '1059331127113080832-7BRFuE18tyLXmdUZORbW2z3Xu1SC6S',
+    consumer_token_secret: process.env.TWITTER_TOKEN_SECRET || 'HvdJuX3jZ4bWIURLJvNNETvY8AVvmSwtFE8hn6251XUp3',
+    callbackUrl: 'https://swebhooks.cloudkibo.com/api/twitter'
   },
 
-  API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api' : 'http://localhost:3000/api'
+  API_URL: process.env.NODE_ENV === 'production' ? 'https://app.kibopush.com/api/' : process.env.NODE_ENV === 'staging' ? 'https://staging.kibopush.com/api/' : 'http://localhost:3000/api/',
+
+  ACCOUNTS_URL: process.env.NODE_ENV === 'production' ? 'https://accounts.cloudkibo.com/api/v1/' : process.env.NODE_ENV === 'staging' ? 'https://saccounts.cloudkibo.com/api/v1/' : 'http://localhost:3000/api/v1/',
+
+  CHAT_URL: process.env.NODE_ENV === 'production' ? 'https://kibochat.cloudkibo.com/api/' : process.env.NODE_ENV === 'staging' ? 'https://skibochat.cloudkibo.com/api/' : 'http://localhost:3000/api/',
+
+  ENGAGE_URL: process.env.NODE_ENV === 'production' ? 'https://kiboengage.cloudkibo.com/api/' : process.env.NODE_ENV === 'staging' ? 'https://skiboengage.cloudkibo.com/api/' : 'http://localhost:3000/api/'
 }
 
 module.exports = _.merge(

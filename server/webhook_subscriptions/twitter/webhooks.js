@@ -4,7 +4,7 @@ const callApi = require('../../utility/api.caller.service')
 
 exports.simpleTweet = (payload) => {
   logger.serverLog(TAG, `in simpleTweet`)
-  callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload)
+  callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload, 'kiboengage')
     .then((response) => {
       logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
     })
@@ -17,7 +17,7 @@ exports.mediaTweet = (payload) => {
   logger.serverLog(TAG, `in mediaTweet Webhook`)
   callApi.callApi('twitterEvents/twitterAutopostingMedia', 'post', payload)
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'kiboengage')
       })
     .catch((err) => {
       logger.serverLog(TAG, `error from KiboPush: ${err}`)

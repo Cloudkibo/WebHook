@@ -5,7 +5,7 @@ const callApi = require('../../../utility/api.caller.service')
 exports.chatPluginWebhook = (payload) => {
   logger.serverLog(TAG,
     `in chatPluginWebhook ${JSON.stringify(payload)}`)
-  callApi.callApi('messengerEvents/subscriber', 'post', payload)
+  callApi.callApi('messengerEvents/subscriber', 'post', payload, 'accounts')
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
         })
