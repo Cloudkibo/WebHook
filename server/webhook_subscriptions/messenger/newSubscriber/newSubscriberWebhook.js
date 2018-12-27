@@ -4,6 +4,7 @@ const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
 
 exports.newSubscriberWebhook = (payloadBody) => {
+  console.log('in newSubscriberWebhook:', JSON.stringify(payloadBody))
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
   if (!payloadBody.entry[0].messaging[0].delivery) {
     // PLEASE DON'T REMOVE THIS LINE:
