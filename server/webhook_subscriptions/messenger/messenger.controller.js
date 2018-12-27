@@ -15,6 +15,7 @@ exports.verifyHook = function (req, res) {
 
 exports.webhook = function (req, res) {
   logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
+  console.log('something received from facebook', JSON.stringify(req.body))
   try {
     let webhookCalled = webhookHandler(req.body)
 
