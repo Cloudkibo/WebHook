@@ -4,7 +4,6 @@ const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
 
 exports.newSubscriberWebhook = (payloadBody) => {
-  console.log('in newSubscriberWebhook:', JSON.stringify(payloadBody))
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
   if (!payloadBody.entry[0].messaging[0].delivery) {
     // PLEASE DON'T REMOVE THIS LINE:
@@ -24,6 +23,9 @@ exports.newSubscriberWebhook = (payloadBody) => {
         subscriberSource = 'customer_matching'
         phoneNumber = event.prior_message.identifier
       }
+      if (event.referral) {
+        subscriberSource = 'messaging_referrals'
+      }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
       .then(pages => {
         pages.forEach((page) => {
@@ -35,6 +37,23 @@ exports.newSubscriberWebhook = (payloadBody) => {
               .catch(err => {
                 logger.serverLog(TAG, `Failed to update phone number ${JSON.stringify(err)}`)
               })
+          }
+          if (subscriberSource === 'messaging_referrals') {
+            console.log('in messaging_referralss')
+            callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kiboengage')
+            .then((response) => {
+              logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+            })
+            .catch((err) => {
+              logger.serverLog(TAG, `error from KiboPush: ${err}`)
+            })
+            callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kibochat')
+            .then((response) => {
+              logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+            })
+            .catch((err) => {
+              logger.serverLog(TAG, `error from KiboPush: ${err}`)
+            })
           }
           needle.get(
             `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
@@ -74,6 +93,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
                     payload.source = 'customer_matching'
                   } else if (subscriberSource === 'chat_plugin') {
                     payload.source = 'chat_plugin'
+                  } else if (subscriberSource === 'messaging_referrals') {
+                    payload.source = `https://m.me/${page._id}?ref=${event.referral.ref}`
                   }
                   callApi.callApi(`subscribers/query`, 'post', {senderId: sender, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
@@ -172,6 +193,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                         }
                         if (!(event.postback &&
                           event.postback.title === 'Get Started')) {
+                          console.log('in getstarted')
                           callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
                         }
                       }
