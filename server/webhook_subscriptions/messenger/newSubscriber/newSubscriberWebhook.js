@@ -38,23 +38,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                 logger.serverLog(TAG, `Failed to update phone number ${JSON.stringify(err)}`)
               })
           }
-          if (subscriberSource === 'messaging_referrals') {
-            console.log('in messaging_referralss')
-            callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kiboengage')
-            .then((response) => {
-              logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
-            })
-            .catch((err) => {
-              logger.serverLog(TAG, `error from KiboPush: ${err}`)
-            })
-            callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kibochat')
-            .then((response) => {
-              logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
-            })
-            .catch((err) => {
-              logger.serverLog(TAG, `error from KiboPush: ${err}`)
-            })
-          }
           needle.get(
             `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
             (err, resp2) => {
@@ -149,6 +132,23 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                               if (subscriberSource === 'customer_matching') {
                                                 updateList(phoneNumber, sender, page)
                                               }
+                                              if (subscriberSource === 'messaging_referrals') {
+                                                console.log('in messaging_referralss')
+                                                callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kiboengage')
+                                                .then((response) => {
+                                                  logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                                                })
+                                                .catch((err) => {
+                                                  logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                                })
+                                                callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kibochat')
+                                                .then((response) => {
+                                                  logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                                                })
+                                                .catch((err) => {
+                                                  logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                                })
+                                              }
                                               if (!(event.postback &&
                                                 event.postback.title === 'Get Started')) {
                                                 callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
@@ -183,6 +183,23 @@ exports.newSubscriberWebhook = (payloadBody) => {
                               })
                       } else {
                         subscriberFound = subscriberFound[0]
+                        if (subscriberSource === 'messaging_referrals') {
+                          console.log('in messaging_referralss')
+                          callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kiboengage')
+                          .then((response) => {
+                            logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                          })
+                          .catch((err) => {
+                            logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                          })
+                          callApi.callApi('messengerEvents/messagingReferrals', 'post', payloadBody, 'kibochat')
+                          .then((response) => {
+                            logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                          })
+                          .catch((err) => {
+                            logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                          })
+                        }
                         if (!subscriberFound.isSubscribed) {
                           // subscribing the subscriber again in case he
                           // or she unsubscribed and removed chat
