@@ -24,6 +24,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
         phoneNumber = event.prior_message.identifier
       }
       if (event.referral) {
+        console.log('event.referral', event.referral)
         subscriberSource = 'messaging_referrals'
       }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
