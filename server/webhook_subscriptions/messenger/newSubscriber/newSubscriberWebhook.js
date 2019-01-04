@@ -9,9 +9,10 @@ exports.newSubscriberWebhook = (payloadBody) => {
     // PLEASE DON'T REMOVE THIS LINE:
     callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
   }
-  if (payloadBody.entry[0].messaging[0].message && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) {
+  if ((payloadBody.entry[0].messaging[0].message || payloadBody.entry[0].messaging[0].message.referral) && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
+    console.log('inside')
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
       const event = payloadBody.entry[0].messaging[i]
       const sender = event.sender.id
