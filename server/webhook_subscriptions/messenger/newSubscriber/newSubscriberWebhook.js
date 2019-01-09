@@ -119,6 +119,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                               })
                                             callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
                                               .then(webhook => {
+                                                webhook = webhook[0]
                                                 if (webhook && webhook.isEnabled) {
                                                   needle.get(webhook.webhook_url, (err, r) => {
                                                     if (err) {
