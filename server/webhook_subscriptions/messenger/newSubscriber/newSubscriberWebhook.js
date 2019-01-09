@@ -12,7 +12,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
   if ((payloadBody.entry[0].messaging[0].message && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) || payloadBody.entry[0].messaging[0].referral) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
-    console.log('inside')
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
       const event = payloadBody.entry[0].messaging[i]
       const sender = event.sender.id
@@ -27,6 +26,9 @@ exports.newSubscriberWebhook = (payloadBody) => {
       if (event.referral) {
         console.log('event.referral', event.referral)
         subscriberSource = 'messaging_referrals'
+      }
+      if (event.optin) {
+        subscriberSource = 'landing_page'
       }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
       .then(pages => {
@@ -158,6 +160,26 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                                   logger.serverLog(TAG, `error from KiboPush: ${err}`)
                                                 })
                                               }
+                                              if (subscriberSource === 'landing_page') {
+                                                callApi.callApi('messengerEvents/landingPage', 'post', {
+                                                  pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                                                  senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kiboengage')
+                                                .then((response) => {
+                                                  logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                                                })
+                                                .catch((err) => {
+                                                  logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                                })
+                                                callApi.callApi('messengerEvents/landingPage', 'post', {
+                                                  pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                                                  senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kibochat')
+                                                .then((response) => {
+                                                  logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                                                })
+                                                .catch((err) => {
+                                                  logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                                })
+                                              }
                                               if (!(event.postback &&
                                                 event.postback.title === 'Get Started')) {
                                                 callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
@@ -230,6 +252,26 @@ exports.newSubscriberWebhook = (payloadBody) => {
                             pageId: payloadBody.entry[0].messaging[i].recipient.id,
                             senderId: payloadBody.entry[0].messaging[i].sender.id,
                             referral: payloadBody.entry[0].messaging[i].referral }, 'kibochat')
+                          .then((response) => {
+                            logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                          })
+                          .catch((err) => {
+                            logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                          })
+                        }
+                        if (subscriberSource === 'landing_page') {
+                          callApi.callApi('messengerEvents/landingPage', 'post', {
+                            pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                            senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kiboengage')
+                          .then((response) => {
+                            logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                          })
+                          .catch((err) => {
+                            logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                          })
+                          callApi.callApi('messengerEvents/landingPage', 'post', {
+                            pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                            senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kibochat')
                           .then((response) => {
                             logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
                           })
