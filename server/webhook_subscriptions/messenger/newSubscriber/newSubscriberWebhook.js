@@ -53,7 +53,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
               logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
               let pageAccessToken = resp2.body.access_token
               const options = {
-                url: `https://graph.facebook.com/v2.6/${sender}?access_token=${pageAccessToken}`,
+                url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
                 qs: { access_token: page.accessToken },
                 method: 'GET'
 
