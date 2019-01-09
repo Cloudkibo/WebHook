@@ -10,10 +10,9 @@ exports.newSubscriberWebhook = (payloadBody) => {
     // PLEASE DON'T REMOVE THIS LINE:
     callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
   }
-  if ((payloadBody.entry[0].messaging[0].message && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) || payloadBody.entry[0].messaging[0].referral) {
+  if ((payloadBody.entry[0].messaging[0].message && !payloadBody.entry[0].messaging[0].message.attachments && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) || payloadBody.entry[0].messaging[0].referral || payloadBody.entry[0].messaging[0].optin) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
-    console.log('inside')
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
       const event = payloadBody.entry[0].messaging[i]
       const sender = event.sender.id
@@ -29,10 +28,14 @@ exports.newSubscriberWebhook = (payloadBody) => {
         console.log('event.referral', event.referral)
         subscriberSource = 'messaging_referrals'
       }
+      if (event.optin) {
+        subscriberSource = 'landing_page'
+      }
       callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
       .then(pages => {
         console.log('pages.length', pages.length)
         pages.forEach((page) => {
+          console.log('pages.length', page)
           if (subscriberSource === 'customer_matching') {
             callApi.callApi(`phone/update`, 'post', {query: {number: payloadBody.entry[0].messaging[0].prior_message.identifier, pageId: page._id, companyId: page.companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
               .then(phonenumberupdated => {
@@ -51,7 +54,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
               logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
               let pageAccessToken = resp2.body.access_token
               const options = {
-                url: `https://graph.facebook.com/v2.6/${sender}?access_token=${pageAccessToken}`,
+                url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
                 qs: { access_token: page.accessToken },
                 method: 'GET'
 
@@ -75,6 +78,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                     pageId: page._id,
                     isSubscribed: true
                   }
+                  console.log('payload to send', payload)
                   if (subscriberSource === 'customer_matching') {
                     payload.phoneNumber = phoneNumber
                     payload.source = 'customer_matching'
@@ -82,68 +86,121 @@ exports.newSubscriberWebhook = (payloadBody) => {
                     payload.source = 'chat_plugin'
                   } else if (subscriberSource === 'messaging_referrals') {
                     payload.source = `https://m.me/${page._id}?ref=${event.referral.ref}`
+                  } else if (subscriberSource === 'landing_page') {
+                    payload.source = 'landing_page'
                   }
                   callApi.callApi(`subscribers/query`, 'post', {senderId: sender, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
+                      console.log('fetched subscriber', subscriberFound)
                       if (subscriberFound.length === 0) {
                             // subscriber not found, create subscriber
                         callApi.callApi(`companyprofile/query`, 'post', {_id: page.companyId}, 'accounts')
                               .then(company => {
+                                console.log('fetched company')
                                 callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
                                   .then(planUsage => {
+                                    console.log('fetched plan')
                                     planUsage = planUsage[0]
                                     callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId}, 'accounts')
                                       .then(companyUsage => {
+                                        console.log('fetched companyUsage')
                                         companyUsage = companyUsage[0]
-                                        if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
+                                        // if (planUsage.subscribers !== -1 && companyUsage.subscribers >= planUsage.subscribers) {
                                           // webhookUtility.limitReachedNotification('subscribers', company)
-                                        } else {
-                                          callApi.callApi(`subscribers`, 'post', payload, 'accounts')
-                                            .then(subscriberCreated => {
-                                              callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
-                                                .then(updated => {
-                                                  logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
-                                                })
-                                                .catch(err => {
-                                                  logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
-                                                })
-                                              callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
-                                                .then(webhook => {
-                                                  if (webhook && webhook.isEnabled) {
-                                                    needle.get(webhook.webhook_url, (err, r) => {
-                                                      if (err) {
-                                                        logger.serverLog(TAG, err)
-                                                      } else if (r.statusCode === 200) {
-                                                        if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-                                                          var data = {
-                                                            subscription_type: 'NEW_SUBSCRIBER',
-                                                            payload: JSON.stringify({ subscriber: subscriber, recipient: pageId, sender: sender })
-                                                          }
-                                                          needle.post(webhook.webhook_url, data,
-                                                            (error, response) => {
-                                                              if (error) logger.serverLog(TAG, err)
-                                                            })
+                                        // } else {
+                                        callApi.callApi(`subscribers`, 'post', payload, 'accounts')
+                                          .then(subscriberCreated => {
+                                            console.log('subscriberCreated')
+                                            callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
+                                              .then(updated => {
+                                                logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
+                                              })
+                                              .catch(err => {
+                                                logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
+                                              })
+                                            callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
+                                              .then(webhook => {
+                                                webhook = webhook[0]
+                                                if (webhook && webhook.isEnabled) {
+                                                  needle.get(webhook.webhook_url, (err, r) => {
+                                                    if (err) {
+                                                      logger.serverLog(TAG, err)
+                                                    } else if (r.statusCode === 200) {
+                                                      if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
+                                                        var data = {
+                                                          subscription_type: 'NEW_SUBSCRIBER',
+                                                          payload: JSON.stringify({ subscriber: subscriber, recipient: pageId, sender: sender })
                                                         }
-                                                      } else {
-                                                        // webhookUtility.saveNotification(webhook)
+                                                        needle.post(webhook.webhook_url, data,
+                                                          (error, response) => {
+                                                            if (error) logger.serverLog(TAG, err)
+                                                          })
                                                       }
-                                                    })
-                                                  }
-                                                })
-                                                .catch(err => {
-                                                  logger.serverLog(TAG, err)
-                                                })
-                                              if (subscriberSource === 'customer_matching') {
-                                                updateList(phoneNumber, sender, page)
-                                              }
-                                              if (subscriberSource === 'messaging_referrals') {
-                                                console.log('in messaging_referralss')
+                                                    } else {
+                                                      // webhookUtility.saveNotification(webhook)
+                                                    }
+                                                  })
+                                                }
+                                              })
+                                              .catch(err => {
+                                                logger.serverLog(TAG, err)
+                                              })
+                                            if (subscriberSource === 'customer_matching') {
+                                              updateList(phoneNumber, sender, page)
+                                            }
+                                            if (subscriberSource === 'messaging_referrals') {
+                                              console.log('in messaging_referralss')
+                                              callApi.callApi('messengerEvents/messagingReferrals', 'post', {
+                                                pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                                                senderId: payloadBody.entry[0].messaging[i].sender.id,
+                                                referral: payloadBody.entry[0].messaging[i].referral }, 'kiboengage')
+                                              .then((response) => {
+                                                logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                                              })
+                                              .catch((err) => {
+                                                logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                              })
+                                              callApi.callApi('messengerEvents/messagingReferrals', 'post', {
+                                                pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                                                senderId: payloadBody.entry[0].messaging[i].sender.id,
+                                                referral: payloadBody.entry[0].messaging[i].referral }, 'kibochat')
+                                              .then((response) => {
+                                                logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                                              })
+                                              .catch((err) => {
+                                                logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                              })
+                                            }
+                                            if (subscriberSource === 'landing_page') {
+                                              callApi.callApi('messengerEvents/landingPage', 'post', {
+                                                pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                                                senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kiboengage')
+                                              .then((response) => {
+                                                logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                                              })
+                                              .catch((err) => {
+                                                logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                              })
+                                              callApi.callApi('messengerEvents/landingPage', 'post', {
+                                                pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                                                senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kibochat')
+                                              .then((response) => {
+                                                logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                                              })
+                                              .catch((err) => {
+                                                logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                                              })
+                                            }
+                                            if (!(event.postback &&
+                                              event.postback.title === 'Get Started')) {
+                                              callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
+                                              if (event.postback.referral) {
                                                 callApi.callApi('messengerEvents/messagingReferrals', 'post', {
                                                   pageId: payloadBody.entry[0].messaging[i].recipient.id,
                                                   senderId: payloadBody.entry[0].messaging[i].sender.id,
-                                                  referral: payloadBody.entry[0].messaging[i].referral }, 'kiboengage')
+                                                  referral: event.postback.referral }, 'kiboengage')
                                                 .then((response) => {
-                                                  logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                                                  logger.serverLog(TAG, `response recieved from Kiboengage: ${response}`)
                                                 })
                                                 .catch((err) => {
                                                   logger.serverLog(TAG, `error from KiboPush: ${err}`)
@@ -151,7 +208,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                                 callApi.callApi('messengerEvents/messagingReferrals', 'post', {
                                                   pageId: payloadBody.entry[0].messaging[i].recipient.id,
                                                   senderId: payloadBody.entry[0].messaging[i].sender.id,
-                                                  referral: payloadBody.entry[0].messaging[i].referral }, 'kibochat')
+                                                  referral: event.postback.referral }, 'kibochat')
                                                 .then((response) => {
                                                   logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
                                                 })
@@ -159,48 +216,23 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                                   logger.serverLog(TAG, `error from KiboPush: ${err}`)
                                                 })
                                               }
-                                              if (!(event.postback &&
-                                                event.postback.title === 'Get Started')) {
-                                                callApi.callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
-                                                if (event.postback.referral) {
-                                                  callApi.callApi('messengerEvents/messagingReferrals', 'post', {
-                                                    pageId: payloadBody.entry[0].messaging[i].recipient.id,
-                                                    senderId: payloadBody.entry[0].messaging[i].sender.id,
-                                                    referral: event.postback.referral }, 'kiboengage')
-                                                  .then((response) => {
-                                                    logger.serverLog(TAG, `response recieved from Kiboengage: ${response}`)
-                                                  })
-                                                  .catch((err) => {
-                                                    logger.serverLog(TAG, `error from KiboPush: ${err}`)
-                                                  })
-                                                  callApi.callApi('messengerEvents/messagingReferrals', 'post', {
-                                                    pageId: payloadBody.entry[0].messaging[i].recipient.id,
-                                                    senderId: payloadBody.entry[0].messaging[i].sender.id,
-                                                    referral: event.postback.referral }, 'kibochat')
-                                                  .then((response) => {
-                                                    logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
-                                                  })
-                                                  .catch((err) => {
-                                                    logger.serverLog(TAG, `error from KiboPush: ${err}`)
-                                                  })
-                                                }
-                                              }
-                                              // require('./../../../config/socketio')
-                                              //   .sendMessageToClient({
-                                              //     room_id: page.companyId,
-                                              //     body: {
-                                              //       action: 'dashboard_updated',
-                                              //       payload: {
-                                              //         subscriber_id: subscriberCreated._id,
-                                              //         company_id: page.companyId
-                                              //       }
-                                              //     }
-                                              //   })
-                                            })
-                                            .catch(err => {
-                                              logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
-                                            })
-                                        }
+                                            }
+                                            // require('./../../../config/socketio')
+                                            //   .sendMessageToClient({
+                                            //     room_id: page.companyId,
+                                            //     body: {
+                                            //       action: 'dashboard_updated',
+                                            //       payload: {
+                                            //         subscriber_id: subscriberCreated._id,
+                                            //         company_id: page.companyId
+                                            //       }
+                                            //     }
+                                            //   })
+                                          })
+                                          .catch(err => {
+                                            logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
+                                          })
+                                        // }
                                       })
                                       .catch(err => {
                                         logger.serverLog(TAG, `Failed to fetch company usage ${JSON.stringify(err)}`)
@@ -231,6 +263,26 @@ exports.newSubscriberWebhook = (payloadBody) => {
                             pageId: payloadBody.entry[0].messaging[i].recipient.id,
                             senderId: payloadBody.entry[0].messaging[i].sender.id,
                             referral: payloadBody.entry[0].messaging[i].referral }, 'kibochat')
+                          .then((response) => {
+                            logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
+                          })
+                          .catch((err) => {
+                            logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                          })
+                        }
+                        if (subscriberSource === 'landing_page') {
+                          callApi.callApi('messengerEvents/landingPage', 'post', {
+                            pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                            senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kiboengage')
+                          .then((response) => {
+                            logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
+                          })
+                          .catch((err) => {
+                            logger.serverLog(TAG, `error from KiboPush: ${err}`)
+                          })
+                          callApi.callApi('messengerEvents/landingPage', 'post', {
+                            pageId: payloadBody.entry[0].messaging[i].recipient.id,
+                            senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kibochat')
                           .then((response) => {
                             logger.serverLog(TAG, `response recieved from KiboChat: ${response}`)
                           })
