@@ -19,7 +19,9 @@ exports.getStartedWebhook = (payload) => {
     console.log(`Response ${JSON.stringify(payload)}`)
     let resp = ''
     if (isJsonString(payload.entry[0].messaging[0].postback.payload)) {
+      console.log(`isJsonString`)
       resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
+      console.log(`Response ${JSON.stringify(resp)}`)
     } else {
       resp = payload.entry[0].messaging[0].postback.payload
     }
