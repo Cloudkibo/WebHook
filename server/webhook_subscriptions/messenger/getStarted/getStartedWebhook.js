@@ -6,7 +6,7 @@ const request = require('request')
 const needle = require('needle')
 
 exports.getStartedWebhook = (payload) => {
-  console.log(`in getStartedWebhook ${JSON.stringify(payload)}`)
+  logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
   if (payload.entry[0].messaging[0].postback.referral) {
     // This will send postback referal for messenger code
     logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`)
@@ -16,18 +16,18 @@ exports.getStartedWebhook = (payload) => {
   if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>') {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
-    console.log(`Response ${JSON.stringify(payload)}`)
     let resp = ''
     if (isJsonString(payload.entry[0].messaging[0].postback.payload)) {
-      console.log(`isJsonString`)
       resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
-      console.log(`Response ${JSON.stringify(resp)}`)
     } else {
       resp = payload.entry[0].messaging[0].postback.payload
     }
+    logger.serverLog(TAG,
+      `Payload Response ${JSON.stringify(resp)}`)
     var jsonAdPayload = resp.split('-')
-    console.log(`jsonAdPayload ${JSON.stringify(jsonAdPayload)}`)
     if (resp.survey_id) {
+      logger.serverLog(TAG,
+        `in surveyResponseWebhook ${JSON.stringify(payload)}`)
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
     } else if (resp.unsubscribe) {
       handleUnsubscribe(resp, payload.entry[0].messaging[0])
@@ -39,7 +39,6 @@ exports.getStartedWebhook = (payload) => {
       var jsonMessageId = jsonAdPayload[1]
       callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
         .then((response) => {
-          console.log(`in Ad response ${JSON.stringify(response)}`)
           sendResponseMessage(payload, response)
         })
         .catch(err => {
@@ -158,15 +157,12 @@ function sendResponseMessage (payload, response) {
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(page => {
       page = page[0]
-      console.log('page Found', page)
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
-          console.log('page._id', page._id)
           if (response.messageContent) {
             for (let i = 0; i < response.messageContent.length; i++) {
               let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, response.messageContent[i], subscriber.firstName, subscriber.lastName, true)
-              console.log('messageData', messageData)
               request(
                 {
                   'method': 'POST',
