@@ -21,10 +21,10 @@ exports.getStartedWebhook = (payload) => {
       resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
     } else {
       resp = payload.entry[0].messaging[0].postback.payload
+      var jsonAdPayload = resp.split('-')
     }
     logger.serverLog(TAG,
       `Payload Response ${JSON.stringify(resp)}`)
-    var jsonAdPayload = resp.split('-')
     if (resp.survey_id) {
       logger.serverLog(TAG,
         `in surveyResponseWebhook ${JSON.stringify(payload)}`)
