@@ -17,7 +17,12 @@ exports.getStartedWebhook = (payload) => {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
     console.log(`Response ${JSON.stringify(payload)}`)
-    let resp = payload.entry[0].messaging[0].postback.payload
+    let resp = ''
+    if (isJsonString(payload.entry[0].messaging[0].postback.payload)) {
+      resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
+    } else {
+      resp = payload.entry[0].messaging[0].postback.payload
+    }
     var jsonAdPayload = resp.split('-')
     console.log(`jsonAdPayload ${JSON.stringify(jsonAdPayload)}`)
     if (resp.survey_id) {
@@ -190,4 +195,12 @@ function sendResponseMessage (payload, response) {
     .catch(err => {
       logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
     })
+}
+function isJsonString (str) {
+  try {
+    JSON.parse(str)
+  } catch (e) {
+    return false
+  }
+  return true
 }
