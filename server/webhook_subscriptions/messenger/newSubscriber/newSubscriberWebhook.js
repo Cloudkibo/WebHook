@@ -112,6 +112,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                         callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                           .then(subscriberCreated => {
                                             console.log('subscriberCreated')
+                                            callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId}, 'kiboengage')
                                             callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                               .then(updated => {
                                                 logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
