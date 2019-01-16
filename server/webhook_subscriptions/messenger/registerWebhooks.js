@@ -32,7 +32,7 @@ const jsonAdWebhook = require('./jsonAd/jsonAdWebhook')
 function initRegistry () {
   // init.registerCallback(validationSchema.testSchema, (payload) => { console.log('Sample Webhook Called') })
   init.registerCallback(messengerCodeSchema.CodeSchema, (payload) => { messengerCodeWebhook.getStartedWebhook(payload) })
-  init.registerCallback(jsonAdSchema.CodeSchema, (payload) => { jsonAdWebhook.getStartedWebhook(payload) })
+  init.registerCallback(jsonAdSchema.jsonAdSchema, (payload) => { jsonAdWebhook.getStartedWebhook(payload) })
   init.registerCallback(seenValidation.seenSchema, (payload) => { seenWebhook.seenWebhook(payload) })
   init.registerCallback(deliveryValidation.deliverySchema, (payload) => { deliveryWebhook.deliveryWebhook(payload) })
   init.registerCallback(commentValidation.commentSchema, (payload) => { commentWebhook.commentWebhook(payload) })

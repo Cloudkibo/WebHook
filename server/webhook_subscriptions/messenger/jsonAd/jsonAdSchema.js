@@ -1,52 +1,77 @@
-exports.CodeSchema = {
-  '$schema': 'http://json-schema.org/draft-04/schema#',
+exports.jsonAdSchema = {
   'type': 'object',
   'properties': {
-    'sender': {
-      'type': 'object',
-      'properties': {
-        'id': {
-          'type': 'string'
-        }
-      },
-      'required': [
-        'id'
-      ]
+    'object': {
+      'type': 'string'
     },
-    'recipient': {
-      'type': 'object',
-      'properties': {
-        'id': {
-          'type': 'string'
+    'entry': {
+      'type': 'array',
+      'items': [
+        {
+          'type': 'object',
+          'properties': {
+            'messaging': {
+              'type': 'array',
+              'items': [
+                {
+                  'type': 'object',
+                  'properties': {
+                    'recipient': {
+                      'type': 'object',
+                      'properties': {
+                        'id': {
+                          'type': 'string'
+                        }
+                      },
+                      'required': [
+                        'id'
+                      ]
+                    },
+                    'sender': {
+                      'type': 'object',
+                      'properties': {
+                        'id': {
+                          'type': 'string'
+                        }
+                      },
+                      'required': [
+                        'id'
+                      ]
+                    },
+                    'postback': {
+                      'type': 'object',
+                      'properties': {
+                        'payload': {
+                          'type': 'string'
+                        },
+                        'title': {
+                          'type': 'string'
+                        }
+                      },
+                      'required': [
+                        'payload',
+                        'title'
+                      ]
+                    }
+                  },
+                  'required': [
+                    'recipient',
+                    'sender',
+                    'postback'
+                  ]
+                }
+              ]
+            }
+          },
+          'required': [
+            'messaging'
+          ]
         }
-      },
-      'required': [
-        'id'
-      ]
-    },
-    'timestamp': {
-      'type': 'integer'
-    },
-    'postback': {
-      'type': 'object',
-      'properties': {
-        'payload': {
-          'type': 'string'
-        },
-        'title': {
-          'type': 'string'
-        }
-      },
-      'required': [
-        'payload',
-        'title'
       ]
     }
   },
   'required': [
-    'sender',
-    'recipient',
-    'timestamp',
-    'postback'
+    'object',
+    'entry'
   ]
 }
