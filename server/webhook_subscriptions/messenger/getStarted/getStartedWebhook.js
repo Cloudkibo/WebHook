@@ -33,7 +33,7 @@ exports.getStartedWebhook = (payload) => {
       callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
         .then((response) => {
           console.log(`in Ad response ${JSON.stringify(response)}`)
-          sendResponseMessage(response)
+          sendResponseMessage(payload, response)
         })
         .catch(err => {
           logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
