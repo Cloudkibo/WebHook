@@ -6,7 +6,7 @@ const request = require('request')
 const needle = require('needle')
 
 exports.getStartedWebhook = (payload) => {
-  logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
+  console.log(`in getStartedWebhook ${JSON.stringify(payload)}`)
   if (payload.entry[0].messaging[0].postback.referral) {
     // This will send postback referal for messenger code
     logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`)
@@ -34,19 +34,17 @@ exports.getStartedWebhook = (payload) => {
     sendWelcomeMessage(payload)
   }
   var jsonPayload = payload.entry[0].messaging[0].postback.payload
-  logger.serverLog(TAG,
-    `in jsonAd ${JSON.stringify(jsonPayload)}`)
+
+  console.log(`in jsonAd ${JSON.stringify(jsonPayload)}`)
   if (jsonPayload.payload) {
     var jsonAdPayload = jsonPayload.payload.split('-')
-    logger.serverLog(TAG,
-      `in jsonAd ${JSON.stringify(jsonAdPayload[0])}`)
+    console.log(`in jsonAd ${JSON.stringify(jsonAdPayload[0])}`)
     if (jsonAdPayload.length > 0) {
       if (jsonAdPayload[0] === 'JSONAD') {
         var jsonMessageId = jsonAdPayload[1]
         callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
           .then((response) => {
-            logger.serverLog(TAG,
-              `in Ad response ${JSON.stringify(response)}`)
+            console.log(`in Ad response ${JSON.stringify(response)}`)
             sendResponseMessage(response)
           })
           .catch(err => {
