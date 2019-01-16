@@ -16,7 +16,10 @@ exports.getStartedWebhook = (payload) => {
   if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>') {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
+    console.log(`Response ${JSON.stringify(payload)}`)
     let resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
+    var jsonAdPayload = resp.payload.split('-')
+    console.log(`jsonAdPayload ${JSON.stringify(jsonAdPayload)}`)
     if (resp.survey_id) {
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
     } else if (resp.unsubscribe) {
@@ -25,6 +28,16 @@ exports.getStartedWebhook = (payload) => {
       callApi.callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
     } else if (resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
+    } else if (jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
+      var jsonMessageId = jsonAdPayload[1]
+      callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
+        .then((response) => {
+          console.log(`in Ad response ${JSON.stringify(response)}`)
+          sendResponseMessage(response)
+        })
+        .catch(err => {
+          logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
+        })
     } else {
       callApi.callApi('messengerEvents/menu', 'post', payload, 'accounts')
     }
@@ -32,26 +45,6 @@ exports.getStartedWebhook = (payload) => {
     logger.serverLog(TAG,
       `in getStartedWebhook ${JSON.stringify(payload)}`)
     sendWelcomeMessage(payload)
-  }
-  var jsonPayload = payload.entry[0].messaging[0].postback.payload
-
-  console.log(`in jsonAd ${JSON.stringify(jsonPayload)}`)
-  if (jsonPayload.payload) {
-    var jsonAdPayload = jsonPayload.payload.split('-')
-    console.log(`in jsonAd ${JSON.stringify(jsonAdPayload[0])}`)
-    if (jsonAdPayload.length > 0) {
-      if (jsonAdPayload[0] === 'JSONAD') {
-        var jsonMessageId = jsonAdPayload[1]
-        callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
-          .then((response) => {
-            console.log(`in Ad response ${JSON.stringify(response)}`)
-            sendResponseMessage(response)
-          })
-          .catch(err => {
-            logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
-          })
-      }
-    }
   }
 }
 
