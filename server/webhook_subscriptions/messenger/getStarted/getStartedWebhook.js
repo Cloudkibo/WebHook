@@ -18,8 +18,6 @@ exports.getStartedWebhook = (payload) => {
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
     console.log(`Response ${JSON.stringify(payload)}`)
     let resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
-    var jsonAdPayload = resp.payload.split('-')
-    console.log(`jsonAdPayload ${JSON.stringify(jsonAdPayload)}`)
     if (resp.survey_id) {
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
     } else if (resp.unsubscribe) {
@@ -28,8 +26,9 @@ exports.getStartedWebhook = (payload) => {
       callApi.callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
     } else if (resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
-    } else if (jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
-      var jsonMessageId = jsonAdPayload[1]
+    } else if (resp.jsonAd && resp.jsonAd !== '') {
+      var jsonMessageId = resp.jsonAd
+      console.log(`jsonMessageId ${JSON.stringify(jsonMessageId)}`)
       callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
         .then((response) => {
           console.log(`in Ad response ${JSON.stringify(response)}`)
