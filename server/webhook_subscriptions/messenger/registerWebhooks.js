@@ -12,7 +12,7 @@ const chatPluginValidation = require('./chatPlugin/chatPluginSchema')
 const shopifyValidation = require('./shopifyAndAdmin/shopifyAndAdminSchema')
 const changePageNameValidation = require('./changePageName/changePageNameSchema')
 const messengerCodeSchema = require('./messengerCode/messengerCodeSchema')
-const jsonAdSchema = require('./jsonAd/jsonAdSchem')
+const jsonAdSchema = require('./jsonAd/jsonAdSchema')
 
 const commentWebhook = require('./comment/commentWebhook')
 // const customerMatchingWebhook = require('./customerMatching/customerMatchingWebhook')
