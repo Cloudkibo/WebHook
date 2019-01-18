@@ -239,21 +239,22 @@ function subscribeIncomingUser (payload) {
                   isSubscribed: true,
                   source: 'messenger_ads'
                 }
-                console.log('payload user', payload)
+                logger.serverLog(`payload user ${JSON.stringify(response.body)}`)
                 callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
                   .then(subscriberFound => {
+                    logger.serverLog(`subscriberFound ${JSON.stringify(subscriberFound)}`)
                     if (subscriberFound.length === 0) {
                           // subscriber not found, create subscriber
                       callApi.callApi(`companyprofile/query`, 'post', {_id: page.companyId}, 'accounts')
                             .then(company => {
-                              console.log('fetched company')
+                              logger.serverLog(`Fetch Company`)
                               callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
                                 .then(planUsage => {
-                                  console.log('fetched plan')
+                                  logger.serverLog(`Fetch Plan`)
                                   planUsage = planUsage[0]
                                   callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId}, 'accounts')
                                     .then(companyUsage => {
-                                      console.log('fetched companyUsage')
+                                      logger.serverLog(`Fetch CompanyUsage`)
                                       companyUsage = companyUsage[0]
                                       callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                         .then(subscriberCreated => {
@@ -308,6 +309,14 @@ function subscribeIncomingUser (payload) {
                             .catch(err => {
                               logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
                             })
+                    }
+                    if (!subscriberFound.isSubscribed) {
+                      // subscribing the subscriber again in case he
+                      // or she unsubscribed and removed chat
+                      callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
+                        .then(subscriber => {
+                          logger.serverLog(TAG, subscriber)
+                        })
                     }
                   })
                   .catch(err => {
