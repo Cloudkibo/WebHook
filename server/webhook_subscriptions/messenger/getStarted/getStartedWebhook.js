@@ -36,22 +36,8 @@ exports.getStartedWebhook = (payload) => {
     } else if (resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
     } else if (jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
-      subscribeIncomingUser(payload)
       var jsonMessageId = jsonAdPayload[1]
-      callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
-        .then((response) => {
-          callApi.callApi(`jsonAd/${response.jsonAdId}`, 'get', {}, 'accounts')
-            .then((jsonAd) => {
-              logger.serverLog(TAG, `jsonAd: ${jsonAd}`)
-              sendResponseMessage(payload, response, jsonAd.jsonAdMessages)
-            })
-            .catch(err => {
-              logger.serverLog(TAG, `error from accounts getting all json messages: ${err}`)
-            })
-        })
-        .catch(err => {
-          logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
-        })
+      subscribeIncomingUser(payload, jsonMessageId)
     } else {
       callApi.callApi('messengerEvents/menu', 'post', payload, 'accounts')
     }
@@ -202,8 +188,20 @@ function sendResponseMessage (payload, response, jsonAdMessages) {
       logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
     })
 }
-
-function subscribeIncomingUser (payload) {
+function getResponseMessage (payload, jsonMessageId) {
+  callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
+    .then((response) => {
+      callApi.callApi(`jsonAd/${response.jsonAdId}`, 'get', {}, 'accounts')
+        .then((jsonAd) => {
+          logger.serverLog(TAG, `jsonAd: ${jsonAd}`)
+          sendResponseMessage(payload, response, jsonAd.jsonAdMessages)
+        })
+        .catch(err => {
+          logger.serverLog(TAG, `error from accounts getting all json messages: ${err}`)
+        })
+    })
+}
+function subscribeIncomingUser (payload, jsonMessageId) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
   logger.serverLog(TAG, `Subscribe Incoming User ${JSON.stringify(pageId)}`)
@@ -266,6 +264,7 @@ function subscribeIncomingUser (payload) {
                                       callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                         .then(subscriberCreated => {
                                           console.log('subscriberCreated')
+                                          getResponseMessage(payload, jsonMessageId)
                                           callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: sender, pageId: page._id}, 'kiboengage')
                                           callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                             .then(updated => {
@@ -299,6 +298,9 @@ function subscribeIncomingUser (payload) {
                                             .catch(err => {
                                               logger.serverLog(TAG, err)
                                             })
+                                            .catch(err => {
+                                              logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
+                                            })
                                         })
                                         .catch(err => {
                                           logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
@@ -316,14 +318,16 @@ function subscribeIncomingUser (payload) {
                             .catch(err => {
                               logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
                             })
-                    }
-                    if (!subscriberFound.isSubscribed) {
+                    } else if (!subscriberFound.isSubscribed) {
                       // subscribing the subscriber again in case he
                       // or she unsubscribed and removed chat
                       callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
                         .then(subscriber => {
                           logger.serverLog(TAG, subscriber)
+                          getResponseMessage(payload, jsonMessageId)
                         })
+                    } else {
+                      getResponseMessage(payload, jsonMessageId)
                     }
                   })
                   .catch(err => {
