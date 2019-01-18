@@ -40,7 +40,14 @@ exports.getStartedWebhook = (payload) => {
       var jsonMessageId = jsonAdPayload[1]
       callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
         .then((response) => {
-          sendResponseMessage(payload, response)
+          callApi.callApi(`jsonAd/${response.jsonAdId}`, 'get', {}, 'accounts')
+            .then((jsonAd) => {
+              logger.serverLog(TAG, `jsonAd: ${jsonAd}`)
+              sendResponseMessage(payload, response, jsonAd.jsonAdMessages)
+            })
+            .catch(err => {
+              logger.serverLog(TAG, `error from accounts getting all json messages: ${err}`)
+            })
         })
         .catch(err => {
           logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
@@ -152,7 +159,7 @@ function handleUnsubscribe (resp, req) {
     })
 }
 
-function sendResponseMessage (payload, response) {
+function sendResponseMessage (payload, response, jsonAdMessages) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
@@ -163,7 +170,7 @@ function sendResponseMessage (payload, response) {
           subscriber = subscriber[0]
           if (response.messageContent) {
             for (let i = 0; i < response.messageContent.length; i++) {
-              let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, response.messageContent[i], subscriber.firstName, subscriber.lastName, true)
+              let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, response.messageContent[i], subscriber.firstName, subscriber.lastName, true, jsonAdMessages)
               request(
                 {
                   'method': 'POST',

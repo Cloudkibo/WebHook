@@ -1,10 +1,30 @@
 const fs = require('fs')
 const path = require('path')
 
-function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse) {
+function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, jsonAdMessages) {
   let messageType = isResponse ? 'RESPONSE' : 'UPDATE'
   let payload = {}
   let text = body.text
+  var buttonPayload = []
+  var button = {}
+  if (jsonAdMessages && body.buttons && body.buttons.length > 0) {
+    for (var i = 0; i < body.buttons.length; i++) {
+      button = body.buttons[i]
+      var jsonAdMessageId
+      if (button.payload && button.type === 'postback') {
+        for (var j = 0; j < jsonAdMessages.length; j++) {
+          if ((button.payload).toString() === (jsonAdMessages[j].jsonAdMessageId).toString()) {
+            jsonAdMessageId = jsonAdMessages[j]._id
+            break
+          }
+        }
+        button.payload = 'JSONAD-' + jsonAdMessageId
+      }
+      buttonPayload.push(button)
+    }
+  } else {
+    buttonPayload = body.buttons
+  }
   if (body.componentType === 'text' && !body.buttons) {
     if (body.text.includes('{{user_full_name}}') || body.text.includes('[Username]')) {
       text = text.replace(
@@ -53,7 +73,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse) {
           'payload': {
             'template_type': 'button',
             'text': text,
-            'buttons': body.buttons
+            'buttons': buttonPayload
           }
         }
       })
@@ -116,7 +136,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse) {
                 'title': body.title,
                 'image_url': body.image_url,
                 'subtitle': body.description,
-                'buttons': body.buttons
+                'buttons': buttonPayload
               }
             ]
           }
@@ -152,7 +172,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse) {
             'template_type': 'list',
             'top_element_style': body.topElementStyle,
             'elements': body.listItems,
-            'buttons': body.buttons
+            'buttons': buttonPayload
           }
         }
       })
