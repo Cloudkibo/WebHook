@@ -229,7 +229,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
               logger.serverLog(TAG, `Subscriber response git from facebook: ${JSON.stringify(response.body)}`)
               const user = response.body
               if (!error && !response.error) {
-                const payload = {
+                const userPayload = {
                   firstName: user.first_name,
                   lastName: user.last_name,
                   locale: user.locale,
@@ -261,7 +261,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
                                     .then(companyUsage => {
                                       logger.serverLog(`Fetch CompanyUsage`)
                                       companyUsage = companyUsage[0]
-                                      callApi.callApi(`subscribers`, 'post', payload, 'accounts')
+                                      callApi.callApi(`subscribers`, 'post', userPayload, 'accounts')
                                         .then(subscriberCreated => {
                                           console.log('subscriberCreated')
                                           getResponseMessage(payload, jsonMessageId)
