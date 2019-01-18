@@ -160,4 +160,14 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse) {
   }
   return payload
 }
+
+function isJsonString (str) {
+  try {
+    JSON.parse(str)
+  } catch (e) {
+    return false
+  }
+  return true
+}
 exports.prepareSendAPIPayload = prepareSendAPIPayload
+exports.isJsonString = isJsonString

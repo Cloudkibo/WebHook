@@ -17,7 +17,7 @@ exports.getStartedWebhook = (payload) => {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
     let resp = ''
-    if (isJsonString(payload.entry[0].messaging[0].postback.payload)) {
+    if (logicLayer.isJsonString(payload.entry[0].messaging[0].postback.payload)) {
       resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
     } else {
       resp = payload.entry[0].messaging[0].postback.payload
