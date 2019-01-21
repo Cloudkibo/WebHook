@@ -5,7 +5,9 @@ const needle = require('needle')
 
 exports.newSubscriberWebhook = (payloadBody) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
-  console.log('in newsubscriberwebhook', JSON.stringify(payloadBody))
+  
+  callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
+
   if (!payloadBody.entry[0].messaging[0].delivery) {
     // PLEASE DON'T REMOVE THIS LINE:
     callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
@@ -111,6 +113,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                         callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                           .then(subscriberCreated => {
                                             console.log('subscriberCreated')
+                                            callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: sender, pageId: page._id}, 'kiboengage')
                                             callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                               .then(updated => {
                                                 logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
