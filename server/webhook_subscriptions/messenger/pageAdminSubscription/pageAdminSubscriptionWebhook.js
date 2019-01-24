@@ -29,10 +29,10 @@ function addAdminAsSubscriber (payload) {
                   let page = pages[0]
                   logger.serverLog(TAG, `page: ${JSON.stringify(page)}`)
                   let pageAdminPayload = {
-                    companyId: companyUser.companyId,
-                    userId: user._id,
-                    subscriberId: payload.messaging[0].sender.id,
-                    pageId: page._id
+                    'companyId': companyUser.companyId,
+                    'userId': user._id,
+                    'subscriberId': payload.messaging[0].sender.id,
+                    'pageId': page._id
                   }
                   callApi.callApi(`adminsubscriptions`, 'post', pageAdminPayload, 'kiboengage')
                     .then(record => {
