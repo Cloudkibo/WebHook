@@ -54,12 +54,15 @@ function sendWelcomeMessage (payload) {
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(page => {
       page = page[0]
+      console.log('page fetched', page)
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
+          console.log('subscriber fetched', subscriber)
           if (page.welcomeMessage) {
             for (let i = 0; i < page.welcomeMessage.length; i++) {
               let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, page.welcomeMessage[i], subscriber.firstName, subscriber.lastName, true)
+              console.log('messageData', messageData)
               request(
                 {
                   'method': 'POST',
@@ -76,6 +79,7 @@ function sendWelcomeMessage (payload) {
                         `At send message landingPage ${JSON.stringify(
                           res.body.error)}`)
                     }
+                    console.log('res.body', res.body)
                   }
                 })
             }
