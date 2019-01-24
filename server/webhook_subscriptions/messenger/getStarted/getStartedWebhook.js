@@ -51,6 +51,7 @@ exports.getStartedWebhook = (payload) => {
 function sendWelcomeMessage (payload) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
+  console.log('senderId', sender)
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(page => {
       page = page[0]
