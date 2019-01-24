@@ -46,7 +46,7 @@ exports.pageAdminSubscriptionSchema = {
                         }
                       },
                       'required': [
-                        'id'
+                        'ref'
                       ]
                     }
                   },

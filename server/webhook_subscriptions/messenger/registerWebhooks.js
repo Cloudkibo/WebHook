@@ -45,7 +45,6 @@ function initRegistry () {
   init.registerCallback(chatPluginValidation.chatPluginSchema, (payload) => { chatPluginWebhook.chatPluginWebhook(payload) })
   init.registerCallback(shopifyValidation.shopifyAndAdminSchema, (payload) => { shopifyWebhook.shopifyAndAdminSchema(payload) })
   init.registerCallback(changePageNameValidation.changePageNameSchema, (payload) => { changePageNameWebhook.changePageNameWebhook(payload) })
-  init.registerCallback(pageAdminSubscriptionSchema.pageAdminSubscriptionSchema, (payload) => { pageAdminSubscriptionWebhok.adminSubscriberWebhook(payload) })
 }
 
 exports.registeryInit = () => {
