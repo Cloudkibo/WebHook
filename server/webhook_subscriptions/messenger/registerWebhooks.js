@@ -12,6 +12,7 @@ const chatPluginValidation = require('./chatPlugin/chatPluginSchema')
 const shopifyValidation = require('./shopifyAndAdmin/shopifyAndAdminSchema')
 const changePageNameValidation = require('./changePageName/changePageNameSchema')
 const messengerCodeSchema = require('./messengerCode/messengerCodeSchema')
+const pageAdminSubscriptionSchema = require('./pageAdminSubscription/pageAdminSubscriptionSchema')
 
 const commentWebhook = require('./comment/commentWebhook')
 // const customerMatchingWebhook = require('./customerMatching/customerMatchingWebhook')
@@ -26,6 +27,7 @@ const chatPluginWebhook = require('./chatPlugin/chatPluginWebhook')
 const shopifyWebhook = require('./shopifyAndAdmin/shopifyAndAdminWebhook')
 const changePageNameWebhook = require('./changePageName/changePageNameWebhook')
 const messengerCodeWebhook = require('./messengerCode/messengerCodeWebhook')
+const pageAdminSubscriptionWebhok = require('./pageAdminSubscription/pageAdminSubscriptionWebhook')
 
 function initRegistry () {
   // init.registerCallback(validationSchema.testSchema, (payload) => { console.log('Sample Webhook Called') })
@@ -42,6 +44,7 @@ function initRegistry () {
   init.registerCallback(chatPluginValidation.chatPluginSchema, (payload) => { chatPluginWebhook.chatPluginWebhook(payload) })
   init.registerCallback(shopifyValidation.shopifyAndAdminSchema, (payload) => { shopifyWebhook.shopifyAndAdminSchema(payload) })
   init.registerCallback(changePageNameValidation.changePageNameSchema, (payload) => { changePageNameWebhook.changePageNameWebhook(payload) })
+  init.registerCallback(pageAdminSubscriptionSchema.pageAdminSubscriptionSchema, (payload) => { pageAdminSubscriptionWebhok.adminSubscriberWebhook(payload) })
 }
 
 exports.registeryInit = () => {
