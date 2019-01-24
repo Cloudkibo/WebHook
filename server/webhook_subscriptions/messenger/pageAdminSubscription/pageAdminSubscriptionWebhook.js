@@ -17,17 +17,17 @@ exports.adminSubscriberWebhook = (payloadBody) => {
 function addAdminAsSubscriber (payload) {
   callApi.callApi(`user/query`, 'post', {_id: payload.messaging[0].optin.ref}, 'accounts')
     .then(user => {
-      if (user.length > 1) {
+      if (user.length > 0) {
         user = user[0]
         logger.serverLog(TAG, `user: ${JSON.stringify(user)}`)
         callApi.callApi(`companyUser/query`, 'post', { domain_email: user.domain_email }, 'accounts')
           .then(companyUser => {
-            if (companyUser.length > 1) {
+            if (companyUser.length > 0) {
               companyUser = companyUser[0]
               logger.serverLog(TAG, `companyUser: ${JSON.stringify(companyUser)}`)
               callApi.callApi(`pages/query`, 'post', { pageId: payload.id, companyId: companyUser.companyId }, 'accounts')
                 .then(pages => {
-                  if (pages.length > 1) {
+                  if (pages.length > 0) {
                     let page = pages[0]
                     logger.serverLog(TAG, `page: ${JSON.stringify(page)}`)
                     let pageAdminPayload = {
