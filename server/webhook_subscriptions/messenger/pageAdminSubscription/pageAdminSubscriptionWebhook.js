@@ -22,33 +22,30 @@ function addAdminAsSubscriber (payload) {
         logger.serverLog(TAG, `user: ${JSON.stringify(user)}`)
         callApi.callApi(`companyUser/query`, 'post', { domain_email: user.domain_email }, 'accounts')
           .then(companyUser => {
-            if (companyUser.length > 0) {
-              companyUser = companyUser[0]
-              logger.serverLog(TAG, `companyUser: ${JSON.stringify(companyUser)}`)
-              callApi.callApi(`pages/query`, 'post', { pageId: payload.id, companyId: companyUser.companyId }, 'accounts')
-                .then(pages => {
-                  if (pages.length > 0) {
-                    let page = pages[0]
-                    logger.serverLog(TAG, `page: ${JSON.stringify(page)}`)
-                    let pageAdminPayload = {
-                      companyId: companyUser.companyId,
-                      userId: user._id,
-                      subscriberId: payload.messaging[0].sender.id,
-                      pageId: page._id
-                    }
-                    callApi.callApi(`adminsubscriptions`, 'post', pageAdminPayload, 'kiboengage')
-                      .then(record => {
-                        logger.serverLog(TAG, `Admin subscription added: ${JSON.stringify(record)}`)
-                      })
-                      .catch(err => {
-                        logger.serverLog(TAG, `Error: Unable to create admin subscription ${JSON.stringify(err)}`)
-                      })
+            logger.serverLog(TAG, `companyUser: ${JSON.stringify(companyUser)}`)
+            callApi.callApi(`pages/query`, 'post', { pageId: payload.id, companyId: companyUser.companyId }, 'accounts')
+              .then(pages => {
+                if (pages.length > 0) {
+                  let page = pages[0]
+                  logger.serverLog(TAG, `page: ${JSON.stringify(page)}`)
+                  let pageAdminPayload = {
+                    companyId: companyUser.companyId,
+                    userId: user._id,
+                    subscriberId: payload.messaging[0].sender.id,
+                    pageId: page._id
                   }
-                })
-                .catch(err => {
-                  logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`)
-                })
-            }
+                  callApi.callApi(`adminsubscriptions`, 'post', pageAdminPayload, 'kiboengage')
+                    .then(record => {
+                      logger.serverLog(TAG, `Admin subscription added: ${JSON.stringify(record)}`)
+                    })
+                    .catch(err => {
+                      logger.serverLog(TAG, `Error: Unable to create admin subscription ${JSON.stringify(err)}`)
+                    })
+                }
+              })
+              .catch(err => {
+                logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`)
+              })
           })
           .catch(err => {
             logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`)
