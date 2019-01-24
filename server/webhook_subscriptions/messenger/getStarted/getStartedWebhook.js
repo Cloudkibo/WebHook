@@ -4,6 +4,7 @@ const callApi = require('../../../utility/api.caller.service')
 const logicLayer = require('./logiclayer')
 const request = require('request')
 const needle = require('needle')
+const {newSubscriberWebhook} = require('../newSubscriber/newSubscriberWebhook')
 
 exports.getStartedWebhook = (payload) => {
   logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
@@ -48,6 +49,33 @@ exports.getStartedWebhook = (payload) => {
   }
 }
 
+function sendWelcomeMessageToSubscriber (page, senderId, firstName, lastName, accessToken) {
+  if (page.welcomeMessage) {
+    for (let i = 0; i < page.welcomeMessage.length; i++) {
+      let messageData = logicLayer.prepareSendAPIPayload(senderId, page.welcomeMessage[i], firstName, lastName, true)
+      console.log('messageData', messageData)
+      request(
+        {
+          'method': 'POST',
+          'json': true,
+          'formData': messageData,
+          'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' + accessToken
+        },
+        (err, res) => {
+          if (err) {
+          } else {
+            if (res.statusCode !== 200) {
+              logger.serverLog(TAG,
+                `At send message landingPage ${JSON.stringify(
+                  res.body.error)}`)
+            }
+            console.log('res.body', res.body)
+          }
+        })
+    }
+  }
+}
+
 function sendWelcomeMessage (payload) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
@@ -59,31 +87,34 @@ function sendWelcomeMessage (payload) {
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
-          console.log('subscriber fetched', subscriber)
-          if (page.welcomeMessage) {
-            for (let i = 0; i < page.welcomeMessage.length; i++) {
-              let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, page.welcomeMessage[i], subscriber.firstName, subscriber.lastName, true)
-              console.log('messageData', messageData)
-              request(
-                {
-                  'method': 'POST',
-                  'json': true,
-                  'formData': messageData,
-                  'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' +
-                    subscriber.pageId.accessToken
-                },
-                (err, res) => {
-                  if (err) {
+          if (subscriber) {
+            console.log('subscriber fetched', subscriber)
+            sendWelcomeMessageToSubscriber(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken)
+          } else {
+            newSubscriberWebhook(payload)
+            needle.get(
+              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
+              (err, resp2) => {
+                if (err) {
+                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
+                }
+                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
+                let pageAccessToken = resp2.body.access_token
+                const options = {
+                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+                  qs: { access_token: page.accessToken },
+                  method: 'GET'
+
+                }
+                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
+                needle.get(options.url, options, (error, response) => {
+                  if (error) {
+                    console.log('error', error)
                   } else {
-                    if (res.statusCode !== 200) {
-                      logger.serverLog(TAG,
-                        `At send message landingPage ${JSON.stringify(
-                          res.body.error)}`)
-                    }
-                    console.log('res.body', res.body)
+                    sendWelcomeMessageToSubscriber(page, sender, response.body.first_name, response.body.last_name, pageAccessToken)
                   }
                 })
-            }
+              })
           }
         })
         .catch(err => {
