@@ -4,6 +4,7 @@ const callApi = require('../../../utility/api.caller.service')
 const logicLayer = require('./logiclayer')
 const request = require('request')
 const needle = require('needle')
+const {newSubscriberWebhook} = require('../newSubscriber/newSubscriberWebhook')
 
 exports.getStartedWebhook = (payload) => {
   logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
@@ -36,22 +37,8 @@ exports.getStartedWebhook = (payload) => {
     } else if (resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
     } else if (jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
-      subscribeIncomingUser(payload)
       var jsonMessageId = jsonAdPayload[1]
-      callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
-        .then((response) => {
-          callApi.callApi(`jsonAd/${response.jsonAdId}`, 'get', {}, 'accounts')
-            .then((jsonAd) => {
-              logger.serverLog(TAG, `jsonAd: ${jsonAd}`)
-              sendResponseMessage(payload, response, jsonAd.jsonAdMessages)
-            })
-            .catch(err => {
-              logger.serverLog(TAG, `error from accounts getting all json messages: ${err}`)
-            })
-        })
-        .catch(err => {
-          logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
-        })
+      subscribeIncomingUser(payload, jsonMessageId)
     } else {
       callApi.callApi('messengerEvents/menu', 'post', payload, 'accounts')
     }
@@ -62,37 +49,72 @@ exports.getStartedWebhook = (payload) => {
   }
 }
 
+function sendWelcomeMessageToSubscriber (page, senderId, firstName, lastName, accessToken) {
+  if (page.welcomeMessage) {
+    for (let i = 0; i < page.welcomeMessage.length; i++) {
+      let messageData = logicLayer.prepareSendAPIPayload(senderId, page.welcomeMessage[i], firstName, lastName, true)
+      console.log('messageData', messageData)
+      request(
+        {
+          'method': 'POST',
+          'json': true,
+          'formData': messageData,
+          'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' + accessToken
+        },
+        (err, res) => {
+          if (err) {
+          } else {
+            if (res.statusCode !== 200) {
+              logger.serverLog(TAG,
+                `At send message landingPage ${JSON.stringify(
+                  res.body.error)}`)
+            }
+            console.log('res.body', res.body)
+          }
+        })
+    }
+  }
+}
+
 function sendWelcomeMessage (payload) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
+  console.log('senderId', sender)
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(page => {
       page = page[0]
+      console.log('page fetched', page)
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
-          if (page.welcomeMessage) {
-            for (let i = 0; i < page.welcomeMessage.length; i++) {
-              let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, page.welcomeMessage[i], subscriber.firstName, subscriber.lastName, true)
-              request(
-                {
-                  'method': 'POST',
-                  'json': true,
-                  'formData': messageData,
-                  'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' +
-                    subscriber.pageId.accessToken
-                },
-                (err, res) => {
-                  if (err) {
+          if (subscriber) {
+            console.log('subscriber fetched', subscriber)
+            sendWelcomeMessageToSubscriber(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken)
+          } else {
+            newSubscriberWebhook(payload)
+            needle.get(
+              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
+              (err, resp2) => {
+                if (err) {
+                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
+                }
+                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
+                let pageAccessToken = resp2.body.access_token
+                const options = {
+                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+                  qs: { access_token: page.accessToken },
+                  method: 'GET'
+
+                }
+                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
+                needle.get(options.url, options, (error, response) => {
+                  if (error) {
+                    console.log('error', error)
                   } else {
-                    if (res.statusCode !== 200) {
-                      logger.serverLog(TAG,
-                        `At send message landingPage ${JSON.stringify(
-                          res.body.error)}`)
-                    }
+                    sendWelcomeMessageToSubscriber(page, sender, response.body.first_name, response.body.last_name, pageAccessToken)
                   }
                 })
-            }
+              })
           }
         })
         .catch(err => {
@@ -202,8 +224,20 @@ function sendResponseMessage (payload, response, jsonAdMessages) {
       logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
     })
 }
-
-function subscribeIncomingUser (payload) {
+function getResponseMessage (payload, jsonMessageId) {
+  callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
+    .then((response) => {
+      callApi.callApi(`jsonAd/${response.jsonAdId}`, 'get', {}, 'accounts')
+        .then((jsonAd) => {
+          logger.serverLog(TAG, `jsonAd: ${jsonAd}`)
+          sendResponseMessage(payload, response, jsonAd.jsonAdMessages)
+        })
+        .catch(err => {
+          logger.serverLog(TAG, `error from accounts getting all json messages: ${err}`)
+        })
+    })
+}
+function subscribeIncomingUser (payload, jsonMessageId) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
   logger.serverLog(TAG, `Subscribe Incoming User ${JSON.stringify(pageId)}`)
@@ -231,7 +265,7 @@ function subscribeIncomingUser (payload) {
               logger.serverLog(TAG, `Subscriber response git from facebook: ${JSON.stringify(response.body)}`)
               const user = response.body
               if (!error && !response.error) {
-                const payload = {
+                const userPayload = {
                   firstName: user.first_name,
                   lastName: user.last_name,
                   locale: user.locale,
@@ -263,9 +297,10 @@ function subscribeIncomingUser (payload) {
                                     .then(companyUsage => {
                                       logger.serverLog(`Fetch CompanyUsage`)
                                       companyUsage = companyUsage[0]
-                                      callApi.callApi(`subscribers`, 'post', payload, 'accounts')
+                                      callApi.callApi(`subscribers`, 'post', userPayload, 'accounts')
                                         .then(subscriberCreated => {
                                           console.log('subscriberCreated')
+                                          getResponseMessage(payload, jsonMessageId)
                                           callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: sender, pageId: page._id}, 'kiboengage')
                                           callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                             .then(updated => {
@@ -299,6 +334,9 @@ function subscribeIncomingUser (payload) {
                                             .catch(err => {
                                               logger.serverLog(TAG, err)
                                             })
+                                            .catch(err => {
+                                              logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
+                                            })
                                         })
                                         .catch(err => {
                                           logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
@@ -316,14 +354,16 @@ function subscribeIncomingUser (payload) {
                             .catch(err => {
                               logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
                             })
-                    }
-                    if (!subscriberFound.isSubscribed) {
+                    } else if (!subscriberFound.isSubscribed) {
                       // subscribing the subscriber again in case he
                       // or she unsubscribed and removed chat
                       callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
                         .then(subscriber => {
                           logger.serverLog(TAG, subscriber)
+                          getResponseMessage(payload, jsonMessageId)
                         })
+                    } else {
+                      getResponseMessage(payload, jsonMessageId)
                     }
                   })
                   .catch(err => {
