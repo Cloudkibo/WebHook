@@ -15,7 +15,7 @@ module.exports = {
   kibo_ip: process.env.KIBOPUSH_IP || 'http://localhost:3000',
 
   domain: `${process.env.DOMAIN || 'https://webhook.cloudkibo.com'}`,
-  
+
   facebook: {
     clientID: process.env.FACEBOOK_ID,
     clientSecret: process.env.FACEBOOK_SECRET,
