@@ -262,31 +262,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
           } else {
             console.log('going to newSubscriberWebhook')
             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
-            needle.get(
-              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
-              (err, resp2) => {
-                if (err) {
-                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
-                }
-                console.log('pageAccessToken', resp2.body)
-                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
-                let pageAccessToken = resp2.body.access_token
-                const options = {
-                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
-                  qs: { access_token: page.accessToken },
-                  method: 'GET'
-
-                }
-                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
-                needle.get(options.url, options, (error, response) => {
-                  if (error) {
-                    console.log('error', error)
-                  } else {
-                    console.log('subscriberInfo')
-                    getResponseMessage(payload, jsonMessageId)
-                  }
-                })
-              })
+            getResponseMessage(payload, jsonMessageId)
           }
         })
         .catch(err => {
