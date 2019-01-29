@@ -5,7 +5,7 @@ const needle = require('needle')
 
 exports.newSubscriberWebhook = (payloadBody) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
-  
+  console.log('in newSubscriberWebhook', payloadBody)
   callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
 
   if (!payloadBody.entry[0].messaging[0].delivery) {

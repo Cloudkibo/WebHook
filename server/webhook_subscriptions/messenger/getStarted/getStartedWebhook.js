@@ -91,6 +91,7 @@ function sendWelcomeMessage (payload) {
             console.log('subscriber fetched', subscriber)
             sendWelcomeMessageToSubscriber(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken)
           } else {
+            console.log('going to newSubscriberWebhook')
             newSubscriberWebhook(payload)
             needle.get(
               `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
