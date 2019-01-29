@@ -243,141 +243,52 @@ function getResponseMessage (payload, jsonMessageId) {
 function subscribeIncomingUser (payload, jsonMessageId) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
-  logger.serverLog(TAG, `Subscribe Incoming User ${JSON.stringify(pageId)}`)
-
+  console.log('senderId', sender)
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
-    .then(pages => {
-      logger.serverLog(TAG, `Pages ${JSON.stringify(pages)}`)
-      pages.forEach((page) => {
-        needle.get(
-          `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
-          (err, resp2) => {
-            if (err) {
-              logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
-            }
-            logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
-            let pageAccessToken = resp2.body.access_token
-            const options = {
-              url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
-              qs: { access_token: page.accessToken },
-              method: 'GET'
-
-            }
-            logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
-            needle.get(options.url, options, (error, response) => {
-              logger.serverLog(TAG, `Subscriber response git from facebook: ${JSON.stringify(response.body)}`)
-              const user = response.body
-              if (!error && !response.error) {
-                const userPayload = {
-                  firstName: user.first_name,
-                  lastName: user.last_name,
-                  locale: user.locale,
-                  gender: user.gender,
-                  timezone: user.timezone,
-                  profilePic: user.profile_pic,
-                  companyId: page.companyId,
-                  pageScopedId: '',
-                  email: '',
-                  senderId: sender,
-                  pageId: page._id,
-                  isSubscribed: true,
-                  source: 'messenger_ads'
+    .then(page => {
+      page = page[0]
+      console.log('page fetched', page)
+      callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
+        .then(subscriber => {
+          subscriber = subscriber[0]
+          if (subscriber) {
+            console.log('subscriber fetched', subscriber)
+            getResponseMessage(payload, jsonMessageId)
+          } else {
+            console.log('going to newSubscriberWebhook')
+            newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
+            needle.get(
+              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
+              (err, resp2) => {
+                if (err) {
+                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
                 }
-                logger.serverLog(`payload user ${JSON.stringify(response.body)}`)
-                callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
-                  .then(subscriberFound => {
-                    logger.serverLog(`subscriberFound ${JSON.stringify(subscriberFound)}`)
-                    if (subscriberFound.length === 0) {
-                          // subscriber not found, create subscriber
-                      callApi.callApi(`companyprofile/query`, 'post', {_id: page.companyId}, 'accounts')
-                            .then(company => {
-                              logger.serverLog(`Fetch Company`)
-                              callApi.callApi(`featureUsage/planQuery`, 'post', {planId: company.planId}, 'accounts')
-                                .then(planUsage => {
-                                  logger.serverLog(`Fetch Plan`)
-                                  planUsage = planUsage[0]
-                                  callApi.callApi(`featureUsage/companyQuery`, 'post', {companyId: page.companyId}, 'accounts')
-                                    .then(companyUsage => {
-                                      logger.serverLog(`Fetch CompanyUsage`)
-                                      companyUsage = companyUsage[0]
-                                      callApi.callApi(`subscribers`, 'post', userPayload, 'accounts')
-                                        .then(subscriberCreated => {
-                                          console.log('subscriberCreated')
-                                          getResponseMessage(payload, jsonMessageId)
-                                          callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: sender, pageId: page._id}, 'kiboengage')
-                                          callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
-                                            .then(updated => {
-                                              logger.serverLog(TAG, `company usage incremented successfully ${JSON.stringify(err)}`)
-                                            })
-                                            .catch(err => {
-                                              logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
-                                            })
-                                          callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
-                                            .then(webhook => {
-                                              webhook = webhook[0]
-                                              if (webhook && webhook.isEnabled) {
-                                                needle.get(webhook.webhook_url, (err, r) => {
-                                                  if (err) {
-                                                    logger.serverLog(TAG, err)
-                                                  } else if (r.statusCode === 200) {
-                                                    if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-                                                      var data = {
-                                                        subscription_type: 'NEW_SUBSCRIBER',
-                                                        payload: JSON.stringify({ subscriber: user, recipient: pageId, sender: sender })
-                                                      }
-                                                      needle.post(webhook.webhook_url, data,
-                                                        (error, response) => {
-                                                          if (error) logger.serverLog(TAG, err)
-                                                        })
-                                                    }
-                                                  }
-                                                })
-                                              }
-                                            })
-                                            .catch(err => {
-                                              logger.serverLog(TAG, err)
-                                            })
-                                            .catch(err => {
-                                              logger.serverLog(TAG, `error from accounts jsonAdResponse: ${err}`)
-                                            })
-                                        })
-                                        .catch(err => {
-                                          logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`)
-                                        })
-                                      // }
-                                    })
-                                    .catch(err => {
-                                      logger.serverLog(TAG, `Failed to fetch company usage ${JSON.stringify(err)}`)
-                                    })
-                                })
-                                .catch(err => {
-                                  logger.serverLog(TAG, `Failed to fetch plan usage ${JSON.stringify(err)}`)
-                                })
-                            })
-                            .catch(err => {
-                              logger.serverLog(TAG, `Failed to fetch company ${JSON.stringify(err)}`)
-                            })
-                    } else if (!subscriberFound.isSubscribed) {
-                      // subscribing the subscriber again in case he
-                      // or she unsubscribed and removed chat
-                      callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
-                        .then(subscriber => {
-                          logger.serverLog(TAG, subscriber)
-                          getResponseMessage(payload, jsonMessageId)
-                        })
-                    } else {
-                      getResponseMessage(payload, jsonMessageId)
-                    }
-                  })
-                  .catch(err => {
-                    logger.serverLog(TAG, `Unable to fetch subscribers ${JSON.stringify(err)}`)
-                  })
-              }
-            })
-          })
-      })
+                console.log('pageAccessToken', resp2.body)
+                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
+                let pageAccessToken = resp2.body.access_token
+                const options = {
+                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+                  qs: { access_token: page.accessToken },
+                  method: 'GET'
+
+                }
+                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
+                needle.get(options.url, options, (error, response) => {
+                  if (error) {
+                    console.log('error', error)
+                  } else {
+                    console.log('subscriberInfo')
+                    getResponseMessage(payload, jsonMessageId)
+                  }
+                })
+              })
+          }
+        })
+        .catch(err => {
+          logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
+        })
     })
     .catch(err => {
-      logger.serverLog(TAG, `Unable to fetch pages ${JSON.stringify(err)}`)
+      logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
     })
 }
