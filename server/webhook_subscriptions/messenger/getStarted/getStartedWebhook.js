@@ -98,6 +98,7 @@ function sendWelcomeMessage (payload) {
                 if (err) {
                   logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
                 }
+                console.log('pageAccessToken', resp2.body)
                 logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
                 let pageAccessToken = resp2.body.access_token
                 const options = {
@@ -111,6 +112,7 @@ function sendWelcomeMessage (payload) {
                   if (error) {
                     console.log('error', error)
                   } else {
+                    console.log('subscriberInfo')
                     sendWelcomeMessageToSubscriber(page, sender, response.body.first_name, response.body.last_name, pageAccessToken)
                   }
                 })
