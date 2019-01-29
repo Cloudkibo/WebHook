@@ -195,7 +195,8 @@ function prepareSubscriberPayload (senderId, pageId) {
     entry: [{
       messaging: [{
         sender: {id: senderId},
-        recipient: {id: pageId}
+        recipient: {id: pageId},
+        message: {text: 'Get Started'}
       }]
     }]
   }
