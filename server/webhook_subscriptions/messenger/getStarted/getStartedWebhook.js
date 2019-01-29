@@ -185,6 +185,7 @@ function handleUnsubscribe (resp, req) {
 }
 
 function sendResponseMessage (payload, response, jsonAdMessages) {
+  console.log('Send Response Message')
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
@@ -193,9 +194,11 @@ function sendResponseMessage (payload, response, jsonAdMessages) {
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
+          console.log('Subscriber', subscriber)
           if (response.messageContent) {
             for (let i = 0; i < response.messageContent.length; i++) {
               let messageData = logicLayer.prepareSendAPIPayload(subscriber.senderId, response.messageContent[i], subscriber.firstName, subscriber.lastName, true, jsonAdMessages)
+              console.log('messageData', messageData)
               request(
                 {
                   'method': 'POST',
@@ -205,6 +208,7 @@ function sendResponseMessage (payload, response, jsonAdMessages) {
                     subscriber.pageId.accessToken
                 },
                 (err, res) => {
+                  console.log('res', res.body)
                   if (err) {
                     console.log(`At send jsonAd response ${JSON.stringify(err)}`)
                   } else {
@@ -227,6 +231,7 @@ function sendResponseMessage (payload, response, jsonAdMessages) {
       logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
     })
 }
+
 function getResponseMessage (payload, jsonMessageId) {
   callApi.callApi(`jsonAd/jsonAdResponse/${jsonMessageId}`, 'get', {}, 'accounts')
     .then((response) => {
