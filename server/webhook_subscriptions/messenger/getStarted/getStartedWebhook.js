@@ -93,7 +93,7 @@ function sendWelcomeMessage (payload) {
           } else {
             newSubscriberWebhook(payload)
             needle.get(
-              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token`,
+              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
               (err, resp2) => {
                 if (err) {
                   logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
