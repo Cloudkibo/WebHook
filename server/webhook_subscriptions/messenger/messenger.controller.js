@@ -20,11 +20,11 @@ exports.webhook = function (req, res) {
   console.log('something received from facebook', JSON.stringify(req.body))
 
   const event = req.body.entry[0].messaging[0]
-  const pageId = req.body.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
+  const pageId = event.recipient.id
   let webhookCalled = false
   try {
     if (config.demoSSAPageIds.indexOf(pageId) > -1) {
-      callApi.callApi('fbPost', 'post', req.body, 'demossa')
+      callApi.callApi('fbPost', 'post', req, 'demossa')
     } else {
       webhookCalled = webhookHandler(req.body)
     }
