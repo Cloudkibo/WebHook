@@ -21,10 +21,12 @@ exports.webhook = function (req, res) {
 
   const event = req.body.entry[0].messaging[0]
   const pageId = event.recipient.id
+  let data = req.body
+  data.fromKiboPush = true
   let webhookCalled = false
   try {
     if (config.demoSSAPageIds.indexOf(pageId) > -1) {
-      callApi.callApi('fbPost', 'post', req, 'demossa')
+      callApi.callApi('fbPost', 'post', data, 'demossa')
     } else {
       webhookCalled = webhookHandler(req.body)
     }
