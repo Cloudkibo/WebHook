@@ -28,5 +28,7 @@ module.exports = {
 
   CHAT_URL: 'https://kibochat.cloudkibo.com/api/',
 
-  ENGAGE_URL: 'https://kiboengage.cloudkibo.com/api/'
+  ENGAGE_URL: 'https://kiboengage.cloudkibo.com/api/',
+  
+  DEMOSSA_URL: 'https://www.synaps3webrtc.com/'
 }
