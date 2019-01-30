@@ -189,5 +189,19 @@ function isJsonString (str) {
   }
   return true
 }
+
+function prepareSubscriberPayload (senderId, pageId) {
+  let data = {
+    entry: [{
+      messaging: [{
+        sender: {id: senderId},
+        recipient: {id: pageId},
+        message: {text: 'Get Started'}
+      }]
+    }]
+  }
+  return data
+}
 exports.prepareSendAPIPayload = prepareSendAPIPayload
 exports.isJsonString = isJsonString
+exports.prepareSubscriberPayload = prepareSubscriberPayload

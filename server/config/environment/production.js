@@ -15,7 +15,7 @@ module.exports = {
   kibo_ip: process.env.KIBOPUSH_IP || 'http://localhost:3000',
 
   domain: `${process.env.DOMAIN || 'https://webhook.cloudkibo.com'}`,
-  
+
   facebook: {
     clientID: process.env.FACEBOOK_ID,
     clientSecret: process.env.FACEBOOK_SECRET,
@@ -29,6 +29,6 @@ module.exports = {
   CHAT_URL: 'https://kibochat.cloudkibo.com/api/',
 
   ENGAGE_URL: 'https://kiboengage.cloudkibo.com/api/',
-  
+
   DEMOSSA_URL: 'https://www.synaps3webrtc.com/'
 }

@@ -29,6 +29,6 @@ module.exports = {
   CHAT_URL: 'http://localhost:3022/api/',
 
   ENGAGE_URL: 'http://localhost:3021/api/',
-  
+
   DEMOSSA_URL: 'https://www.synaps3webrtc.com/'
 }
