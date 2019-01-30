@@ -7,6 +7,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
   console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
   callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
+  callApi.callApi('fbPost', 'post', payloadBody, 'demossa')
 
   if (!payloadBody.entry[0].messaging[0].delivery) {
     // PLEASE DON'T REMOVE THIS LINE:
@@ -17,8 +18,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
     let subscriberSource = 'direct_message'
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
       const event = payloadBody.entry[0].messaging[i]
-      const sender = event.sender.id
-      const pageId = event.recipient.id
+      const sender = payloadBody.entry[0].messaging[0].message.is_echo ? event.recipient.id : event.sender.id
+      const pageId = payloadBody.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
       if (event.message && event.message.tags && event.message.tags.source === 'customer_chat_plugin') {
         subscriberSource = 'chat_plugin'
       }
