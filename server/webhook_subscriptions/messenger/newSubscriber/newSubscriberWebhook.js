@@ -7,6 +7,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
   console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
   callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
+  callApi.callApi('fbPost', 'post', payloadBody, 'demossa')
 
   if (!payloadBody.entry[0].messaging[0].delivery) {
     // PLEASE DON'T REMOVE THIS LINE:
