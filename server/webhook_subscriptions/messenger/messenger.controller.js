@@ -4,6 +4,7 @@ const _cloneDeep = require('lodash/cloneDeep')
 const validator = new Validator()
 const logger = require('./../../components/logger')
 const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
+const callApi = require('../../utility/api.caller.service')
 
 exports.verifyHook = function (req, res) {
   if (req.query['hub.verify_token'] === 'VERIFY_ME') {
@@ -16,6 +17,7 @@ exports.verifyHook = function (req, res) {
 exports.webhook = function (req, res) {
   logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
   console.log('something received from facebook', JSON.stringify(req.body))
+  callApi.callApi('fbPost', 'post', req.body, 'demossa')
   try {
     let webhookCalled = webhookHandler(req.body)
 
