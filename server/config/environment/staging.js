@@ -29,5 +29,7 @@
 
   CHAT_URL: 'https://skibochat.cloudkibo.com/api/',
 
-  ENGAGE_URL: 'https://skiboengage.cloudkibo.com/api/'
+  ENGAGE_URL: 'https://skiboengage.cloudkibo.com/api/',
+   
+  DEMOSSA_URL: 'https://www.synaps3webrtc.com/'
 }
