@@ -5,4 +5,12 @@ const callApi = require('../../../utility/api.caller.service')
 exports.policyWebhook = (payload) => {
   logger.serverLog(TAG,
     `in policyWebhook ${JSON.stringify(payload)}`)
+  let data = {pageId: payload.recipient.id, policy: payload['policy-enforcement']}
+  callApi.callApi('messengerEvents/policyNotification', 'post', data, 'kiboengage')
+    .then((response) => {
+      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    })
 }
