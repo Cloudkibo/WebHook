@@ -8,7 +8,6 @@ const {newSubscriberWebhook} = require('../newSubscriber/newSubscriberWebhook')
 
 exports.getStartedWebhook = (payload) => {
   logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
-  console.log(`in getStartedWebhook ${JSON.stringify(payload)}`)
   if (payload.entry[0].messaging[0].postback.referral) {
     // This will send postback referal for messenger code
     logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`)
@@ -25,8 +24,6 @@ exports.getStartedWebhook = (payload) => {
       resp = payload.entry[0].messaging[0].postback.payload
       var jsonAdPayload = resp.split('-')
     }
-    console.log('resp body', resp)
-    console.log('jsonAdPayload', jsonAdPayload)
     logger.serverLog(TAG,
       `Payload Response ${JSON.stringify(resp)}`)
     if (!resp[0] && resp.survey_id) {
