@@ -8,6 +8,7 @@ const {newSubscriberWebhook} = require('../newSubscriber/newSubscriberWebhook')
 
 exports.getStartedWebhook = (payload) => {
   logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
+  console.log(`in getStartedWebhook ${JSON.stringify(payload)}`)
   if (payload.entry[0].messaging[0].postback.referral) {
     // This will send postback referal for messenger code
     logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`)
@@ -24,29 +25,79 @@ exports.getStartedWebhook = (payload) => {
       resp = payload.entry[0].messaging[0].postback.payload
       var jsonAdPayload = resp.split('-')
     }
+    console.log('resp body', resp)
+    console.log('jsonAdPayload', jsonAdPayload)
     logger.serverLog(TAG,
       `Payload Response ${JSON.stringify(resp)}`)
-    if (resp.survey_id) {
+    if (!resp[0] && resp.survey_id) {
       logger.serverLog(TAG,
         `in surveyResponseWebhook ${JSON.stringify(payload)}`)
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
-    } else if (resp.unsubscribe) {
+    } else if (!resp[0] && resp.unsubscribe) {
       handleUnsubscribe(resp, payload.entry[0].messaging[0])
-    } else if (resp.action === 'subscribe') {
+    } else if (!resp[0] && resp.action === 'subscribe') {
       callApi.callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
-    } else if (resp.action === 'unsubscribe') {
+    } else if (!resp[0] && resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
-    } else if (jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
+    } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
       var jsonMessageId = jsonAdPayload[1]
       subscribeIncomingUser(payload, jsonMessageId)
     } else {
-      callApi.callApi('messengerEvents/menu', 'post', payload, 'accounts')
+      sendMenuReply(payload, resp)
     }
   } else if (payload.entry[0].messaging[0].postback.payload === '<GET_STARTED_PAYLOAD>') {
     logger.serverLog(TAG,
       `in getStartedWebhook ${JSON.stringify(payload)}`)
     sendWelcomeMessage(payload)
   }
+}
+
+function sendMenuReplyToSubscriber (replyPayload, senderId, firstName, lastName, accessToken) {
+  for (let i = 0; i < replyPayload.length; i++) {
+    let messageData = logicLayer.prepareSendAPIPayload(senderId, replyPayload[i], firstName, lastName, true)
+    logger.serverLog(TAG, `messageData ${JSON.stringify(messageData)}`)
+    request(
+      {
+        'method': 'POST',
+        'json': true,
+        'formData': messageData,
+        'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' + accessToken
+      },
+      (err, res) => {
+        if (err) {
+        } else {
+          if (res.statusCode !== 200) {
+            logger.serverLog(TAG,
+              `At send message landingPage ${JSON.stringify(
+                res.body.error)}`)
+          }
+          logger.serverLog(TAG, `At sendMenuReplyToSubscriber response ${JSON.stringify(res.body)}`)
+        }
+      })
+  }
+}
+
+function sendMenuReply (payload, replyPayload) {
+  const sender = payload.entry[0].messaging[0].sender.id
+  const pageId = payload.entry[0].messaging[0].recipient.id
+  callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+    .then(page => {
+      page = page[0]
+      callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
+        .then(subscriber => {
+          subscriber = subscriber[0]
+          logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`)
+          if (subscriber) {
+            sendMenuReplyToSubscriber(replyPayload, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken)
+          }
+        })
+        .catch(err => {
+          logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
+        })
+    })
+    .catch(err => {
+      logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
+    })
 }
 
 function sendWelcomeMessageToSubscriber (page, senderId, firstName, lastName, accessToken) {
