@@ -69,6 +69,7 @@ function sendMenuReplyToSubscriber (replyPayload, senderId, firstName, lastName,
                 res.body.error)}`)
           }
           logger.serverLog(TAG, `At sendMenuReplyToSubscriber response ${JSON.stringify(res.body)}`)
+          console.log(`At sendMenuReplyToSubscriber response ${JSON.stringify(res.body)}`)
         }
       })
   }
