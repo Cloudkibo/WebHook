@@ -20,9 +20,8 @@ exports.commentSchema = {
                         'comment_id': {'type': 'string'},
                         'sender_id': {'type': 'string'},
                         'post_id': {'type': 'string'},
-                        'message': {'type': 'string'}
                       },
-                      'required': ['item', 'comment_id', 'sender_id', 'post_id', 'message']
+                      'required': ['item', 'comment_id', 'sender_id', 'post_id']
                     }
                   },
                   'required': ['value']
