@@ -63,8 +63,9 @@ function sendMenuReplyToSubscriber (replyPayload, senderId, firstName, lastName,
         'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' + accessToken
       },
       (err, res) => {
-        console.log(`At sendMenuReplyToSubscriber response ${JSON.stringify(res.body)}`)
+        console.log(`At sendMenuReplyToSubscriber response ${JSON.stringify(res)}`)
         if (err) {
+          console.log('error', err)
         } else {
           if (res.statusCode !== 200) {
             logger.serverLog(TAG,
