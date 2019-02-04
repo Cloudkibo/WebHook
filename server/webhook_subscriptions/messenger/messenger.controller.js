@@ -17,15 +17,14 @@ exports.verifyHook = function (req, res) {
 
 exports.webhook = function (req, res) {
   logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
-  console.log('something received from facebook', JSON.stringify(req.body))
 
-  const event = req.body.entry[0].messaging[0]
-  const pageId = event.recipient.id
+  const event = req.body.entry[0].messaging ? req.body.entry[0].messaging[0] : ''
+  const pageId = event !== '' ? event.recipient.id : ''
   let data = req.body
   data.fromKiboPush = true
   let webhookCalled = false
   try {
-    if (config.demoSSAPageIds.indexOf(pageId) > -1) {
+    if (pageId && config.demoSSAPageIds.indexOf(pageId) > -1) {
       callApi.callApi('fbPost', 'post', data, 'demossa')
     } else {
       webhookCalled = webhookHandler(req.body)
