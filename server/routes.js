@@ -1,6 +1,8 @@
 /**
  * Main application routes
  */
+const config = require('./config/environment/index')
+const Raven = require('raven')
 
 'use strict'
 
@@ -35,4 +37,8 @@ module.exports = function (app) {
     console.error(err.stack)
     res.status(500).send('Something broke!')
   })
+
+  if (config.env === 'production' || config.env === 'staging') {
+    app.use(Raven.errorHandler())
+  }
 }
