@@ -17,8 +17,9 @@ exports.verifyHook = function (req, res) {
 
 exports.webhook = function (req, res) {
   logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
-
-  const event = req.body.entry[0].messaging ? req.body.entry[0].messaging[0] : ''
+  console.log('webhook called', req.body)
+  const event = (req.body.entry && req.body.entry[0] && req.body.entry[0].messaging) ? req.body.entry[0].messaging[0] : ''
+  console.log('event', event)
   const pageId = event !== '' ? event.recipient.id : ''
   let data = req.body
   data.fromKiboPush = true
@@ -36,6 +37,7 @@ exports.webhook = function (req, res) {
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${e}`)
+    console.log(`Error on Webhook ${e.stack}`)
     return res.status(500).json({status: 'failed', err: e})
   }
 }
