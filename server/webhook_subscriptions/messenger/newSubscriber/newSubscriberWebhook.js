@@ -24,8 +24,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
     let subscriberSource = 'direct_message'
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
       const event = payloadBody.entry[0].messaging[i]
-      const sender = payloadBody.entry[0].messaging[0].message.is_echo ? event.recipient.id : event.sender.id
-      const pageId = payloadBody.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
+      const sender = payloadBody.entry[0].messaging[0].message && payloadBody.entry[0].messaging[0].message.is_echo ? event.recipient.id : event.sender.id
+      const pageId = payloadBody.entry[0].messaging[0].message && payloadBody.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
       if (event.message && event.message.tags && event.message.tags.source === 'customer_chat_plugin') {
         subscriberSource = 'chat_plugin'
       }
