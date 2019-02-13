@@ -19,6 +19,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
   //   // callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
   // }
   if ((isMessage || isReferral || isOptin) && !isPostback && !isDelivery) {
+    console.log('inside if conditions')
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
