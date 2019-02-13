@@ -8,11 +8,17 @@ exports.newSubscriberWebhook = (payloadBody) => {
   console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
   callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
 
-  if (!payloadBody.entry[0].messaging[0].delivery) {
-    // PLEASE DON'T REMOVE THIS LINE:
-    // callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
-  }
-  if ((payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.text || payloadBody.entry[0].messaging[0].message.attachments) && !payloadBody.entry[0].messaging[0].postback && !payloadBody.entry[0].messaging[0].delivery) || payloadBody.entry[0].messaging[0].referral || payloadBody.entry[0].messaging[0].optin) {
+  const isMessage = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.text || payloadBody.entry[0].messaging[0].message.attachments))
+  const isReferral = (payloadBody.entry[0].messaging[0].referral)
+  const isOptin = (payloadBody.entry[0].messaging[0].optin)
+  const isPostback = (payloadBody.entry[0].messaging[0].postback)
+  const isDelivery = (payloadBody.entry[0].messaging[0].delivery)
+
+  // if (!payloadBody.entry[0].messaging[0].delivery) {
+  //   // PLEASE DON'T REMOVE THIS LINE:
+  //   // callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
+  // }
+  if ((isMessage || isReferral || isOptin) && !isPostback && !isDelivery) {
     let phoneNumber = ''
     let subscriberSource = 'direct_message'
     for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
