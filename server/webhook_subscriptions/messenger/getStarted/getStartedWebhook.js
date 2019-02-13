@@ -138,29 +138,30 @@ function sendResponseMessage (page, senderId, firstName, lastName, accessToken, 
   if (page) {
     if (response.messageContent) {
       for (let i = 0; i < response.messageContent.length; i++) {
-        let messageData = logicLayer.prepareSendAPIPayload(senderId, response.messageContent[i], firstName, lastName, true, jsonAdMessages)
-        console.log('messageData', messageData)
-        request(
-          {
-            'method': 'POST',
-            'json': true,
-            'formData': messageData,
-            'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' +
-              accessToken
-          },
-          (err, res) => {
-            console.log('res', res.body)
-            if (err) {
-              console.log(`At send jsonAd response ${JSON.stringify(err)}`)
-            } else {
+        logicLayer.prepareSendAPIPayload(senderId, response.messageContent[i], firstName, lastName, true, jsonAdMessages)
+        .then(result => {
+          request(
+            {
+              'method': 'POST',
+              'json': true,
+              'formData': result.payload,
+              'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' +
+                accessToken
+            },
+            (err, res) => {
               console.log('res', res.body)
-              if (res.statusCode !== 200) {
-                logger.serverLog(TAG,
-                  `At send message jsonAd response ${JSON.stringify(
-                    res.body.error)}`)
+              if (err) {
+                console.log(`At send jsonAd response ${JSON.stringify(err)}`)
+              } else {
+                console.log('res', res.body)
+                if (res.statusCode !== 200) {
+                  logger.serverLog(TAG,
+                    `At send message jsonAd response ${JSON.stringify(
+                      res.body.error)}`)
+                }
               }
-            }
-          })
+            })
+        })
       }
     }
   }
