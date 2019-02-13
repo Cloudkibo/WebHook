@@ -54,6 +54,7 @@
     "morgan": "^1.8.2",
     "needle": "^2.2.3",
     "pubsubhubbub": "^0.4.1",
+    "raven": "^2.6.4",
     "request-promise": "^4.2.2",
     "twit": "^2.2.9",
     "winston": "^2.3.1",
