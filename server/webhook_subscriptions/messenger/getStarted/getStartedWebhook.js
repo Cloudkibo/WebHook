@@ -41,7 +41,6 @@ exports.getStartedWebhook = (payload) => {
       subscribeIncomingUser(payload, jsonMessageId)
     } else {
       callApi.callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
-      callApi.callApi('messengerEvents/menuReply', 'post', payload, 'kibochat')
     }
   } else if (payload.entry[0].messaging[0].postback.payload === '<GET_STARTED_PAYLOAD>') {
     logger.serverLog(TAG,
