@@ -50,86 +50,6 @@ exports.getStartedWebhook = (payload) => {
   }
 }
 
-function sendMenuReplyToSubscriber (replyPayload, senderId, firstName, lastName, accessToken) {
-  for (let i = 0; i < replyPayload.length; i++) {
-    let messageData = logicLayer.prepareSendAPIPayload(senderId, replyPayload[i], firstName, lastName, true)
-    logger.serverLog(TAG, `messageData ${JSON.stringify(messageData)}`)
-    console.log('messageData', messageData)
-    console.log('accessToken', accessToken)
-    request(
-      {
-        'method': 'POST',
-        'json': true,
-        'formData': messageData,
-        'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' + accessToken
-      },
-      (err, res) => {
-        console.log(`At sendMenuReplyToSubscriber response ${JSON.stringify(res)}`)
-        if (err) {
-          console.log('error', err)
-        } else {
-          if (res.statusCode !== 200) {
-            logger.serverLog(TAG,
-              `At send message landingPage ${JSON.stringify(
-                res.body.error)}`)
-          }
-          logger.serverLog(TAG, `At sendMenuReplyToSubscriber response ${JSON.stringify(res.body)}`)
-          console.log(`At sendMenuReplyToSubscriber response ${JSON.stringify(res.body)}`)
-        }
-      })
-  }
-}
-
-function sendMenuReply (payload, replyPayload) {
-  const sender = payload.entry[0].messaging[0].sender.id
-  const pageId = payload.entry[0].messaging[0].recipient.id
-  callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
-    .then(page => {
-      page = page[0]
-      callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
-        .then(subscriber => {
-          subscriber = subscriber[0]
-          logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`)
-          if (subscriber) {
-            sendMenuReplyToSubscriber(replyPayload, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken)
-          }
-        })
-        .catch(err => {
-          logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
-        })
-    })
-    .catch(err => {
-      logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
-    })
-}
-
-function sendWelcomeMessageToSubscriber (page, senderId, firstName, lastName, accessToken) {
-  if (page.welcomeMessage) {
-    for (let i = 0; i < page.welcomeMessage.length; i++) {
-      let messageData = logicLayer.prepareSendAPIPayload(senderId, page.welcomeMessage[i], firstName, lastName, true)
-      console.log('messageData', messageData)
-      request(
-        {
-          'method': 'POST',
-          'json': true,
-          'formData': messageData,
-          'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' + accessToken
-        },
-        (err, res) => {
-          if (err) {
-          } else {
-            if (res.statusCode !== 200) {
-              logger.serverLog(TAG,
-                `At send message landingPage ${JSON.stringify(
-                  res.body.error)}`)
-            }
-            console.log('res.body', res.body)
-          }
-        })
-    }
-  }
-}
-
 function sendWelcomeMessage (payload) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
@@ -143,35 +63,11 @@ function sendWelcomeMessage (payload) {
           subscriber = subscriber[0]
           if (subscriber) {
             console.log('subscriber fetched', subscriber)
-            sendWelcomeMessageToSubscriber(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken)
+            callApi.callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
           } else {
             console.log('going to newSubscriberWebhook')
             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
-            needle.get(
-              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
-              (err, resp2) => {
-                if (err) {
-                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
-                }
-                console.log('pageAccessToken', resp2.body)
-                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
-                let pageAccessToken = resp2.body.access_token
-                const options = {
-                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
-                  qs: { access_token: page.accessToken },
-                  method: 'GET'
-
-                }
-                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
-                needle.get(options.url, options, (error, response) => {
-                  if (error) {
-                    console.log('error', error)
-                  } else {
-                    console.log('subscriberInfo')
-                    sendWelcomeMessageToSubscriber(page, sender, response.body.first_name, response.body.last_name, pageAccessToken)
-                  }
-                })
-              })
+            callApi.callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
           }
         })
         .catch(err => {
