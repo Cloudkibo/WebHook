@@ -13,6 +13,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
   const isOptin = (payloadBody.entry[0].messaging[0].optin)
   const isPostback = (payloadBody.entry[0].messaging[0].postback)
   const isDelivery = (payloadBody.entry[0].messaging[0].delivery)
+  const isEcho = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.is_echo && payloadBody.entry[0].messaging[0].message.is_echo === 'true'))
 
   // if (!payloadBody.entry[0].messaging[0].delivery) {
   //   // PLEASE DON'T REMOVE THIS LINE:
@@ -265,10 +266,16 @@ exports.newSubscriberWebhook = (payloadBody) => {
                         if (!subscriberFound.isSubscribed) {
                           // subscribing the subscriber again in case he
                           // or she unsubscribed and removed chat
-                          callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
-                            .then(subscriber => {
-                              logger.serverLog(TAG, subscriber)
-                            })
+                          var messageText = ''
+                          if (isMessage) {
+                            messageText = payloadBody.entry[0].messaging[0].message.text
+                          }
+                          if (!isEcho && (messageText.toLowerCase() === 'subscribe' || messageText.toLowerCase() === 'start')) {
+                            callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
+                              .then(subscriber => {
+                                logger.serverLog(TAG, subscriber)
+                              })
+                          }
                         }
                         if (!(event.postback &&
                           event.postback.title === 'Get Started')) {
