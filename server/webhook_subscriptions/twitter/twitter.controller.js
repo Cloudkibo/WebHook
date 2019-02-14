@@ -44,6 +44,7 @@ exports.webhook = function (req, res) {
 }
 
 function webhookHandler (body) {
+  console.log('webhook twitter', body)
   let webhookCalled = false
   init.getRegistry().map((entry) => {
     if (validator.validate(body, entry.schema).valid) {
@@ -52,6 +53,7 @@ function webhookHandler (body) {
     }
   })
   if (webhookCalled) {
+    console.log(`webhook called for twitter`)
     logger.serverLog(TAG, `webhook called`)
   } else {
     logger.serverLog(TAG, `No webhook for the given request schema`)

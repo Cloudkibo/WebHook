@@ -28,6 +28,7 @@ exports.webhook = function (req, res) {
 }
 
 function webhookHandler (body) {
+  console.log('webhook wordpress', body)
   let webhookCalled = false
   init.getRegistry().map((entry) => {
     if (validator.validate(body, entry.schema).valid) {
