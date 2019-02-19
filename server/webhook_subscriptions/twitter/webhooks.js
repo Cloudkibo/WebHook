@@ -15,7 +15,8 @@ exports.simpleTweet = (payload) => {
 
 exports.mediaTweet = (payload) => {
   logger.serverLog(TAG, `in mediaTweet Webhook ${JSON.stringify(payload)}`)
-  callApi.callApi('twitterEvents/twitterAutopostingMedia', 'post', payload)
+  console.log('in mediaTweet')
+  callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload)
       .then((response) => {
         logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'kiboengage')
       })
