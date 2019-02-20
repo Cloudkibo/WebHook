@@ -4,7 +4,7 @@ const twitterSchemas = require('../twitter/schemas')
 const twitterWebhooks = require('../twitter/webhooks')
 
 function initRegistry () {
-  init.registerCallback(twitterSchemas.simpleTweet, (payload) => { twitterWebhooks.simpleTweet(payload) })
+  // init.registerCallback(twitterSchemas.simpleTweet, (payload) => { twitterWebhooks.simpleTweet(payload) })
   init.registerCallback(twitterSchemas.mediaTweet, (payload) => { twitterWebhooks.mediaTweet(payload) })
 }
 

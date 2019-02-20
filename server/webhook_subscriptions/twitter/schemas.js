@@ -77,10 +77,7 @@ exports.mediaTweet = {
             }
           ]
         }
-      },
-      'required': [
-        'media'
-      ]
+      }
     }
   },
   'required': [

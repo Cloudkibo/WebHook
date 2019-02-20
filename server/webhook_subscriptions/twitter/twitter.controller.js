@@ -44,7 +44,8 @@ exports.webhook = function (req, res) {
 }
 
 function webhookHandler (body) {
-  console.log('webhook twitter', body)
+  console.log('webhook twitter', JSON.stringify(body))
+  console.log('webhook twitter', JSON.stringify(body.entities.media))
   let webhookCalled = false
   init.getRegistry().map((entry) => {
     if (validator.validate(body, entry.schema).valid) {
