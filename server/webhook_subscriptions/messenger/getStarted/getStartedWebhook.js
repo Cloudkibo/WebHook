@@ -57,7 +57,7 @@ function sendWelcomeMessage (payload) {
     .then(page => {
       page = page[0]
       console.log('page fetched', page)
-      callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
+      callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender, companyId: page.companyId }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
           if (subscriber) {
