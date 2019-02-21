@@ -90,7 +90,7 @@ function handleUnsubscribe (resp, req) {
           .then(subscribers => {
             let subscriber = subscribers[0]
             logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`)
-            callApi.callApi('featureUsage/updatePlanUsage', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
+            callApi.callApi('featureUsage/updateCompany', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
               .then(updated => {
                 logger.serverLog(TAG, `company usage incremented succssfully ${JSON.stringify(updated)}`)
               })
