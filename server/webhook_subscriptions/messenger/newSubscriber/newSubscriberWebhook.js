@@ -175,7 +175,9 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                             if (subscriberSource === 'landing_page') {
                                               callApi.callApi('messengerEvents/landingPage', 'post', {
                                                 pageId: payloadBody.entry[0].messaging[i].recipient.id,
-                                                senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kiboengage')
+                                                senderId: payloadBody.entry[0].messaging[i].sender.id,
+                                                companyId: page.companyId
+                                              }, 'kiboengage')
                                               .then((response) => {
                                                 logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
                                               })
@@ -255,7 +257,9 @@ exports.newSubscriberWebhook = (payloadBody) => {
                         if (subscriberSource === 'landing_page') {
                           callApi.callApi('messengerEvents/landingPage', 'post', {
                             pageId: payloadBody.entry[0].messaging[i].recipient.id,
-                            senderId: payloadBody.entry[0].messaging[i].sender.id }, 'kiboengage')
+                            senderId: payloadBody.entry[0].messaging[i].sender.id,
+                            companyId: page.companyId
+                          }, 'kiboengage')
                           .then((response) => {
                             logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`)
                           })
