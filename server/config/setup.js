@@ -60,6 +60,8 @@ module.exports = function (app, httpapp, config) {
   })
 
   if (config.env === 'production' || config.env === 'staging') {
+    logger.serverLog(TAG, `Webhook server STARTED on ${
+      config.secure_port} in ${config.env} mode`)
     // console.log('KiboHook server STARTED on %s in %s mode', config.port, config.env)
     //  initWebhooks.registeryInit()
   }
