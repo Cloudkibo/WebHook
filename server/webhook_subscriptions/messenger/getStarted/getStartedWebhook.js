@@ -14,7 +14,7 @@ exports.getStartedWebhook = (payload) => {
     callApi.callApi('messenger_code/webhook', 'post', payload.entry[0].messaging[0], 'accounts')
   }
 
-  if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>' || payload.entry[0].messaging[0].postback.payload !== 'GET_STARTED_PAYLOAD') {
+  if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>' && payload.entry[0].messaging[0].postback.payload !== 'GET_STARTED_PAYLOAD') {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
     let resp = ''
