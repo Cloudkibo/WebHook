@@ -30,5 +30,8 @@ module.exports = {
 
   ENGAGE_URL: 'https://kiboengage.cloudkibo.com/api/',
 
-  DEMOSSA_URL: 'https://www.synaps3webrtc.com/'
+  DEMOSSA_URL: 'https://www.synaps3webrtc.com/',
+
+  ENGAGE_DBLAYER: `http://142.93.179.77/api/v1/`
+
 }
