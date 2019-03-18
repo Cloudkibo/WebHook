@@ -17,6 +17,8 @@ module.exports = function (app) {
 
   app.use('/webhooks/wordpress', require('./webhook_subscriptions/wordpress'))
 
+  app.use('/webhooks/twilio', require('./webhook_subscriptions/twilio'))
+
   app.route('/:url(api|auth)/*').get((req, res) => {
     res.status(404).send({url: `${req.originalUrl} not found`})
   }).post((req, res) => {
