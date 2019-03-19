@@ -20,3 +20,7 @@ exports.trackDelivery = function (req, res) {
   }
   return res.status(200).json({ status: 'success' })
 }
+exports.receiveSms = function (req, res) {
+  callApi.callApi('twilioEvents', 'post', req.body, 'kibochat')
+  return res.status(200).json({ status: 'success' })
+}
