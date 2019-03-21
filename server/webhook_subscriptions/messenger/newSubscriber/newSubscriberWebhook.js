@@ -121,6 +121,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                         callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                           .then(subscriberCreated => {
                                             console.log('subscriberCreated')
+                                            assignDefaultTags(page, subscriberCreated)
                                             callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: sender, pageId: page._id}, 'kiboengage')
                                             callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
                                               .then(updated => {
@@ -358,5 +359,77 @@ function updateList (phoneNumber, sender, page) {
             logger.serverLog(TAG, `Failed to update update subscriber ${JSON.stringify(err)}`)
           })
       }
+    })
+}
+
+function assignDefaultTags (page, subscriber) {
+  let subscribersData = [
+    {$match: {pageId: page._id}},
+    {$group: {_id: null, count: {$sum: 1}}}
+  ]
+  callApi.callApi('subscribers/aggregate', 'post', subscribersData, 'accounts')
+    .then(subscribersCount => {
+      let value = (subscribersCount[0].count - 1) % 10000
+      let count = Math.floor(subscribersCount[0].count / 10000)
+      if (value === 0 && subscribersCount[0].count > 10000) {
+        createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
+      } else {
+        assignTag(page, subscriber, `_${page.pageId}_${count + 1}`)
+      }
+      assignTag(page, subscriber, subscriber.gender)
+      assignTag(page, subscriber, subscriber.locale)
+    })
+    .catch(err => logger.serverLog(TAG, `Failed to get subscribers count ${err}`))
+}
+
+function assignTag (page, subscriber, tag) {
+  callApi.callApi('tags/query', 'post', {tag, pageId: page._id}, 'accounts')
+    .then(tags => {
+      let tag = tags[0]
+      needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.pageAccessToken}`, 'post', {'user': subscriber.senderId})
+        .then(assignedLabel => {
+          if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`)
+          let subscriberTagsPayload = {
+            tagId: tag._id,
+            subscriberId: subscriber._id,
+            companyId: page.companyId
+          }
+          callApi.callApi(`tags_subscriber/`, 'post', subscriberTagsPayload, 'accounts')
+            .then(newRecord => {
+              logger.serverLog(TAG, `label associated successfully!`)
+            })
+            .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`))
+        })
+        .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`))
+    })
+    .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`))
+}
+
+function createTag (page, subscriber, tag) {
+  needle('post', `https://graph.facebook.com/v2.11/me/custom_labels?accessToken=${page.pageAccessToken}`)
+    .then(label => {
+      if (label.id) {
+        let tagData = {
+          tag: tag,
+          userId: page.userId,
+          companyId: page.companyId,
+          pageId: page._id,
+          labelFbId: label.id,
+          defaultTag: true
+        }
+        callApi('tags', 'post', tagData, 'accounts')
+          .then(created => {
+            assignTag(page, subscriber, tag)
+            logger.serverLog(TAG, `default tag created successfully!`)
+          })
+          .catch(err => {
+            logger.serverLog(TAG, `Error at save tag ${err}`)
+          })
+      } else {
+        logger.serverLog(TAG, `Error at create tag on Facebook ${label.error}`)
+      }
+    })
+    .catch(err => {
+      logger.serverLog(TAG, `Error at create tag on Facebook ${err}`)
     })
 }
