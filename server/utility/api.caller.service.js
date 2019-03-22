@@ -19,7 +19,7 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
   } else if (type === 'demossa') {
     uri = `${config.DEMOSSA_URL}${endpoint}`
   } else if (type === 'telco') {
-    uri = `${config.DEMOSSA_URL}${endpoint}`
+    uri = `${config.TELCO_URL}${endpoint}`
   } else if (type === 'engageDbLayer') {
     uri = `${config.ENGAGE_DBLAYER}${endpoint}`
   } else {
