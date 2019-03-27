@@ -6,7 +6,9 @@ const pageAdminSubscriptionWebhok = require('../pageAdminSubscription/pageAdminS
 
 
 exports.newSubscriberWebhook = (payloadBody) => {
-  if(payloadBody.entry[0].messaging[0].optin.ref === '_kibopush_test_broadcast_'){
+  let ref = payloadBody.entry[0].messaging[0].optin.ref.split('__')
+  if(ref.length === 2 && ref[1] === 'kibopush_test_broadcast_'){
+    payloadBody.entry[0].messaging[0].optin.ref = ref[0]
     pageAdminSubscriptionWebhok.adminSubscriberWebhook(payloadBody) 
   }else {
     logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
