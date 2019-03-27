@@ -2,8 +2,13 @@ const TAG = 'webhook_subscriptions/messenger/newSubscriberWebhook.js'
 const logger = require('../../../components/logger')
 const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
+const pageAdminSubscriptionWebhok = require('../pageAdminSubscription/pageAdminSubscriptionWebhook')
+
 
 exports.newSubscriberWebhook = (payloadBody) => {
+  if(payloadBody.entry.messaging.optin.ref === '_kibopush_test_broadcast_'){
+    pageAdminSubscriptionWebhok.adminSubscriberWebhook(payloadBody) 
+  }else 
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
   console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
   callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
