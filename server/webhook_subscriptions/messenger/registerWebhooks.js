@@ -35,7 +35,7 @@ const policyWebhook = require('./policy/policyWebhook')
 
 function initRegistry () {
   // init.registerCallback(validationSchema.testSchema, (payload) => { console.log('Sample Webhook Called') })
-  init.registerCallback(pageAdminSubscriptionSchema.pageAdminSubscriptionSchema, (payload) => { pageAdminSubscriptionWebhok.adminSubscriberWebhook(payload) })
+  //init.registerCallback(pageAdminSubscriptionSchema.pageAdminSubscriptionSchema, (payload) => { pageAdminSubscriptionWebhok.adminSubscriberWebhook(payload) })
   init.registerCallback(messengerCodeSchema.CodeSchema, (payload) => { messengerCodeWebhook.getStartedWebhook(payload) })
   init.registerCallback(seenValidation.seenSchema, (payload) => { seenWebhook.seenWebhook(payload) })
   init.registerCallback(deliveryValidation.deliverySchema, (payload) => { deliveryWebhook.deliveryWebhook(payload) })
