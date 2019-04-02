@@ -4,28 +4,30 @@ const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
 const pageAdminSubscriptionWebhok = require('../pageAdminSubscription/pageAdminSubscriptionWebhook')
 
-
 exports.newSubscriberWebhook = (payloadBody) => {
-  let ref = payloadBody.entry[0].messaging[0].optin.ref.split('__')
-  if(ref.length === 2 && ref[1] === 'kibopush_test_broadcast_'){
+  logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
+  console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
+  callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
+
+  const isMessage = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.text || payloadBody.entry[0].messaging[0].message.attachments))
+  const isReferral = (payloadBody.entry[0].messaging[0].referral)
+  const isOptin = (payloadBody.entry[0].messaging[0].optin)
+  const isPostback = (payloadBody.entry[0].messaging[0].postback)
+  const isDelivery = (payloadBody.entry[0].messaging[0].delivery)
+  const isEcho = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.is_echo && payloadBody.entry[0].messaging[0].message.is_echo === 'true'))
+
+  // if (!payloadBody.entry[0].messaging[0].delivery) {
+  //   // PLEASE DON'T REMOVE THIS LINE:
+  //   // callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
+  // }
+  let ref = []
+  if (isOptin) {
+    ref = payloadBody.entry[0].messaging[0].optin.ref.split('__')
+  }
+  if (ref.length === 2 && ref[1] === 'kibopush_test_broadcast_') {
     payloadBody.entry[0].messaging[0].optin.ref = ref[0]
-    pageAdminSubscriptionWebhok.adminSubscriberWebhook(payloadBody) 
-  }else {
-    logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
-    console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
-    callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
-
-    const isMessage = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.text || payloadBody.entry[0].messaging[0].message.attachments))
-    const isReferral = (payloadBody.entry[0].messaging[0].referral)
-    const isOptin = (payloadBody.entry[0].messaging[0].optin)
-    const isPostback = (payloadBody.entry[0].messaging[0].postback)
-    const isDelivery = (payloadBody.entry[0].messaging[0].delivery)
-    const isEcho = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.is_echo && payloadBody.entry[0].messaging[0].message.is_echo === 'true'))
-
-    // if (!payloadBody.entry[0].messaging[0].delivery) {
-    //   // PLEASE DON'T REMOVE THIS LINE:
-    //   // callApi.callApi('messengerEvents/subscriber', 'post', payloadBody)
-    // }
+    pageAdminSubscriptionWebhok.adminSubscriberWebhook(payloadBody)
+  } else {
     if ((isMessage || isReferral || isOptin) && !isPostback && !isDelivery) {
       console.log('inside if conditions')
       let phoneNumber = ''
@@ -336,7 +338,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
     }
   }
 }
-
 
 function updateList (phoneNumber, sender, page) {
   callApi.callApi(`phone/query`, 'post', {number: phoneNumber, hasSubscribed: true, pageId: page, companyId: page.companyId}, 'accounts')
