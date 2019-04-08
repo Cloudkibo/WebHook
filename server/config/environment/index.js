@@ -45,7 +45,9 @@ const all = {
     callbackUrl: 'https://swebhooks.cloudkibo.com/api/twitter'
   },
 
-  demoSSAPageIds: ['382154169188869', '350372502408394']
+  demoSSAPageIds: ['382154169188869', '350372502408394'],
+
+  telcoPageId: ['975622025980854']
 }
 
 module.exports = _.merge(

@@ -32,6 +32,8 @@ module.exports = {
 
   DEMOSSA_URL: 'https://www.synaps3webrtc.com/',
 
+  TELCO_URL: 'https://zircon-spatula.glitch.me/',
+
   ENGAGE_DBLAYER: `http://142.93.179.77/api/v1/`
 
 }
