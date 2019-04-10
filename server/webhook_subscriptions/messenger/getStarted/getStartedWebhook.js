@@ -14,7 +14,7 @@ exports.getStartedWebhook = (payload) => {
     callApi.callApi('messenger_code/webhook', 'post', payload.entry[0].messaging[0], 'accounts')
   }
 
-  if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>') {
+  if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>' && payload.entry[0].messaging[0].postback.payload !== 'GET_STARTED_PAYLOAD') {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
     let resp = ''
@@ -57,6 +57,9 @@ function sendWelcomeMessage (payload) {
     .then(page => {
       page = page[0]
       console.log('page fetched', page)
+      logger.serverLog(TAG, `pageId ${JSON.stringify(page._id)}`)
+      logger.serverLog(TAG, `page fetched in welcomeMessage ${JSON.stringify(page.companyId)}`)
+      logger.serverLog(TAG, `senderId ${JSON.stringify(sender)}`)
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender, companyId: page.companyId }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
