@@ -20,6 +20,8 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
     uri = `${config.DEMOSSA_URL}${endpoint}`
   } else if (type === 'engageDbLayer') {
     uri = `${config.ENGAGE_DBLAYER}${endpoint}`
+  } else if (type === 'chatDbLayer') {
+    uri = `${config.CHAT_DBLAYER}${endpoint}`
   } else {
     uri = `${config.API_URL}${endpoint}`
   }
