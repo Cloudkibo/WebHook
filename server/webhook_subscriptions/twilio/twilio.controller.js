@@ -47,12 +47,13 @@ exports.trackDeliveryWhatsApp = function (req, res) {
 }
 
 exports.trackStatusWhatsAppChat = function (req, res) {
+  console.log('trackStatusWhatsAppChat', req.body)
   let query = {}
   if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'READ') {
     query = {
       purpose: 'updateOne',
       match: {_id: req.params.id},
-      updated: {status: 'seen'}
+      updated: {status: 'seen', seenDateTime: Date.now}
     }
   }
   callApi.callApi(`whatsAppChat`, 'put', query, 'chatDbLayer')
@@ -72,6 +73,7 @@ exports.receiveSms = function (req, res) {
   return res.status(200).json({ status: 'success' })
 }
 exports.receiveWhatsApp = function (req, res) {
+  console.log('receiveWhatsApp', req.body)
   callApi.callApi('twilioEvents/whatsApp', 'post', req.body, 'kibochat')
   return res.status(200).json({ status: 'success' })
 }
