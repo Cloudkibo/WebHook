@@ -34,36 +34,40 @@ exports.trackDeliveryWhatsApp = function (req, res) {
       updated: {$inc: { seen: 1 }}
     }
   }
-  callApi.callApi(`whatsAppBroadcasts`, 'put', query, 'engageDbLayer')
-    .then(updated => {
+  if (query !== {}) {
+    callApi.callApi(`whatsAppBroadcasts`, 'put', query, 'engageDbLayer')
+      .then(updated => {
+      })
+    .catch(err => {
+      return res.status(500).json({
+        status: 'failed',
+        description: `Internal server error in updating plan usage ${err}`
+      })
     })
-  .catch(err => {
-    return res.status(500).json({
-      status: 'failed',
-      description: `Internal server error in updating plan usage ${err}`
-    })
-  })
+  }
   return res.status(200).json({ status: 'success' })
 }
 
 exports.trackStatusWhatsAppChat = function (req, res) {
+  console.log('trackStatusWhatsAppChat', req.body)
   let query = {}
-  if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'READ') {
+  if (req.body.SmsStatus === 'delivered' && req.body.EventType && req.body.EventType === 'READ') {
+    console.log('going to update')
     query = {
       purpose: 'updateOne',
       match: {_id: req.params.id},
       updated: {status: 'seen', seenDateTime: Date.now}
     }
+    callApi.callApi(`whatsAppChat`, 'put', query, 'chatDbLayer')
+      .then(updated => {
+      })
+    .catch(err => {
+      return res.status(500).json({
+        status: 'failed',
+        description: `Internal server error in updating plan usage ${err}`
+      })
+    })
   }
-  callApi.callApi(`whatsAppChat`, 'put', query, 'chatDbLayer')
-    .then(updated => {
-    })
-  .catch(err => {
-    return res.status(500).json({
-      status: 'failed',
-      description: `Internal server error in updating plan usage ${err}`
-    })
-  })
   return res.status(200).json({ status: 'success' })
 }
 
