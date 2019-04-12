@@ -52,7 +52,7 @@ exports.trackStatusWhatsAppChat = function (req, res) {
     query = {
       purpose: 'updateOne',
       match: {_id: req.params.id},
-      updated: {status: 'seen'}
+      updated: {status: 'seen', seenDateTime: Date.now}
     }
   }
   callApi.callApi(`whatsAppChat`, 'put', query, 'chatDbLayer')
