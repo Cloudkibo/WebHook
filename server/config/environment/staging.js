@@ -33,5 +33,7 @@
 
    DEMOSSA_URL: 'https://www.synaps3webrtc.com/',
 
-   ENGAGE_DBLAYER: `http://159.89.46.75/api/v1/`
+   ENGAGE_DBLAYER: `http://159.89.46.75/api/v1/`,
+
+   CHAT_DBLAYER: `http://165.227.65.154/api/v1/`
  }

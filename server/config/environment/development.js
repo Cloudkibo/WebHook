@@ -32,5 +32,7 @@ module.exports = {
 
   DEMOSSA_URL: 'https://www.synaps3webrtc.com/',
 
-  ENGAGE_DBLAYER: `http://localhost:3031/api/v1/`
+  ENGAGE_DBLAYER: `http://localhost:3031/api/v1/`,
+
+  CHAT_DBLAYER: `http://localhost:3030/api/v1/`
 }
