@@ -59,6 +59,32 @@ function handleUnsubscribe (resp, req) {
         callApi.callApi(`subscribers/query`, 'post', { senderId: req.sender.id }, 'accounts')
           .then(subscribers => {
             let subscriber = subscribers[0]
+            callApi.callApi(`pages/query`, 'post', { _id: subscriber.pageId._id }, 'accounts')
+              .then(pages => {
+                let page = pages[0]
+                callApi.callApi(`tags/query`, 'post', { tag: `_${page.pageId}_unsubscribe`, defaultTag: true }, 'accounts')
+                  .then(unsubscribeTag => {
+                    unsubscribeTag = unsubscribeTag[0]
+                    // assign tag
+                    needle('post', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
+                      .then(response => {
+                        if (response.body.error) {
+                          logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`)
+                        } else {
+                          logger.serverLog(TAG, 'unsubscribeTag assigned succssfully!')
+                        }
+                      })
+                      .catch(err => {
+                        logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(err)}`)
+                      })
+                  })
+                  .catch(err => {
+                    logger.serverLog(TAG, `Failed to fetch default tag ${JSON.stringify(err)}`)
+                  })
+              })
+              .catch(err => {
+                logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
+              })
             logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`)
             callApi.callApi('featureUsage/updatePlanUsage', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
               .then(updated => {
