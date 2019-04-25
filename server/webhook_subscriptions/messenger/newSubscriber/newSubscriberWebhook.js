@@ -287,6 +287,27 @@ exports.newSubscriberWebhook = (payloadBody) => {
                               callApi.callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
                                 .then(subscriber => {
                                   logger.serverLog(TAG, subscriber)
+                                  callApi.callApi(`tags/query`, 'post', {tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId}, 'accounts')
+                                    .then(unsubscribeTag => {
+                                      unsubscribeTag = unsubscribeTag[0]
+                                      needle('delete', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
+                                        .then(response => {
+                                          if (response.body.error) {
+                                            logger.serverLog(TAG, `failed to unassigned unsubscribe tag: ${JSON.stringify(response.body.error)}`)
+                                          } else {
+                                            logger.serverLog(TAG, `unsubscribe tag unassigned successfully!`)
+                                          }
+                                        })
+                                        .catch((err) => {
+                                          logger.serverLog(TAG, `failed to unassigned unsubscribe tag: ${JSON.stringify(err)}`)
+                                        })
+                                    })
+                                    .catch((err) => {
+                                      logger.serverLog(TAG, `failed to fetch unsubscribe tag: ${err}`)
+                                    })
+                                })
+                                .catch((err) => {
+                                  logger.serverLog(TAG, `failed to update subscriber: ${err}`)
                                 })
                             }
                           }
