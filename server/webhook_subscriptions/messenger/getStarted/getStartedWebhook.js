@@ -8,6 +8,8 @@ const {newSubscriberWebhook} = require('../newSubscriber/newSubscriberWebhook')
 
 exports.getStartedWebhook = (payload) => {
   logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
+  console.log(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
+
   if (payload.entry[0].messaging[0].postback.referral) {
     // This will send postback referal for messenger code
     logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`)
@@ -81,6 +83,7 @@ function sendWelcomeMessage (payload) {
     })
 }
 function handleUnsubscribe (resp, req) {
+  console.log('in handleUnsubscribe')
   let messageData = {}
   if (resp.action === 'yes') {
     messageData = {
@@ -92,6 +95,36 @@ function handleUnsubscribe (resp, req) {
         callApi.callApi(`subscribers/query`, 'post', { senderId: req.sender.id }, 'accounts')
           .then(subscribers => {
             let subscriber = subscribers[0]
+            console.log(TAG, `subscriberfound: ${JSON.stringify(subscriber)}`)
+            callApi.callApi(`pages/query`, 'post', { _id: subscriber.pageId._id }, 'accounts')
+              .then(pages => {
+                let page = pages[0]
+                callApi.callApi(`tags/query`, 'post', { tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId }, 'accounts')
+                  .then(unsubscribeTag => {
+                    unsubscribeTag = unsubscribeTag[0]
+                    console.log(TAG, `unsubscribeTag: ${JSON.stringify(unsubscribeTag)}`)
+                    // assign tag
+                    needle('post', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
+                      .then(response => {
+                        if (response.body.error) {
+                          logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`)
+                          console.log(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`)
+                        } else {
+                          logger.serverLog(TAG, 'unsubscribeTag assigned succssfully!')
+                          console.log(TAG, 'unsubscribeTag assigned succssfully!')
+                        }
+                      })
+                      .catch(err => {
+                        logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(err)}`)
+                      })
+                  })
+                  .catch(err => {
+                    logger.serverLog(TAG, `Failed to fetch default tag ${JSON.stringify(err)}`)
+                  })
+              })
+              .catch(err => {
+                logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
+              })
             logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`)
             callApi.callApi('featureUsage/updateCompany', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
               .then(updated => {
