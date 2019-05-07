@@ -9,6 +9,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
   console.log('in newSubscriberWebhook', JSON.stringify(payloadBody))
   callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
 
+  // todo all these should be separate schemas for matching
+  // this is making the code messy. It needs refactor. @Sojharo
   const isMessage = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.text || payloadBody.entry[0].messaging[0].message.attachments))
   const isReferral = (payloadBody.entry[0].messaging[0].referral)
   const isOptin = (payloadBody.entry[0].messaging[0].optin)
@@ -34,8 +36,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
       let subscriberSource = 'direct_message'
       for (let i = 0; i < payloadBody.entry[0].messaging.length; i++) {
         const event = payloadBody.entry[0].messaging[i]
-        const sender = payloadBody.entry[0].messaging[0].message && payloadBody.entry[0].messaging[0].message.is_echo ? event.recipient.id : event.sender.id
-        const pageId = payloadBody.entry[0].messaging[0].message && payloadBody.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
+        const sender = payloadBody.entry[0].messaging[i].message && payloadBody.entry[0].messaging[i].message.is_echo ? event.recipient.id : event.sender.id
+        const pageId = payloadBody.entry[0].messaging[i].message && payloadBody.entry[0].messaging[i].message.is_echo ? event.sender.id : event.recipient.id
         if (event.message && event.message.tags && event.message.tags.source === 'customer_chat_plugin') {
           subscriberSource = 'chat_plugin'
         }
@@ -47,9 +49,51 @@ exports.newSubscriberWebhook = (payloadBody) => {
           console.log('event.referral', event.referral)
           subscriberSource = 'messaging_referrals'
         }
-        if (event.optin) {
+        // checkbox plugin code starts
+        let userRefIdForCheckBox
+        let refPayload = JSON.parse(payloadBody.entry[0].messaging[i].optin.ref)
+        if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
+          let companyId = refPayload.company_id
+          let pageId = payloadBody.entry[0].messaging[i].recipient.id
+          userRefIdForCheckBox = payloadBody.entry[0].messaging[i].optin.user_ref
+          callApi.callApi('webhooks/query', 'post', {companyId, pageId}, 'accounts')
+          .then(webhook => {
+            webhook = webhook[0]
+            if (webhook && webhook.isEnabled) {
+              needle.get(webhook.webhook_url, (err, r) => {
+                if (err) {
+                  logger.serverLog(TAG, err)
+                } else if (r.statusCode === 200) {
+                  if (webhook && webhook.optIn.NEW_OPTIN) {
+                    var data = {
+                      subscription_type: 'NEW_OPTIN',
+                      payload: JSON.stringify({ subscriberRefId: userRefIdForCheckBox, payload: refPayload })
+                    }
+                    needle.post(webhook.webhook_url, data,
+                      (error, response) => {
+                        if (error) logger.serverLog(TAG, err)
+                      })
+                  }
+                } else {
+                  // webhookUtility.saveNotification(webhook)
+                }
+              })
+            }
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`)
+          })
+          return
+        } else if (event.optin) {
           subscriberSource = 'landing_page'
         }
+        if (payloadBody.entry[0].messaging[i].prior_message) {
+          if (payloadBody.entry[0].messaging[i].prior_message.source === 'checkbox_plugin') {
+            subscriberSource = 'checkbox_plugin'
+            userRefIdForCheckBox = payloadBody.entry[0].messaging[i].prior_message.identifier
+          }
+        }
+        // checkbox plugin code ends
         callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
         .then(pages => {
           console.log('pages.length', pages.length)
@@ -106,7 +150,51 @@ exports.newSubscriberWebhook = (payloadBody) => {
                       payload.source = `https://m.me/${page._id}?ref=${event.referral.ref}`
                     } else if (subscriberSource === 'landing_page') {
                       payload.source = 'landing_page'
+                    } else if (subscriberSource === 'checkbox_plugin') {
+                      payload.source = 'checkbox_plugin'
                     }
+                    // checkbox plugin code starts here
+                    if (userRefIdForCheckBox) {
+                      payload.userRefIdForCheckBox = userRefIdForCheckBox
+                      callApi.callApi('webhooks/query', 'post', {companyId: page.companyId, pageId: page.pageId}, 'accounts')
+                      .then(webhook => {
+                        webhook = webhook[0]
+                        if (webhook && webhook.isEnabled) {
+                          needle.get(webhook.webhook_url, (err, r) => {
+                            if (err) {
+                              logger.serverLog(TAG, err)
+                            } else if (r.statusCode === 200) {
+                              if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
+                                var data = {
+                                  subscription_type: 'NEW_SUBSCRIBER',
+                                  payload: JSON.stringify({
+                                    subscriberRefId: userRefIdForCheckBox,
+                                    payload: {
+                                      firstName: subscriber.first_name,
+                                      lastName: subscriber.last_name,
+                                      locale: subscriber.locale,
+                                      gender: subscriber.gender,
+                                      timezone: subscriber.timezone,
+                                      profilePic: subscriber.profile_pic,
+                                      subscriberSenderId: sender
+                                    }})
+                                }
+                                needle.post(webhook.webhook_url, data,
+                                  (error, response) => {
+                                    if (error) logger.serverLog(TAG, err)
+                                  })
+                              }
+                            } else {
+                              // webhookUtility.saveNotification(webhook)
+                            }
+                          })
+                        }
+                      })
+                      .catch((err) => {
+                        logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`)
+                      })
+                    }
+                    // checkbox plugin code ends here
                     callApi.callApi(`subscribers/query`, 'post', {senderId: sender, pageId: page._id}, 'accounts')
                       .then(subscriberFound => {
                         console.log('fetched subscriber', subscriberFound)
