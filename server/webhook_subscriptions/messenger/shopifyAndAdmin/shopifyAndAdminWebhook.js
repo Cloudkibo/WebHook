@@ -1,7 +1,6 @@
 const TAG = 'webhook_subscriptions/messenger/shopifyAndAdminWebhook.js'
 const logger = require('../../../components/logger')
 const callApi = require('../../../utility/api.caller.service')
-const needle = require('needle')
 
 exports.shopifyAndAdminWebhook = (payload) => {
   if (payload.entry[0].messaging[0].optin.ref === 'SHOPIFY') {
