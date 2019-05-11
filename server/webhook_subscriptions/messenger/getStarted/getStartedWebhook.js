@@ -228,12 +228,10 @@ function subscribeIncomingUser (payload, jsonMessageId) {
         .then(subscriber => {
           subscriber = subscriber[0]
           if (subscriber) {
-            callApi.callApi('messengerEvents/jsonAdReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
-            console.log('subscriber fetched', subscriber)
-            getResponseMessage(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken, jsonMessageId)
+            callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
           } else {
             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
-            callApi.callApi('messengerEvents/jsonAdReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+            callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
           }
         })
         .catch(err => {
