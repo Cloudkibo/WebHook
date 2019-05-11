@@ -216,6 +216,32 @@ function getResponseMessage (page, senderId, firstName, lastName, accessToken, j
         })
     })
 }
+// function subscribeIncomingUser (payload, jsonMessageId) {
+//   const sender = payload.entry[0].messaging[0].sender.id
+//   const pageId = payload.entry[0].messaging[0].recipient.id
+//   console.log('senderId', sender)
+//   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+//     .then(page => {
+//       page = page[0]
+//       console.log('page fetched', page)
+//       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
+//         .then(subscriber => {
+//           subscriber = subscriber[0]
+//           if (subscriber) {
+//             callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+//           } else {
+//             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
+//             callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+//           }
+//         })
+//         .catch(err => {
+//           logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
+//         })
+//     })
+//     .catch(err => {
+//       logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
+//     })
+// }
 function subscribeIncomingUser (payload, jsonMessageId) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
@@ -228,10 +254,36 @@ function subscribeIncomingUser (payload, jsonMessageId) {
         .then(subscriber => {
           subscriber = subscriber[0]
           if (subscriber) {
-            callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+            console.log('subscriber fetched', subscriber)
+            getResponseMessage(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken, jsonMessageId)
           } else {
+            console.log('going to newSubscriberWebhook')
             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
-            callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+            needle.get(
+              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
+              (err, resp2) => {
+                if (err) {
+                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
+                }
+                console.log('pageAccessToken', resp2.body)
+                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
+                let pageAccessToken = resp2.body.access_token
+                const options = {
+                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+                  qs: { access_token: page.accessToken },
+                  method: 'GET'
+
+                }
+                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
+                needle.get(options.url, options, (error, response) => {
+                  if (error) {
+                    console.log('error', error)
+                  } else {
+                    console.log('subscriberInfo')
+                    getResponseMessage(page, sender, response.body.first_name, response.body.last_name, pageAccessToken, jsonMessageId)
+                  }
+                })
+              })
           }
         })
         .catch(err => {

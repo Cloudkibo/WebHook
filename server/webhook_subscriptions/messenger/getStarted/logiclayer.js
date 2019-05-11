@@ -84,37 +84,39 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
       resolve({payload})
     } else if (['image', 'audio', 'file', 'video'].indexOf(
       body.componentType) > -1) {
-      let dir = path.resolve(__dirname, '../../../../broadcastFiles/')
-      let fileToStore = ''
-      if (body.componentType === 'file') {
-        fileToStore = dir + '/userfiles/' + body.fileurl.name
-      } else {
-        fileToStore = dir + '/userfiles/' + body.fileurl.id
-      }
-      var stream = request(`${config.ACCOUNTS_URL}files/download/${body.fileurl.id}`).pipe(fs.createWriteStream(fileToStore))
-      stream.on('finish', function () {
-        console.log('finished')
-        let fileReaderStream = fs.createReadStream(fileToStore)
-        stream.on('close', function () {
-          console.log('finished reading')
-          payload = {
-            'messaging_type': messageType,
-            'recipient': JSON.stringify({
-              'id': subscriberId
-            }),
-            'message': JSON.stringify({
-              'attachment': {
-                'type': body.componentType,
-                'payload': {}
-              }
-            }),
-            'filedata': fileReaderStream
+      // let dir = path.resolve(__dirname, '../../../../broadcastFiles/')
+      // let fileToStore = ''
+      // if (body.componentType === 'file') {
+      //   fileToStore = dir + '/userfiles/' + body.fileurl.name
+      // } else {
+      //   fileToStore = dir + '/userfiles/' + body.fileurl.id
+      // }
+      // var stream = request(`${config.ACCOUNTS_URL}files/download/${body.fileurl.id}`).pipe(fs.createWriteStream(fileToStore))
+      // stream.on('finish', function () {
+      //   console.log('finished')
+      //   let fileReaderStream = fs.createReadStream(fileToStore)
+      //   stream.on('close', function () {
+      //     console.log('finished reading')
+      payload = {
+        'messaging_type': messageType,
+        'recipient': JSON.stringify({
+          'id': subscriberId
+        }),
+        'message': JSON.stringify({
+          'attachment': {
+            'type': body.componentType,
+            'payload': {
+              'url': body.fileurl.url,
+              'is_reusable': true
+            }
           }
-          console.log('in filedata', payload)
-          fs.unlink(fileToStore)
-          resolve({payload})
         })
-      })
+      }
+      //     console.log('in filedata', payload)
+      //     fs.unlink(fileToStore)
+      //     resolve({payload})
+      //   })
+      // })
       // todo test this one. we are not removing as we need to keep it for live chat
       // if (!isForLiveChat) deleteFile(body.fileurl)
     } else if (['gif', 'sticker', 'thumbsUp'].indexOf(
