@@ -179,24 +179,27 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
       }
       resolve({payload})
     } else if (body.componentType === 'list') {
-      payload = {
-        'messaging_type': messageType,
-        'recipient': JSON.stringify({
-          'id': subscriberId
-        }),
-        'message': JSON.stringify({
-          'attachment': {
-            'type': 'template',
-            'payload': {
-              'template_type': 'list',
-              'top_element_style': body.topElementStyle,
-              'elements': body.listItems,
-              'buttons': buttonPayload
+      updateListItem(body.listItems)
+      .then(result => {
+        payload = {
+          'messaging_type': messageType,
+          'recipient': JSON.stringify({
+            'id': subscriberId
+          }),
+          'message': JSON.stringify({
+            'attachment': {
+              'type': 'template',
+              'payload': {
+                'template_type': 'list',
+                'top_element_style': body.topElementStyle,
+                'elements': result,
+                'buttons': buttonPayload
+              }
             }
-          }
-        })
-      }
-      resolve({payload})
+          })
+        }
+        resolve({payload})
+      })
     }
   })
 }
@@ -221,6 +224,17 @@ function prepareSubscriberPayload (senderId, pageId) {
     }]
   }
   return data
+}
+function updateListItem (listItems) {
+  return new Promise(function (resolve, reject) {
+    let data = listItems
+    for (let i = 0; i < listItems.length; i++) {
+      delete data[i].id
+      if (i === listItems.length - 1) {
+        resolve(data)
+      }
+    }
+  })
 }
 exports.prepareSendAPIPayload = prepareSendAPIPayload
 exports.isJsonString = isJsonString
