@@ -176,6 +176,7 @@ function sendResponseMessage (page, senderId, firstName, lastName, accessToken, 
       for (let i = 0; i < response.messageContent.length; i++) {
         logicLayer.prepareSendAPIPayload(senderId, response.messageContent[i], firstName, lastName, true, jsonAdMessages)
         .then(result => {
+          console.log('result.payload', JSON.stringify(result.payload))
           request(
             {
               'method': 'POST',
