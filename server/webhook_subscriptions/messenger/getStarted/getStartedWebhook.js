@@ -170,10 +170,10 @@ function handleUnsubscribe (resp, req) {
 }
 
 function sendResponseMessage (page, senderId, firstName, lastName, accessToken, response, jsonAdMessages) {
-  console.log('Send Response Message')
   if (page) {
     if (response.messageContent) {
       for (let i = 0; i < response.messageContent.length; i++) {
+        console.log('response.messageContent[i]', JSON.stringify(response.messageContent[i]))
         logicLayer.prepareSendAPIPayload(senderId, response.messageContent[i], firstName, lastName, true, jsonAdMessages)
         .then(result => {
           console.log('result.payload', JSON.stringify(result.payload))

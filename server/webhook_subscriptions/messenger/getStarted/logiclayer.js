@@ -119,6 +119,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
       // })
       // todo test this one. we are not removing as we need to keep it for live chat
       // if (!isForLiveChat) deleteFile(body.fileurl)
+      resolve({payload})
     } else if (['gif', 'sticker', 'thumbsUp'].indexOf(
       body.componentType) > -1) {
       payload = {
