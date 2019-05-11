@@ -8,6 +8,7 @@ exports.shopifyAndAdminWebhook = (payload) => {
       `in shopifyWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('facebookEvents/shopify', 'post', payload, 'kibocommerce')
   } else {
+    // todo this seems not working, needs to check this
     logger.serverLog(TAG,
       `in addAdminAsSubscriberWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('facebookEvents/addAdminAsSubscriber', 'post', payload, 'kibocommerce')
