@@ -195,36 +195,12 @@ function subscribeIncomingUser (payload, jsonMessageId) {
         .then(subscriber => {
           subscriber = subscriber[0]
           if (subscriber) {
+            callApi.callApi('messengerEvents/jsonAdReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
             console.log('subscriber fetched', subscriber)
             getResponseMessage(page, subscriber.senderId, subscriber.firstName, subscriber.lastName, subscriber.pageId.accessToken, jsonMessageId)
           } else {
-            console.log('going to newSubscriberWebhook')
             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
-            needle.get(
-              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
-              (err, resp2) => {
-                if (err) {
-                  logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`)
-                }
-                console.log('pageAccessToken', resp2.body)
-                logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`)
-                let pageAccessToken = resp2.body.access_token
-                const options = {
-                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
-                  qs: { access_token: page.accessToken },
-                  method: 'GET'
-
-                }
-                logger.serverLog(TAG, `options: ${JSON.stringify(options)}`)
-                needle.get(options.url, options, (error, response) => {
-                  if (error) {
-                    console.log('error', error)
-                  } else {
-                    console.log('subscriberInfo')
-                    getResponseMessage(page, sender, response.body.first_name, response.body.last_name, pageAccessToken, jsonMessageId)
-                  }
-                })
-              })
+            callApi.callApi('messengerEvents/jsonAdReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
           }
         })
         .catch(err => {
