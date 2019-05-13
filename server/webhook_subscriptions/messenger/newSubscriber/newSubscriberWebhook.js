@@ -51,7 +51,8 @@ exports.newSubscriberWebhook = (payloadBody) => {
         }
         // checkbox plugin code starts
         let userRefIdForCheckBox
-        let refPayload = JSON.parse(payloadBody.entry[0].messaging[i].optin.ref)
+        let refPayload;
+        if (payloadBody.entry[0].messaging[i].optin) refPayload = JSON.parse(payloadBody.entry[0].messaging[i].optin.ref)
         if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
           let companyId = refPayload.company_id
           let pageId = payloadBody.entry[0].messaging[i].recipient.id
