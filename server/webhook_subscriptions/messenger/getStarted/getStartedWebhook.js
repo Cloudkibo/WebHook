@@ -170,12 +170,13 @@ function handleUnsubscribe (resp, req) {
 }
 
 function sendResponseMessage (page, senderId, firstName, lastName, accessToken, response, jsonAdMessages) {
-  console.log('Send Response Message')
   if (page) {
     if (response.messageContent) {
       for (let i = 0; i < response.messageContent.length; i++) {
+        console.log('response.messageContent[i]', JSON.stringify(response.messageContent[i]))
         logicLayer.prepareSendAPIPayload(senderId, response.messageContent[i], firstName, lastName, true, jsonAdMessages)
         .then(result => {
+          console.log('result.payload', JSON.stringify(result.payload))
           request(
             {
               'method': 'POST',
@@ -216,6 +217,32 @@ function getResponseMessage (page, senderId, firstName, lastName, accessToken, j
         })
     })
 }
+// function subscribeIncomingUser (payload, jsonMessageId) {
+//   const sender = payload.entry[0].messaging[0].sender.id
+//   const pageId = payload.entry[0].messaging[0].recipient.id
+//   console.log('senderId', sender)
+//   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+//     .then(page => {
+//       page = page[0]
+//       console.log('page fetched', page)
+//       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender }, 'accounts')
+//         .then(subscriber => {
+//           subscriber = subscriber[0]
+//           if (subscriber) {
+//             callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+//           } else {
+//             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
+//             callApi.callApi('messengerEvents/messengerAdsReply', 'post', {payload: payload, jsonMessageId: jsonMessageId}, 'kiboengage')
+//           }
+//         })
+//         .catch(err => {
+//           logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
+//         })
+//     })
+//     .catch(err => {
+//       logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
+//     })
+// }
 function subscribeIncomingUser (payload, jsonMessageId) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
