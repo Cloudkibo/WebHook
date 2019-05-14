@@ -197,33 +197,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                               .catch(err => {
                                                 logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
                                               })
-                                            callApi.callApi(`webhooks/query`, 'post', { pageId: pageId }, 'accounts')
-                                              .then(webhook => {
-                                                webhook = webhook[0]
-                                                if (webhook && webhook.isEnabled) {
-                                                  needle.get(webhook.webhook_url, (err, r) => {
-                                                    if (err) {
-                                                      logger.serverLog(TAG, err)
-                                                    } else if (r.statusCode === 200) {
-                                                      if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-                                                        var data = {
-                                                          subscription_type: 'NEW_SUBSCRIBER',
-                                                          payload: JSON.stringify({ subscriber: subscriber, recipient: pageId, sender: sender })
-                                                        }
-                                                        needle.post(webhook.webhook_url, data,
-                                                          (error, response) => {
-                                                            if (error) logger.serverLog(TAG, err)
-                                                          })
-                                                      }
-                                                    } else {
-                                                      // webhookUtility.saveNotification(webhook)
-                                                    }
-                                                  })
-                                                }
-                                              })
-                                              .catch(err => {
-                                                logger.serverLog(TAG, err)
-                                              })
                                             if (subscriberSource === 'customer_matching') {
                                               updateList(phoneNumber, sender, page)
                                             }
