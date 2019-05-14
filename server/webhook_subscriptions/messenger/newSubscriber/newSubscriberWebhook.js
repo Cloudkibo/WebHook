@@ -123,43 +123,6 @@ exports.newSubscriberWebhook = (payloadBody) => {
                     // checkbox plugin code starts here
                     if (userRefIdForCheckBox) {
                       payload.userRefIdForCheckBox = userRefIdForCheckBox
-                      callApi.callApi('webhooks/query', 'post', {companyId: page.companyId, pageId: page.pageId}, 'accounts')
-                      .then(webhook => {
-                        webhook = webhook[0]
-                        if (webhook && webhook.isEnabled) {
-                          needle.get(webhook.webhook_url, (err, r) => {
-                            if (err) {
-                              logger.serverLog(TAG, err)
-                            } else if (r.statusCode === 200) {
-                              if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-                                var data = {
-                                  subscription_type: 'NEW_SUBSCRIBER',
-                                  payload: JSON.stringify({
-                                    subscriberRefId: userRefIdForCheckBox,
-                                    payload: {
-                                      firstName: subscriber.first_name,
-                                      lastName: subscriber.last_name,
-                                      locale: subscriber.locale,
-                                      gender: subscriber.gender,
-                                      timezone: subscriber.timezone,
-                                      profilePic: subscriber.profile_pic,
-                                      subscriberSenderId: sender
-                                    }})
-                                }
-                                needle.post(webhook.webhook_url, data,
-                                  (error, response) => {
-                                    if (error) logger.serverLog(TAG, err)
-                                  })
-                              }
-                            } else {
-                              // webhookUtility.saveNotification(webhook)
-                            }
-                          })
-                        }
-                      })
-                      .catch((err) => {
-                        logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`)
-                      })
                     }
                     // checkbox plugin code ends here
                     callApi.callApi(`subscribers/query`, 'post', {senderId: sender, pageId: page._id}, 'accounts')
@@ -184,6 +147,47 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                         callApi.callApi(`subscribers`, 'post', payload, 'accounts')
                                           .then(subscriberCreated => {
                                             console.log('subscriberCreated')
+                                            // checkbox code starts
+                                            if (userRefIdForCheckBox) {
+                                              callApi.callApi('webhooks/query', 'post', {companyId: page.companyId, pageId: page.pageId}, 'accounts')
+                                              .then(webhook => {
+                                                webhook = webhook[0]
+                                                if (webhook && webhook.isEnabled) {
+                                                  needle.get(webhook.webhook_url, (err, r) => {
+                                                    if (err) {
+                                                      logger.serverLog(TAG, err)
+                                                    } else if (r.statusCode === 200) {
+                                                      if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
+                                                        var data = {
+                                                          subscription_type: 'NEW_SUBSCRIBER',
+                                                          payload: JSON.stringify({
+                                                            subscriberRefId: userRefIdForCheckBox,
+                                                            payload: {
+                                                              firstName: subscriber.first_name,
+                                                              lastName: subscriber.last_name,
+                                                              locale: subscriber.locale,
+                                                              gender: subscriber.gender,
+                                                              timezone: subscriber.timezone,
+                                                              profilePic: subscriber.profile_pic,
+                                                              subscriberSenderId: subscriberCreated._id
+                                                            }})
+                                                        }
+                                                        needle.post(webhook.webhook_url, data,
+                                                          (error, response) => {
+                                                            if (error) logger.serverLog(TAG, err)
+                                                          })
+                                                      }
+                                                    } else {
+                                                      // webhookUtility.saveNotification(webhook)
+                                                    }
+                                                  })
+                                                }
+                                              })
+                                              .catch((err) => {
+                                                logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`)
+                                              })
+                                            }
+                                            // checkbox code ends
                                             assignDefaultTags(page, subscriberCreated)
                                             callApi.callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: sender, pageId: page._id}, 'kiboengage')
                                             callApi.callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: page.companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
