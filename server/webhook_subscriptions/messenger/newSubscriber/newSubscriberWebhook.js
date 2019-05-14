@@ -51,40 +51,41 @@ exports.newSubscriberWebhook = (payloadBody) => {
         }
         // checkbox plugin code starts
         let userRefIdForCheckBox
-        let refPayload = JSON.parse(payloadBody.entry[0].messaging[i].optin.ref)
-        if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
-          let companyId = refPayload.company_id
-          let pageId = payloadBody.entry[0].messaging[i].recipient.id
-          userRefIdForCheckBox = payloadBody.entry[0].messaging[i].optin.user_ref
-          callApi.callApi('webhooks/query', 'post', {companyId, pageId}, 'accounts')
-          .then(webhook => {
-            webhook = webhook[0]
-            if (webhook && webhook.isEnabled) {
-              needle.get(webhook.webhook_url, (err, r) => {
-                if (err) {
-                  logger.serverLog(TAG, err)
-                } else if (r.statusCode === 200) {
-                  if (webhook && webhook.optIn.NEW_OPTIN) {
-                    var data = {
-                      subscription_type: 'NEW_OPTIN',
-                      payload: JSON.stringify({ subscriberRefId: userRefIdForCheckBox, payload: refPayload })
-                    }
-                    needle.post(webhook.webhook_url, data,
-                      (error, response) => {
-                        if (error) logger.serverLog(TAG, err)
-                      })
-                  }
-                } else {
-                  // webhookUtility.saveNotification(webhook)
-                }
-              })
-            }
-          })
-          .catch((err) => {
-            logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`)
-          })
-          return
-        } else if (event.optin) {
+        // let refPayload = JSON.parse(payloadBody.entry[0].messaging[i].optin.ref)
+        // if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
+        //   let companyId = refPayload.company_id
+        //   let pageId = payloadBody.entry[0].messaging[i].recipient.id
+        //   userRefIdForCheckBox = payloadBody.entry[0].messaging[i].optin.user_ref
+        //   callApi.callApi('webhooks/query', 'post', {companyId, pageId}, 'accounts')
+        //   .then(webhook => {
+        //     webhook = webhook[0]
+        //     if (webhook && webhook.isEnabled) {
+        //       needle.get(webhook.webhook_url, (err, r) => {
+        //         if (err) {
+        //           logger.serverLog(TAG, err)
+        //         } else if (r.statusCode === 200) {
+        //           if (webhook && webhook.optIn.NEW_OPTIN) {
+        //             var data = {
+        //               subscription_type: 'NEW_OPTIN',
+        //               payload: JSON.stringify({ subscriberRefId: userRefIdForCheckBox, payload: refPayload })
+        //             }
+        //             needle.post(webhook.webhook_url, data,
+        //               (error, response) => {
+        //                 if (error) logger.serverLog(TAG, err)
+        //               })
+        //           }
+        //         } else {
+        //           // webhookUtility.saveNotification(webhook)
+        //         }
+        //       })
+        //     }
+        //   })
+        //   .catch((err) => {
+        //     logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`)
+        //   })
+        //   return
+        // } else
+        if (event.optin) {
           subscriberSource = 'landing_page'
         }
         if (payloadBody.entry[0].messaging[i].prior_message) {
