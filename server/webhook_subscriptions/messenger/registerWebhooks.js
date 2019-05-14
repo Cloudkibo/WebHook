@@ -47,7 +47,7 @@ function initRegistry () {
   init.registerCallback(surveyResponseValidation.surveyResponseSchema, (payload) => { surveyResponseWebhook.surveyResponseWebhook(payload) })
   init.registerCallback(autopostingValidation.autopostingSchema, (payload) => { autopostingWebhook.autopostingWebhook(payload) })
   init.registerCallback(chatPluginValidation.chatPluginSchema, (payload) => { chatPluginWebhook.chatPluginWebhook(payload) })
-  init.registerCallback(shopifyValidation.shopifyAndAdminSchema, (payload) => { shopifyWebhook.shopifyAndAdminSchema(payload) })
+  init.registerCallback(shopifyValidation.shopifyAndAdminSchema, (payload) => { shopifyWebhook.shopifyAndAdminWebhook(payload) })
   init.registerCallback(changePageNameValidation.changePageNameSchema, (payload) => { changePageNameWebhook.changePageNameWebhook(payload) })
   init.registerCallback(policySchema.policySchema, (payload) => { policyWebhook.policyWebhook(payload) })
   init.registerCallback(profilePicSchema.profilePicSchema, (payload) => { profilePicWebhook.profilePicWebhook(payload) })
