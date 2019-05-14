@@ -4,18 +4,16 @@ const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
 
 exports.shopifyAndAdminWebhook = (payload) => {
-  console.log('in shopify')
   if (payload.entry[0].messaging[0].optin.ref === 'SHOPIFY') {
     logger.serverLog(TAG,
       `in shopifyWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('facebookEvents/shopify', 'post', payload, 'kibocommerce')
   } else {
-    console.log('payload', JSON.stringify(payload))
+    logger.serverLog(TAG,
+      `in checkbox ${JSON.stringify(payload)}`)
     let userRefIdForCheckBox
     let refPayload = JSON.parse(payload.entry[0].messaging[0].optin.ref)
-    console.log('after', refPayload)
     if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
-      console.log('inside if')
       let companyId = refPayload.company_id
       let pageId = payload.entry[0].messaging[0].recipient.id
       userRefIdForCheckBox = payload.entry[0].messaging[0].optin.user_ref
