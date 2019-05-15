@@ -172,7 +172,7 @@ exports.newSubscriberWebhook = (payloadBody) => {
                                                               subscriberSenderId: subscriberCreated._id
                                                             }})
                                                         }
-                                                        needle.post(webhook.webhook_url, data,
+                                                        needle.post(webhook.webhook_url, data, {json: true},
                                                           (error, response) => {
                                                             if (error) logger.serverLog(TAG, err)
                                                           })

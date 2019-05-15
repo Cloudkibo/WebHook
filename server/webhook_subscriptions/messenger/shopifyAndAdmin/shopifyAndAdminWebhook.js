@@ -30,7 +30,7 @@ exports.shopifyAndAdminWebhook = (payload) => {
                   subscription_type: 'NEW_OPTIN',
                   payload: JSON.stringify({ subscriberRefId: userRefIdForCheckBox, payload: refPayload })
                 }
-                needle.post(webhook.webhook_url, data,
+                needle.post(webhook.webhook_url, data, {json: true},
                   (error, response) => {
                     if (error) logger.serverLog(TAG, err)
                   })
