@@ -16,7 +16,7 @@ exports.verifyHook = function (req, res) {
 }
 
 exports.webhook = function (req, res) {
-  logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
+  // logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
   const event = (req.body.entry && req.body.entry[0] && req.body.entry[0].messaging) ? req.body.entry[0].messaging[0] : ''
   const pageId = event !== '' ? event.recipient.id : ''
   let data = req.body
