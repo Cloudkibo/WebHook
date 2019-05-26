@@ -44,8 +44,6 @@ exports.webhook = function (req, res) {
 }
 
 function webhookHandler (body) {
-  console.log('webhook twitter', JSON.stringify(body))
-  console.log('webhook twitter', JSON.stringify(body.entities.media))
   let webhookCalled = false
   init.getRegistry().map((entry) => {
     if (validator.validate(body, entry.schema).valid) {
@@ -54,7 +52,6 @@ function webhookHandler (body) {
     }
   })
   if (webhookCalled) {
-    console.log(`webhook called for twitter`)
     logger.serverLog(TAG, `webhook called`)
   } else {
     logger.serverLog(TAG, `No webhook for the given request schema`)
@@ -67,7 +64,6 @@ let stream
 function connect () {
   logger.serverLog(TAG, `connect functio called`)
   callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
-    console.log('Autoposting Response', response)
     let autoposting = response
     if (autoposting.length > 0) {
       let arrUsers = []

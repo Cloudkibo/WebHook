@@ -93,10 +93,8 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
       // }
       // var stream = request(`${config.ACCOUNTS_URL}files/download/${body.fileurl.id}`).pipe(fs.createWriteStream(fileToStore))
       // stream.on('finish', function () {
-      //   console.log('finished')
       //   let fileReaderStream = fs.createReadStream(fileToStore)
       //   stream.on('close', function () {
-      //     console.log('finished reading')
       payload = {
         'messaging_type': messageType,
         'recipient': JSON.stringify({
@@ -112,7 +110,6 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
           }
         })
       }
-      //     console.log('in filedata', payload)
       //     fs.unlink(fileToStore)
       //     resolve({payload})
       //   })

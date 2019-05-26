@@ -34,7 +34,6 @@ function addAdminAsSubscriber (payload) {
                     subscriberId: payload.messaging[0].sender.id,
                     pageId: page._id
                   }
-                  console.log('adminsubscriptions', payload.messaging[0].sender.id)
                   callApi.callApi(`adminsubscriptions`, 'post', {companyId: companyUser.companyId,
                     userId: user._id,
                     subscriberId: payload.messaging[0].sender.id,
