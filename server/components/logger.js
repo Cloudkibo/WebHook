@@ -32,7 +32,6 @@ exports.serverLog = function (label, data, type = 'info') {
     // logger.info(`${namespace} - ${data}`)
   } else {
     logger.log(type, `${namespace} - ${data}`)
-    console.log(`${namespace} - ${data}`)
   }
 }
 
