@@ -27,12 +27,14 @@ exports.serverLog = function (label, data, type = 'info') {
 
   if (config.env === 'development' || config.env === 'test') {
     debug(data)
-    console.log(`${namespace} - ${data}`)
     // todo use log levels like info, warn, error and debug
     // logger.info(`${namespace} - ${data}`)
   } else {
-    // TODO comment it out once papertrail is fixed, it is putting lots of console logs on each failure from papertrail call
-    // logger.log(type, `${namespace} - ${data}`)
+    if (config.env === 'production' && ['info', 'error'].indexOf(type) > -1) {
+      logger.log(type, `${namespace} - ${data}`)
+    } else {
+      logger.log(type, `${namespace} - ${data}`)
+    }
   }
 }
 

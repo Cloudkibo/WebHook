@@ -21,10 +21,10 @@ function isAuthorizedWebHookTrigger () {
   return compose().use((req, res, next) => {
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress ||
       req.socket.remoteAddress || req.connection.socket.remoteAddress
-    logger.serverLog(TAG, req.ip)
-    logger.serverLog(TAG, ip)
-    logger.serverLog(TAG, 'This is middleware')
-    logger.serverLog(TAG, req.body)
+    logger.serverLog(TAG, req.ip, 'debug')
+    logger.serverLog(TAG, ip, 'debug')
+    logger.serverLog(TAG, 'This is middleware', 'debug')
+    logger.serverLog(TAG, req.body, 'debug')
     if (ip === '::ffff:' + config.kibo_ip) next()
     else res.send(403)
   })

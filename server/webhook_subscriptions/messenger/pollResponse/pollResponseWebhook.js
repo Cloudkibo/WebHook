@@ -9,20 +9,20 @@ exports.pollResponseWebhook = (payload) => {
       `in talkToHuman ${JSON.stringify(payload)}`)
     callApi.callApi('messengerEvents/talkToHuman', 'post', payload, 'kibochat')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
       .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`)
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   } else {
     logger.serverLog(TAG,
       `in pollResponseWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('messengerEvents/pollResponse', 'post', payload, 'kiboengage')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
       .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`)
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   }
 }
