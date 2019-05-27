@@ -38,7 +38,7 @@ exports.webhook = function (req, res) {
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`)
+    logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`, 'error')
     return res.status(500).json({status: 'failed', err: e})
   }
 }
@@ -70,7 +70,7 @@ function connect () {
       for (let i = 0; i < autoposting.length; i++) {
         arrUsers.push(autoposting[i].payload.id)
       }
-      logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`)
+      logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
       stream = twitterClient.stream('statuses/filter',
         {follow: arrUsers})
 
@@ -82,17 +82,17 @@ function connect () {
         webhookHandler(tweet)
       })
       stream.on('error', error => {
-        logger.serverLog('Stream Error', error)
+        logger.serverLog(TAG, `Stream Error ${error}`, 'error')
       })
     }
   })
   .catch(error => {
-    logger.serverLog(TAG, `Error in fetching autoposting ${error}`)
+    logger.serverLog(TAG, `Error in fetching autoposting ${error}`, 'error')
   })
 }
 
 function restart () {
-  logger.serverLog(TAG, `KiboPush called me`)
+  logger.serverLog(TAG, `KiboPush called me`, 'debug')
   if (stream) stream.stop()
   connect()
 }

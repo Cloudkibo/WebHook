@@ -8,9 +8,9 @@ exports.policyWebhook = (payload) => {
   let data = {pageId: payload.recipient.id, policy: payload['policy-enforcement']}
   callApi.callApi('messengerEvents/policyNotification', 'post', data, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
 }

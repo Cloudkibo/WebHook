@@ -31,12 +31,12 @@ exports.webhook = function (req, res) {
       webhookCalled = webhookHandler(req.body)
     }
 
-    logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`)
+    logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`, 'debug')
 
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${e}`)
+    logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
     return res.status(500).json({status: 'failed', err: e})
   }
 }
