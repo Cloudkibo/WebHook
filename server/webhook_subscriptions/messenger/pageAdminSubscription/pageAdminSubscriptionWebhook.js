@@ -19,15 +19,12 @@ function addAdminAsSubscriber (payload) {
     .then(user => {
       if (user.length > 0) {
         user = user[0]
-        logger.serverLog(TAG, `user: ${JSON.stringify(user)}`)
         callApi.callApi(`companyUser/query`, 'post', { domain_email: user.domain_email }, 'accounts')
           .then(companyUser => {
-            logger.serverLog(TAG, `companyUser: ${JSON.stringify(companyUser)}`)
             callApi.callApi(`pages/query`, 'post', { pageId: payload.id, companyId: companyUser.companyId }, 'accounts')
               .then(pages => {
                 if (pages.length > 0) {
                   let page = pages[0]
-                  logger.serverLog(TAG, `page: ${JSON.stringify(page)}`)
                   let pageAdminPayload = {
                     companyId: companyUser.companyId,
                     userId: user._id,
@@ -42,7 +39,7 @@ function addAdminAsSubscriber (payload) {
                       logger.serverLog(TAG, `Admin subscription added: ${JSON.stringify(record)}`)
                     })
                     .catch(err => {
-                      logger.serverLog(TAG, `Error: Unable to create admin subscription ${JSON.stringify(err)}`)
+                      logger.serverLog(TAG, `Error: Unable to create admin subscription ${JSON.stringify(err)}`, 'error')
                     })
                 }
               })
@@ -51,11 +48,11 @@ function addAdminAsSubscriber (payload) {
               })
           })
           .catch(err => {
-            logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`)
+            logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`, 'error')
           })
       }
     })
     .catch(err => {
-      logger.serverLog(TAG, `Error: Unable to get user ${JSON.stringify(err)}`)
+      logger.serverLog(TAG, `Error: Unable to get user ${JSON.stringify(err)}`, 'error')
     })
 }

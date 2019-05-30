@@ -8,9 +8,9 @@ exports.profilePicWebhook = (payload) => {
   let data = {senderId: payload.entry[0].uid, profilePic: payload.entry[0].changes[0].value}
   callApi.callApi('messengerEvents/updateProfilePic', 'post', data, 'kiboengage')
   .then((response) => {
-    logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+    logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
   })
   .catch((err) => {
-    logger.serverLog(TAG, `error from KiboPush: ${err}`)
+    logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
   })
 }

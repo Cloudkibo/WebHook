@@ -23,7 +23,7 @@ exports.shopifyAndAdminWebhook = (payload) => {
         if (webhook && webhook.isEnabled) {
           needle.get(webhook.webhook_url, (err, r) => {
             if (err) {
-              logger.serverLog(TAG, err)
+              logger.serverLog(TAG, err, 'error')
             } else if (r.statusCode === 200) {
               if (webhook && webhook.optIn.NEW_OPTIN) {
                 var data = {
@@ -32,7 +32,7 @@ exports.shopifyAndAdminWebhook = (payload) => {
                 }
                 needle.post(webhook.webhook_url, data, {json: true},
                   (error, response) => {
-                    if (error) logger.serverLog(TAG, err)
+                    if (error) logger.serverLog(TAG, err, 'error')
                   })
               }
             } else {
@@ -42,7 +42,7 @@ exports.shopifyAndAdminWebhook = (payload) => {
         }
       })
       .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks on Optin: ${err}`)
+        logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks on Optin: ${err}`, 'error')
       })
       return
     }
@@ -51,10 +51,10 @@ exports.shopifyAndAdminWebhook = (payload) => {
       `in addAdminAsSubscriberWebhook ${JSON.stringify(payload)}`)
     callApi.callApi('facebookEvents/addAdminAsSubscriber', 'post', payload, 'kibocommerce')
           .then((response) => {
-            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
           })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
   }
 }

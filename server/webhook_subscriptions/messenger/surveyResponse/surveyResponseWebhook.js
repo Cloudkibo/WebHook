@@ -4,7 +4,6 @@ const callApi = require('../../../utility/api.caller.service')
 const needle = require('needle')
 
 exports.surveyResponseWebhook = (payload) => {
-  console.log('in surveyResponseWebhook')
   if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>') {
     logger.serverLog(TAG,
       `in surveyResponseWebhook ${JSON.stringify(payload)}`)
@@ -12,36 +11,36 @@ exports.surveyResponseWebhook = (payload) => {
     if (resp.survey_id) {
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
             .then((response) => {
-              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
             })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
     } else if (resp.unsubscribe) {
       handleUnsubscribe(resp, payload.entry[0].messaging[0])
     } else if (resp.action === 'subscribe') {
       callApi.callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
     } else if (resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
     } else {
       callApi.callApi('messengerEvents/menu', 'post', payload, 'accounts')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
     }
   }
@@ -55,7 +54,7 @@ function handleUnsubscribe (resp, req) {
     }
     callApi.callApi(`subscribers/update`, 'put', {query: { senderId: req.sender.id }, newPayload: { isSubscribed: false }, options: {}}, 'accounts')
       .then(updated => {
-        logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`)
+        logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`, 'debug')
         callApi.callApi(`subscribers/query`, 'post', { senderId: req.sender.id }, 'accounts')
           .then(subscribers => {
             let subscriber = subscribers[0]
@@ -69,37 +68,37 @@ function handleUnsubscribe (resp, req) {
                     needle('post', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
                       .then(response => {
                         if (response.body.error) {
-                          logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`)
+                          logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`, 'error')
                         } else {
                           logger.serverLog(TAG, 'unsubscribeTag assigned succssfully!')
                         }
                       })
                       .catch(err => {
-                        logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(err)}`)
+                        logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(err)}`, 'error')
                       })
                   })
                   .catch(err => {
-                    logger.serverLog(TAG, `Failed to fetch default tag ${JSON.stringify(err)}`)
+                    logger.serverLog(TAG, `Failed to fetch default tag ${JSON.stringify(err)}`, 'error')
                   })
               })
               .catch(err => {
-                logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`)
+                logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`, 'error')
               })
-            logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`)
+            logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`, 'debug')
             callApi.callApi('featureUsage/updatePlanUsage', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
               .then(updated => {
-                logger.serverLog(TAG, `company usage incremented succssfully ${JSON.stringify(updated)}`)
+                logger.serverLog(TAG, `company usage incremented succssfully ${JSON.stringify(updated)}`, 'debug')
               })
               .catch(err => {
-                logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`)
+                logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`, 'error')
               })
           })
           .catch(err => {
-            logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`)
+            logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`, 'error')
           })
       })
       .catch(err => {
-        logger.serverLog(TAG, `Failed to update subscriber ${JSON.stringify(err)}`)
+        logger.serverLog(TAG, `Failed to update subscriber ${JSON.stringify(err)}`, 'error')
       })
   } else {
     messageData = {
@@ -111,7 +110,7 @@ function handleUnsubscribe (resp, req) {
     (err3, response) => {
       if (err3) {
         logger.serverLog(TAG,
-          `Page token error from graph api ${JSON.stringify(err3)}`)
+          `Page token error from graph api ${JSON.stringify(err3)}`, 'error')
       }
       const data = {
         messaging_type: 'RESPONSE',
@@ -121,10 +120,10 @@ function handleUnsubscribe (resp, req) {
       needle.post(
         `https://graph.facebook.com/v2.6/me/messages?access_token=${response.body.access_token}`,
         data, (err4, respp) => {
-          logger.serverLog(TAG, `ressp.body ${JSON.stringify(respp.body)}`)
+          logger.serverLog(TAG, `ressp.body ${JSON.stringify(respp.body)}`, 'debug')
           logger.serverLog(TAG,
             `Sending unsubscribe confirmation response to subscriber  ${JSON.stringify(
-              respp.body)}`)
+              respp.body)}`, 'debug')
         })
     })
 }

@@ -18,11 +18,11 @@ exports.webhook = function (req, res) {
   try {
     logger.serverLog(TAG, 'in wordpress webhook')
     let webhookCalled = webhookHandler(req.body)
-    logger.serverLog(TAG, `schema found: ${webhookCalled}`)
+    logger.serverLog(TAG, `schema found: ${webhookCalled}`, 'debug')
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`)
+    logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`, 'error')
     return res.status(500).json({status: 'failed', err: e})
   }
 }
