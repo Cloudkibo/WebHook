@@ -39,7 +39,6 @@ exports.webhook = function (req, res) {
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`, 'error')
-    console.log(TAG, `Error on Webhook ${JSON.stringify(e)}`, 'error')
     return res.status(500).json({status: 'failed', err: e})
   }
 }
@@ -54,10 +53,8 @@ function webhookHandler (body) {
   })
   if (webhookCalled) {
     logger.serverLog(TAG, `webhook called`)
-    console.log(TAG, `webhook called`)
   } else {
     logger.serverLog(TAG, `No webhook for the given request schema`)
-    console.log(TAG, `No webhook for the given request schema`)
   }
   return webhookCalled
 }
@@ -79,7 +76,6 @@ function connect () {
 
       stream.on('tweet', tweet => {
         logger.serverLog(TAG, `received new tweet`)
-        console.log(TAG, `received new tweet`)
         if (tweet.in_reply_to_status_id !== null || tweet.in_reply_to_user_id !== null || tweet.in_reply_to_screen_name !== null) {
           return
         }
@@ -87,7 +83,6 @@ function connect () {
       })
       stream.on('error', error => {
         logger.serverLog(TAG, `Stream Error ${error}`, 'error')
-        console.log(TAG, `Stream Error ${error}`, 'error')
       })
     }
   })
