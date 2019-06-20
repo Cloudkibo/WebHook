@@ -31,9 +31,17 @@ exports.surveyResponseWebhook = (payload) => {
       .then((response) => {
         logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
-    .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-    })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+    } else if ((resp.action === 'send_tweet' || resp.action === 'do_not_send_tweet') && resp.autopostingId && resp.tweetId) {
+      callApi.callApi('autoposting/handleTweetModeration', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
+        })
     } else {
       callApi.callApi('messengerEvents/menu', 'post', payload, 'accounts')
       .then((response) => {

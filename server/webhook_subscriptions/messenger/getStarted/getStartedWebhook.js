@@ -37,6 +37,14 @@ exports.getStartedWebhook = (payload) => {
       callApi.callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
     } else if (!resp[0] && resp.action === 'unsubscribe') {
       callApi.callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
+    } else if ((resp.action === 'send_tweet' || resp.action === 'do_not_send_tweet') && resp.autopostingId && resp.tweetId) {
+      callApi.callApi('autoposting/handleTweetModeration', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
+        })
     } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
       var jsonMessageId = jsonAdPayload[1]
       subscribeIncomingUser(payload, jsonMessageId)
