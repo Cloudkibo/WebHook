@@ -221,7 +221,7 @@ function assignTag (page, subscriber, tag, count) {
 }
 
 function createTag (page, subscriber, tag) {
-  console.log('in create tag')
+  console.log('in create tag', page.accessToken)
   needle('post', `https://graph.facebook.com/v2.11/me/custom_labels?accessToken=${page.accessToken}`)
     .then(label => {
       console.log('label', label.body)
