@@ -179,36 +179,40 @@ function assignDefaultTags (page, subscriber) {
       if (value === 0 && subscribersCount[0].count > 10000) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
-        assignTag(page, subscriber, `_${page.pageId}_${count + 1}`)
+        assignTag(page, subscriber, `_${page.pageId}_${count + 1}`, count)
       }
-      assignTag(page, subscriber, subscriber.gender)
-      assignTag(page, subscriber, subscriber.locale)
+      assignTag(page, subscriber, subscriber.gender, count)
+      assignTag(page, subscriber, subscriber.locale, count)
     })
     .catch(err => logger.serverLog(TAG, `Failed to get subscribers count ${err}`, 'error'))
 }
 
-function assignTag (page, subscriber, tag) {
+function assignTag (page, subscriber, tag, count) {
   console.log('in assignTag')
   callApi.callApi('tags/query', 'post', {tag: tag, pageId: page._id, companyId: page.companyId}, 'accounts')
     .then(tags => {
       console.log('tags', tags)
-      let tag = tags[0]
-      needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.pageAccessToken}`, 'post', {'user': subscriber.senderId})
-        .then(assignedLabel => {
-          console.log('assignedLabel', assignedLabel)
-          if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
-          let subscriberTagsPayload = {
-            tagId: tag._id,
-            subscriberId: subscriber._id,
-            companyId: page.companyId
-          }
-          callApi.callApi(`tags_subscriber/`, 'post', subscriberTagsPayload, 'accounts')
-            .then(newRecord => {
-              logger.serverLog(TAG, `label associated successfully!`)
-            })
-            .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
-        })
-        .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
+      if (tags.length === 0) {
+        createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
+      } else {
+        let tag = tags[0]
+        needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.pageAccessToken}`, 'post', {'user': subscriber.senderId})
+          .then(assignedLabel => {
+            console.log('assignedLabel', assignedLabel)
+            if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
+            let subscriberTagsPayload = {
+              tagId: tag._id,
+              subscriberId: subscriber._id,
+              companyId: page.companyId
+            }
+            callApi.callApi(`tags_subscriber/`, 'post', subscriberTagsPayload, 'accounts')
+              .then(newRecord => {
+                logger.serverLog(TAG, `label associated successfully!`)
+              })
+              .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
+          })
+          .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
+      }
     })
     .catch(err => {
       console.log('error in catch', err)
