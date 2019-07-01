@@ -210,7 +210,10 @@ function assignTag (page, subscriber, tag) {
         })
         .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
     })
-    .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
+    .catch(err => {
+      console.log('error in catch', err)
+      logger.serverLog(TAG, `Error at save tag ${err}`, 'error')
+    })
 }
 
 function createTag (page, subscriber, tag) {
