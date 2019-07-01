@@ -166,7 +166,6 @@ function updateList (phoneNumber, sender, page) {
 }
 
 function assignDefaultTags (page, subscriber) {
-  console.log('in defaultTag')
   let subscribersData = [
     {$match: {pageId: page._id}},
     {$group: {_id: null, count: {$sum: 1}}}
@@ -175,7 +174,6 @@ function assignDefaultTags (page, subscriber) {
     .then(subscribersCount => {
       let value = (subscribersCount[0].count - 1) % 10000
       let count = Math.floor(subscribersCount[0].count / 10000)
-      console.log('value', value)
       if (value === 0 && subscribersCount[0].count > 10000) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
@@ -188,17 +186,14 @@ function assignDefaultTags (page, subscriber) {
 }
 
 function assignTag (page, subscriber, tag, count) {
-  console.log('in assignTag')
   callApi.callApi('tags/query', 'post', {tag: tag, pageId: page._id, companyId: page.companyId}, 'accounts')
     .then(tags => {
-      console.log('tags', tags)
       if (tags.length === 0) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
         let tag = tags[0]
         needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.accessToken}`, 'post', {'user': subscriber.senderId})
           .then(assignedLabel => {
-            console.log('assignedLabel', assignedLabel)
             if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
             let subscriberTagsPayload = {
               tagId: tag._id,
@@ -215,17 +210,13 @@ function assignTag (page, subscriber, tag, count) {
       }
     })
     .catch(err => {
-      console.log('error in catch', err)
       logger.serverLog(TAG, `Error at save tag ${err}`, 'error')
     })
 }
 
 function createTag (page, subscriber, tag) {
-  console.log('in create tag page', page)
-  console.log('in create tag', page.accessToken)
   needle('post', `https://graph.facebook.com/v2.11/me/custom_labels?accessToken=${page.accessToken}`)
     .then(label => {
-      console.log('label', label.body)
       if (label.id) {
         let tagData = {
           tag: tag,

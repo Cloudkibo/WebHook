@@ -67,11 +67,10 @@ function connect () {
     let autoposting = response
     if (autoposting.length > 0) {
       let arrUsers = ['1145580414318383104']
-      // for (let i = 0; i < autoposting.length; i++) {
-      //   arrUsers.push(autoposting[i].payload.id)
-      // }
+      for (let i = 0; i < autoposting.length; i++) {
+        arrUsers.push(autoposting[i].payload.id)
+      }
       logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
-      console.log(`Twitter Ids to listen: ${arrUsers}`)
       stream = twitterClient.stream('statuses/filter',
         {follow: arrUsers})
 
@@ -93,7 +92,6 @@ function connect () {
 }
 
 function restart () {
-  console.log('restart called')
   logger.serverLog(TAG, `KiboPush called me`, 'debug')
   if (stream) stream.stop()
   connect()
