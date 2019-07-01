@@ -189,7 +189,7 @@ function assignDefaultTags (page, subscriber) {
 
 function assignTag (page, subscriber, tag) {
   console.log('in assignTag')
-  callApi.callApi('tags/query', 'post', {tag: tag, pageId: page._id}, 'accounts')
+  callApi.callApi('tags/query', 'post', {tag: tag, pageId: page._id, companyId: page.companyId}, 'accounts')
     .then(tags => {
       console.log('tags', tags)
       let tag = tags[0]
