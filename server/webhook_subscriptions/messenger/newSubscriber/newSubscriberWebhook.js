@@ -224,6 +224,7 @@ function createTag (page, subscriber, tag) {
   console.log('in create tag')
   needle('post', `https://graph.facebook.com/v2.11/me/custom_labels?accessToken=${page.pageAccessToken}`)
     .then(label => {
+      console.log('label', label)
       if (label.id) {
         let tagData = {
           tag: tag,
