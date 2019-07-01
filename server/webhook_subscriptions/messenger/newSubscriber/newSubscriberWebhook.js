@@ -191,6 +191,7 @@ function assignTag (page, subscriber, tag) {
   console.log('in assignTag')
   callApi.callApi('tags/query', 'post', {tag, pageId: page._id}, 'accounts')
     .then(tags => {
+      console.log('tags', tags)
       let tag = tags[0]
       needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.pageAccessToken}`, 'post', {'user': subscriber.senderId})
         .then(assignedLabel => {
