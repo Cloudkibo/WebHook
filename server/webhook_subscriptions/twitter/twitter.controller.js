@@ -71,7 +71,6 @@ function connect () {
         arrUsers.push(autoposting[i].payload.id)
       }
       logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
-      console.log(`Twitter Ids to listen: ${arrUsers}`)
       stream = twitterClient.stream('statuses/filter',
         {follow: arrUsers})
 
