@@ -66,10 +66,10 @@ function connect () {
   callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
     let autoposting = response
     if (autoposting.length > 0) {
-      let arrUsers = []
-      for (let i = 0; i < autoposting.length; i++) {
-        arrUsers.push(autoposting[i].payload.id)
-      }
+      let arrUsers = ['1145580414318383104']
+      // for (let i = 0; i < autoposting.length; i++) {
+      //   arrUsers.push(autoposting[i].payload.id)
+      // }
       logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
       stream = twitterClient.stream('statuses/filter',
         {follow: arrUsers})
