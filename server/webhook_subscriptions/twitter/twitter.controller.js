@@ -71,6 +71,7 @@ function connect () {
         arrUsers.push(autoposting[i].payload.id)
       }
       logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
+      console.log(`Twitter Ids to listen: ${arrUsers}`)
       stream = twitterClient.stream('statuses/filter',
         {follow: arrUsers})
 
@@ -92,6 +93,7 @@ function connect () {
 }
 
 function restart () {
+  console.log('restart called')
   logger.serverLog(TAG, `KiboPush called me`, 'debug')
   if (stream) stream.stop()
   connect()

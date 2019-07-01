@@ -8,7 +8,7 @@ const global = require('../../../global/global')
 
 exports.newSubscriberWebhook = (payloadBody) => {
   logger.serverLog(TAG, `in newSubscriberWebhook: ${JSON.stringify(payloadBody)}`)
-  callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
+  // callApi.callApi('messengerEvents/sequence', 'post', payloadBody, 'kiboengage')
 
   const isMessage = (payloadBody.entry[0].messaging[0].message && (payloadBody.entry[0].messaging[0].message.text || payloadBody.entry[0].messaging[0].message.attachments))
   const isReferral = (payloadBody.entry[0].messaging[0].referral)
