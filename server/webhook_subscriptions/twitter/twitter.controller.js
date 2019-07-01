@@ -66,7 +66,7 @@ function connect () {
   callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
     let autoposting = response
     if (autoposting.length > 0) {
-      let arrUsers = ['1145580414318383104']
+      let arrUsers = []
       for (let i = 0; i < autoposting.length; i++) {
         arrUsers.push(autoposting[i].payload.id)
       }
