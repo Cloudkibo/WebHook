@@ -7,7 +7,7 @@ exports.shopifyAndAdminWebhook = (payload) => {
   if (payload.entry[0].messaging[0].optin.ref === 'SHOPIFY') {
     logger.serverLog(TAG,
       `in shopifyWebhook ${JSON.stringify(payload)}`)
-    callApi.callApi('facebookEvents/shopify', 'post', payload, 'kibocommerce')
+    callApi.callApi('messengerEvents/shopify', 'post', payload, 'kiboengage')
   } else {
     logger.serverLog(TAG,
       `in checkbox ${JSON.stringify(payload)}`)
