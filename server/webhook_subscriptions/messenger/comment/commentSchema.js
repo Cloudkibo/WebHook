@@ -16,12 +16,19 @@ exports.commentSchema = {
                     'value': {
                       'type': 'object',
                       'properties': {
-                        'item': {'type': 'string'},
+                        'item': {
+                          'type': 'string',
+                          'enum': ['comment']
+                        },
+                        'verb': {
+                          'type': 'string',
+                          'enum': ['add', 'remove']
+                        },
                         'comment_id': {'type': 'string'},
                         'sender_id': {'type': 'string'},
-                        'post_id': {'type': 'string'},
+                        'post_id': {'type': 'string'}
                       },
-                      'required': ['item', 'comment_id', 'sender_id', 'post_id']
+                      'required': ['item', 'verb', 'comment_id', 'sender_id', 'post_id']
                     }
                   },
                   'required': ['value']
