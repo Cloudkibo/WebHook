@@ -166,6 +166,7 @@ function updateList (phoneNumber, sender, page) {
 }
 
 function assignDefaultTags (page, subscriber) {
+  console.log('in defaultTag')
   let subscribersData = [
     {$match: {pageId: page._id}},
     {$group: {_id: null, count: {$sum: 1}}}
@@ -174,6 +175,7 @@ function assignDefaultTags (page, subscriber) {
     .then(subscribersCount => {
       let value = (subscribersCount[0].count - 1) % 10000
       let count = Math.floor(subscribersCount[0].count / 10000)
+      console.log('value', value)
       if (value === 0 && subscribersCount[0].count > 10000) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
@@ -186,6 +188,7 @@ function assignDefaultTags (page, subscriber) {
 }
 
 function assignTag (page, subscriber, tag) {
+  console.log('in assignTag')
   callApi.callApi('tags/query', 'post', {tag, pageId: page._id}, 'accounts')
     .then(tags => {
       let tag = tags[0]
