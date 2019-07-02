@@ -13,3 +13,11 @@ exports.getRefreshedPageAccessToken = (pageId, accessToken) => {
       })
   })
 }
+
+exports.sendSuccessResponse = (statusCode, data, res) => {
+  return res.status(statusCode).json({status: 'success', payload: data})
+}
+
+exports.sendErrorResponse = (statusCode, errorMessage, res) => {
+  return res.status(statusCode).json({status: 'success', description: errorMessage})
+}
