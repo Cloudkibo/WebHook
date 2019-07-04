@@ -3,12 +3,12 @@
  */
 
 let Twit = require('twit')
-const config = require('../../config/environment')
+const config = require('../../../config/environment')
 
-const logger = require('../../components/logger')
+const logger = require('../../../components/logger')
 const TAG = 'config/integrations/twitter.js'
 
-const callApi = require('../../utility/api.caller.service')
+const callApi = require('../../../utility/api.caller.service')
 
 // test twitter ids : [2616186000, 1430793200]
 

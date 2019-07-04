@@ -1,4 +1,4 @@
-exports.commentSchema = {
+exports.postCommentSchema = {
   'type': 'object',
   'properties': {
     'entry': {
@@ -22,7 +22,7 @@ exports.commentSchema = {
                         },
                         'verb': {
                           'type': 'string',
-                          'enum': ['add', 'remove']
+                          'enum': ['add', 'remove', 'delete']
                         },
                         'comment_id': {'type': 'string'},
                         'sender_id': {'type': 'string'},
