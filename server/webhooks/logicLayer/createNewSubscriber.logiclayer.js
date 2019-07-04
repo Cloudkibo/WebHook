@@ -1,7 +1,7 @@
 const needle = require('needle')
-const { callApi } = require('../utility/api.caller.service')
+const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.logiclayer.js'
-const logger = require('../components/logger')
+const logger = require('../../components/logger')
 
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {

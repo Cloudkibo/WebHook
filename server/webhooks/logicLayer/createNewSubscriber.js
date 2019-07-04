@@ -1,6 +1,6 @@
-const { callApi } = require('../utility/api.caller.service')
+const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.js'
-const logger = require('../components/logger')
+const logger = require('../../components/logger')
 const Global = require('../../global/global.js')
 const LogicLayer = require('./createNewSubscriber.logiclayer.js')
 
