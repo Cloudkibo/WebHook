@@ -1,4 +1,4 @@
-exports.chatPluginSchema = {
+exports.checkboxPluginSchema = {
   'type': 'object',
   'properties': {
     'object': {
@@ -44,31 +44,23 @@ exports.chatPluginSchema = {
                         'id'
                       ]
                     },
-                    'message': {
+                    'prior_message': {
                       'type': 'object',
                       'properties': {
-                        'tags': {
-                          'type': 'object',
-                          'properties': {
-                            'source': {
-                              'type': 'string',
-                              'enum': ['customer_chat_plugin']
-                            }
-                          },
-                          'required': [
-                            'source'
-                          ]
+                        'source': {
+                          'type': 'string',
+                          'enum': ['checkbox_plugin']
                         }
                       },
                       'required': [
-                        'tags'
+                        'source'
                       ]
                     }
                   },
                   'required': [
                     'sender',
                     'recipient',
-                    'message'
+                    'prior_message'
                   ]
                 }
               ]

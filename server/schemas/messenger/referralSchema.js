@@ -1,4 +1,4 @@
-exports.chatPluginSchema = {
+exports.referralSchema = {
   'type': 'object',
   'properties': {
     'object': {
@@ -44,31 +44,22 @@ exports.chatPluginSchema = {
                         'id'
                       ]
                     },
-                    'message': {
+                    'referral': {
                       'type': 'object',
                       'properties': {
-                        'tags': {
-                          'type': 'object',
-                          'properties': {
-                            'source': {
-                              'type': 'string',
-                              'enum': ['customer_chat_plugin']
-                            }
-                          },
-                          'required': [
-                            'source'
-                          ]
+                        'ref': {
+                          'type': 'string'
                         }
                       },
                       'required': [
-                        'tags'
+                        'ref'
                       ]
                     }
                   },
                   'required': [
                     'sender',
                     'recipient',
-                    'message'
+                    'referral'
                   ]
                 }
               ]
