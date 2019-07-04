@@ -3,11 +3,17 @@ const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
 const needle = require('needle')
 const { createNewSubscriber } = require('../logicLayer/createNewSubscriber.js')
+const logicLayer = require('../logicLayer/postback.logiclayer.js')
 
 exports.optinWebhook = (payload) => {
   logger.serverLog(TAG, `in optin ${JSON.stringify(payload)}`)
   let userRefIdForCheckBox
-  let refPayload = JSON.parse(payload.entry[0].messaging[0].optin.ref)
+  let refPayload = ''
+  if (logicLayer.isJsonString(payload.entry[0].messaging[0].optin.ref)) {
+    refPayload = JSON.parse(payload.entry[0].messaging[0].optin.ref)
+  } else {
+    refPayload = payload.entry[0].messaging[0].optin.ref
+  }
   if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
     let companyId = refPayload.company_id
     let pageId = payload.entry[0].messaging[0].recipient.id
@@ -45,7 +51,7 @@ exports.optinWebhook = (payload) => {
   const event = payload.entry[0].messaging[0]
   const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
   const pageId = event.message && event.message.is_echo ? event.sender.id : event.recipient.id
-  createNewSubscriber(pageId, senderId, 'customer_matching', '', null, event)
+  createNewSubscriber(pageId, senderId, 'landing_page', '', null, event)
   let ref = event.optin.ref.split('__')
   if (ref.length === 2 && ref[1] === 'kibopush_test_broadcast_') {
     event.optin.ref = ref[0]

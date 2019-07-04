@@ -11,7 +11,7 @@ module.exports = function (app) {
   // requirement. Discuss with me. Sojharo
 
   // app.use('/api/v1/things', require('./api/v1/thing'))
-  app.use('/webhooks/messenger', require('./webhook_subscriptions/messenger'))
+  app.use('/webhooks/messenger', require('./api/v1/messenger'))
 
   app.use('/api/twitter', require('./webhook_subscriptions/twitter'))
 
