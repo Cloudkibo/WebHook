@@ -84,20 +84,12 @@ exports.assignDefaultTags = (page, subscriber) => {
 }
 
 const assignTag = (page, subscriber, tag, count) => {
-  console.log('page in assignTag',page)
-  console.log('subscriber in assignTag', subscriber)
-  console.log('tag in assignTah',tag)
-  console.log('count in assignTag', count)
   callApi('tags/query', 'post', {tag: tag, pageId: page._id, companyId: page.companyId}, 'accounts')
     .then(tags => {
-      console.log('tags.length', tags.length)
       if (tags.length === 0) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
         let tag = tags[0]
-        console.log('tag.labelFbId', tag.labelFbId)
-        console.log('subscriber.senderId', subscriber.senderId)
-        console.log('page.accessToken', page.accessToken)
         needle('post', `https://graph.facebook.com/v2.11/${tag.labelFbId}/label?access_token=${page.accessToken}`, {'user': subscriber.senderId})
           .then(assignedLabel => {
             console.log('assigned label', assignedLabel)
