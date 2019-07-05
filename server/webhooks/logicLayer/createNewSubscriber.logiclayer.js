@@ -1,7 +1,7 @@
 const needle = require('needle')
-const { callApi } = require('../utility/api.caller.service')
+const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.logiclayer.js'
-const logger = require('../components/logger')
+const logger = require('../../components/logger')
 
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {
@@ -68,11 +68,13 @@ exports.assignDefaultTags = (page, subscriber) => {
   ]
   callApi('subscribers/aggregate', 'post', subscribersData, 'accounts')
     .then(subscribersCount => {
+      console.log('subscribersCount' , subscribersCount)
       let value = (subscribersCount[0].count - 1) % 10000
       let count = Math.floor(subscribersCount[0].count / 10000)
       if (value === 0 && subscribersCount[0].count > 10000) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
+        console.log('Assign tag in else condition')
         assignTag(page, subscriber, `_${page.pageId}_${count + 1}`, count)
       }
       assignTag(page, subscriber, subscriber.gender, count)
@@ -82,14 +84,23 @@ exports.assignDefaultTags = (page, subscriber) => {
 }
 
 const assignTag = (page, subscriber, tag, count) => {
+  console.log('page in assignTag',page)
+  console.log('subscriber in assignTag', subscriber)
+  console.log('tag in assignTah',tag)
+  console.log('count in assignTag', count)
   callApi('tags/query', 'post', {tag: tag, pageId: page._id, companyId: page.companyId}, 'accounts')
     .then(tags => {
+      console.log('tags.length', tags.length)
       if (tags.length === 0) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
         let tag = tags[0]
+        console.log('tag.labelFbId', tag.labelFbId)
+        console.log('subscriber.senderId', subscriber.senderId)
+        console.log('page.accessToken', page.accessToken)
         needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.accessToken}`, 'post', {'user': subscriber.senderId})
           .then(assignedLabel => {
+            console.log('assigned label', assignedLabel)
             if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
             let subscriberTagsPayload = {
               tagId: tag._id,

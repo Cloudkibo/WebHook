@@ -66,9 +66,7 @@ exports.messageDeliverySchema = {
                         }
                       },
                       'required': [
-                        'mids',
-                        'watermark',
-                        'seq'
+                        'watermark'
                       ]
                     }
                   },
