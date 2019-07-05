@@ -100,6 +100,7 @@ const assignTag = (page, subscriber, tag, count) => {
         console.log('page.accessToken', page.accessToken)
         needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.accessToken}`, 'post', {'user': subscriber.senderId})
           .then(assignedLabel => {
+            console.log('assigned label', assignedLabel)
             if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
             let subscriberTagsPayload = {
               tagId: tag._id,
