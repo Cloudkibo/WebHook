@@ -47,6 +47,8 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
     payload.source = 'landing_page'
   } else if (subscriberSource === 'checkbox_plugin') {
     payload.source = 'checkbox_plugin'
+  } else if (subscriberSource === 'shopify') {
+    payload.source = 'shopify'
   }
   return payload
 }
