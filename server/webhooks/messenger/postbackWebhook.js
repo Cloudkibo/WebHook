@@ -7,7 +7,7 @@ const logicLayer = require('../logicLayer/postback.logiclayer.js')
 const { newSubscriberWebhook } = require('./newSubscriberWebhook.js')
 
 exports.postbackWebhook = (payload) => {
-  coinsole.log(TAG, `in postbackWebhook ${JSON.stringify(payload)}`)
+  console.log(TAG, `in postbackWebhook ${JSON.stringify(payload)}`)
   let resp = ''
   if (logicLayer.isJsonString(payload.entry[0].messaging[0].postback.payload)) {
     resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
