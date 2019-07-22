@@ -7,7 +7,7 @@ const logicLayer = require('../logicLayer/postback.logiclayer.js')
 const { newSubscriberWebhook } = require('./newSubscriberWebhook.js')
 
 exports.postbackWebhook = (payload) => {
-  logger.serverLog(TAG, `in postbackWebhook ${JSON.stringify(payload)}`)
+  coinsole.log(TAG, `in postbackWebhook ${JSON.stringify(payload)}`)
   let resp = ''
   if (logicLayer.isJsonString(payload.entry[0].messaging[0].postback.payload)) {
     resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
@@ -55,6 +55,7 @@ exports.postbackWebhook = (payload) => {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
   } else {
+    console.log('payload.entry[0].messaging', payload.entry[0].messaging)
     callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
         logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
