@@ -55,7 +55,7 @@ exports.postbackWebhook = (payload) => {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
   } else {
-    console.log('payload.entry[0].messaging', payload.entry[0].messaging)
+    if(payload.entry[0].messaging[0].postback && payload.entry[0].messaging[0].postback.payload[0].componentType) {
     callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
         logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
@@ -64,6 +64,7 @@ exports.postbackWebhook = (payload) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   }
+}
 }
 
 function handleUnsubscribe (resp, req) {
