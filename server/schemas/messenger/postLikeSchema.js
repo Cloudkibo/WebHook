@@ -45,7 +45,6 @@ exports.postLikeSchema = {
                         }
                       },
                       'required': [
-                        'sender_id',
                         'post_id',
                         'verb',
                         'item'

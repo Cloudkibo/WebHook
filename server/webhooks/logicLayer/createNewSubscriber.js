@@ -21,7 +21,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                 } else {
                   const subscriber = response.body
                   const payload = LogicLayer.prepareNewSubscriberPayload(subscriber, page, subscriberSource, identifier, senderId, ref)
-                  if (subscriberSource === 'checkbox_plugin') {
+                  if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                     payload.userRefIdForCheckBox = identifier
                   }
                   callApi(`subscribers/query`, 'post', {senderId: senderId, pageId: page._id}, 'accounts')
@@ -29,7 +29,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
-                            if (subscriberSource === 'checkbox_plugin') {
+                            if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                               LogicLayer.sendWebhookForNewSubscriber(
                                 page.pageId,
                                 page.companyId,
