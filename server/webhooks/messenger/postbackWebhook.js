@@ -54,6 +54,7 @@ console.log('Payload response', resp)
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
   } else {
+    payload.entry[0].messaging[0].postback.payload= resp
     console.log('payload.entry[0].messaging[0].postback', payload.entry[0].messaging[0].postback)
     console.log('payload.entry[0].messaging[0].postback.payload[0].componentType', payload.entry[0].messaging[0].postback.payload[0].componentType)
     if(payload.entry[0].messaging[0].postback && payload.entry[0].messaging[0].postback.payload[0].componentType) {
