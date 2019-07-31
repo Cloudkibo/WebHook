@@ -54,14 +54,9 @@ console.log('Payload response', resp)
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
   } else {
-    payload.entry[0].messaging[0].postback.payload= resp
-    console.log('payload.entry[0].messaging[0].postback', payload.entry[0].messaging[0].postback)
-    console.log('payload.entry[0].messaging[0].postback.payload[0].componentType', payload.entry[0].messaging[0].postback.payload[0].componentType)
-    if(payload.entry[0].messaging[0].postback && payload.entry[0].messaging[0].postback.payload[0].componentType) {
-      console.log('call function to menu reply')
+      if(payload.entry[0].messaging[0].postback && resp[0].componentType) {
       callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
-        console.log('response from menu reply')
         console.log(TAG, `response recieved from KiboPush: ${response}`)
       })
       .catch((err) => {
