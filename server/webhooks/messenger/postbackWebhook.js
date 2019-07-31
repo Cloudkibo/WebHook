@@ -55,17 +55,13 @@ exports.postbackWebhook = (payload) => {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
   } else {
-    console.log('payload.entry[0].messaging[0].postback', payload.entry[0].messaging[0].postback)
-    console.log('payload.entry[0].messaging[0].postback.payload[0].componentType', payload.entry[0].messaging[0].postback.payload[0].componentType)
     if(payload.entry[0].messaging[0].postback && payload.entry[0].messaging[0].postback.payload[0].componentType) {
-      console.log('call function to menu reply')
-      callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
+    callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
-        console.log('response from menu reply')
-        console.log(TAG, `response recieved from KiboPush: ${response}`)
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
       .catch((err) => {
-        console.log(TAG, `error from KiboPush: ${err}`)
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   }
 }
