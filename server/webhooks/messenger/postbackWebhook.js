@@ -58,9 +58,10 @@ console.log('Payload response', resp)
       callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
         console.log(TAG, `response recieved from KiboPush: ${response}`)
+
       })
       .catch((err) => {
-        console.log(TAG, `error from KiboPush: ${err}`)
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   }
 }
