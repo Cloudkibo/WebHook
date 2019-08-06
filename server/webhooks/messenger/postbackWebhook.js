@@ -15,8 +15,7 @@ exports.postbackWebhook = (payload) => {
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
-  logger.serverLog(TAG, `Payload Response ${JSON.stringify(resp)}`, 'debug')
-
+console.log('Payload response', resp)
   if (!resp[0] && resp.survey_id) {
     callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
       .then((response) => {
@@ -55,10 +54,11 @@ exports.postbackWebhook = (payload) => {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
   } else {
-    if(payload.entry[0].messaging[0].postback && payload.entry[0].messaging[0].postback.payload[0].componentType) {
-    callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
+      if(payload.entry[0].messaging[0].postback && resp[0].componentType) {
+      callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        console.log(TAG, `response recieved from KiboPush: ${response}`)
+
       })
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
