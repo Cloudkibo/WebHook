@@ -62,7 +62,7 @@ function webhookHandler (body) {
 let stream
 
 function connect () {
-  logger.serverLog(TAG, `connect functio called`)
+  // logger.serverLog(TAG, `connect functio called`)
   callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
     let autoposting = response
     if (autoposting.length > 0) {
@@ -70,12 +70,12 @@ function connect () {
       for (let i = 0; i < autoposting.length; i++) {
         arrUsers.push(autoposting[i].payload.id)
       }
-      logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
+      // logger.serverLog(TAG, `Twitter Ids to listen: ${arrUsers}`, 'debug')
       stream = twitterClient.stream('statuses/filter',
         {follow: arrUsers})
 
       stream.on('tweet', tweet => {
-        logger.serverLog(TAG, `received new tweet`)
+        // logger.serverLog(TAG, `received new tweet`)
         if (tweet.in_reply_to_status_id !== null || tweet.in_reply_to_user_id !== null || tweet.in_reply_to_screen_name !== null) {
           return
         }
