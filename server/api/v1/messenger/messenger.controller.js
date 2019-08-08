@@ -18,7 +18,7 @@ exports.verifyHook = function (req, res) {
 
 exports.webhook = function (req, res) {
   // logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
-  console.log(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
+  console.log(TAG, `something received from facebook ${JSON.stringify(req.body)}`) 
   const event = (req.body.entry && req.body.entry[0] && req.body.entry[0].messaging) ? req.body.entry[0].messaging[0] : ''
   const pageId = event !== '' ? event.recipient.id : ''
   let data = req.body
@@ -33,14 +33,14 @@ exports.webhook = function (req, res) {
       webhookCalled = webhookHandler(req.body)
     }
 
-    logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`, 'debug')
-    console.log(TAG, `webhookCalled: ${webhookCalled}`)
+    //logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`, 'debug')
+    //console.log(TAG, `webhookCalled: ${webhookCalled}`)
 
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
     sendSuccessResponse(200, responseMessage, res)
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
-    console.log('Error on webhook', e)
+    //console.log('Error on webhook', e)
     sendErrorResponse(500, e, res)
   }
 }

@@ -4,7 +4,7 @@ const { callApi } = require('../../utility/api.caller.service')
 const { newSubscriberWebhook } = require('./newSubscriberWebhook.js')
 
 exports.getStartedWebhook = (payload) => {
-  logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
+  // logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
   sendWelcomeMessage(payload)
 }
 
