@@ -7,17 +7,17 @@ const needle = require('needle')
 const {newSubscriberWebhook} = require('../newSubscriber/newSubscriberWebhook')
 
 exports.getStartedWebhook = (payload) => {
-  logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
+  // logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
 
   if (payload.entry[0].messaging[0].postback.referral) {
     // This will send postback referal for messenger code
-    logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`, 'debug')
+    // logger.serverLog(TAG, `in Messenger ${JSON.stringify(payload)}`, 'debug')
     callApi.callApi('messenger_code/webhook', 'post', payload.entry[0].messaging[0], 'accounts')
   }
 
   if (payload.entry[0].messaging[0].postback.payload !== '<GET_STARTED_PAYLOAD>' && payload.entry[0].messaging[0].postback.payload !== 'GET_STARTED_PAYLOAD') {
-    logger.serverLog(TAG,
-      `in surveyResponseWebhook ${JSON.stringify(payload)}`, 'debug')
+    // logger.serverLog(TAG,
+    //   `in surveyResponseWebhook ${JSON.stringify(payload)}`, 'debug')
     let resp = ''
     if (logicLayer.isJsonString(payload.entry[0].messaging[0].postback.payload)) {
       resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
@@ -25,11 +25,11 @@ exports.getStartedWebhook = (payload) => {
       resp = payload.entry[0].messaging[0].postback.payload
       var jsonAdPayload = resp.split('-')
     }
-    logger.serverLog(TAG,
-      `Payload Response ${JSON.stringify(resp)}`, 'debug')
+    // logger.serverLog(TAG,
+    //   `Payload Response ${JSON.stringify(resp)}`, 'debug')
     if (!resp[0] && resp.survey_id) {
-      logger.serverLog(TAG,
-        `in surveyResponseWebhook ${JSON.stringify(payload)}`, 'debug')
+      // logger.serverLog(TAG,
+      //   `in surveyResponseWebhook ${JSON.stringify(payload)}`, 'debug')
       callApi.callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
     } else if (!resp[0] && resp.unsubscribe) {
       handleUnsubscribe(resp, payload.entry[0].messaging[0])
@@ -52,8 +52,8 @@ exports.getStartedWebhook = (payload) => {
       callApi.callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
     }
   } else if (payload.entry[0].messaging[0].postback.payload === '<GET_STARTED_PAYLOAD>') {
-    logger.serverLog(TAG,
-      `in getStartedWebhook ${JSON.stringify(payload)}`, 'debug')
+    // logger.serverLog(TAG,
+    //   `in getStartedWebhook ${JSON.stringify(payload)}`, 'debug')
     sendWelcomeMessage(payload)
   }
 }
@@ -64,9 +64,9 @@ function sendWelcomeMessage (payload) {
   callApi.callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(page => {
       page = page[0]
-      logger.serverLog(TAG, `pageId ${JSON.stringify(page._id)}`, 'debug')
-      logger.serverLog(TAG, `page fetched in welcomeMessage ${JSON.stringify(page.companyId)}`, 'debug')
-      logger.serverLog(TAG, `senderId ${JSON.stringify(sender)}`, 'debug')
+      // logger.serverLog(TAG, `pageId ${JSON.stringify(page._id)}`, 'debug')
+      // logger.serverLog(TAG, `page fetched in welcomeMessage ${JSON.stringify(page.companyId)}`, 'debug')
+      // logger.serverLog(TAG, `senderId ${JSON.stringify(sender)}`, 'debug')
       callApi.callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender, companyId: page.companyId }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
@@ -93,7 +93,7 @@ function handleUnsubscribe (resp, req) {
     }
     callApi.callApi(`subscribers/update`, 'put', {query: { senderId: req.sender.id }, newPayload: { isSubscribed: false }, options: {}}, 'accounts')
       .then(updated => {
-        logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`, 'debug')
+        // logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`, 'debug')
         callApi.callApi(`subscribers/query`, 'post', { senderId: req.sender.id }, 'accounts')
           .then(subscribers => {
             let subscriber = subscribers[0]
@@ -123,7 +123,7 @@ function handleUnsubscribe (resp, req) {
               .catch(err => {
                 logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`, 'error')
               })
-            logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`, 'debug')
+            // logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`, 'debug')
             callApi.callApi('featureUsage/updateCompany', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
               .then(updated => {
                 logger.serverLog(TAG, `company usage incremented succssfully ${JSON.stringify(updated)}`, 'debug')
@@ -159,7 +159,6 @@ function handleUnsubscribe (resp, req) {
       needle.post(
         `https://graph.facebook.com/v2.6/me/messages?access_token=${response.body.access_token}`,
         data, (err4, respp) => {
-          logger.serverLog(TAG, `ressp.body ${JSON.stringify(respp.body)}`, 'debug')
           logger.serverLog(TAG,
             `Sending unsubscribe confirmation response to subscriber  ${JSON.stringify(
               respp.body)}`, 'debug')

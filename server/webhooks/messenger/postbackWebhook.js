@@ -75,7 +75,7 @@ function handleUnsubscribe (resp, req) {
     }
     callApi(`subscribers/update`, 'put', {query: { senderId: req.sender.id }, newPayload: { isSubscribed: false }, options: {}}, 'accounts')
       .then(updated => {
-        logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`, 'debug')
+        // logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`, 'debug')
         callApi(`subscribers/query`, 'post', { senderId: req.sender.id }, 'accounts')
           .then(subscribers => {
             let subscriber = subscribers[0]
@@ -141,7 +141,7 @@ function handleUnsubscribe (resp, req) {
       needle.post(
         `https://graph.facebook.com/v2.6/me/messages?access_token=${response.body.access_token}`,
         data, (err4, respp) => {
-          logger.serverLog(TAG, `ressp.body ${JSON.stringify(respp.body)}`, 'debug')
+          // logger.serverLog(TAG, `ressp.body ${JSON.stringify(respp.body)}`, 'debug')
           logger.serverLog(TAG,
             `Sending unsubscribe confirmation response to subscriber  ${JSON.stringify(
               respp.body)}`, 'debug')
@@ -186,7 +186,7 @@ function getResponseMessage (page, senderId, firstName, lastName, accessToken, j
     .then((response) => {
       callApi(`jsonAd/${response.jsonAdId}`, 'get', {}, 'accounts')
         .then((jsonAd) => {
-          logger.serverLog(TAG, `jsonAd: ${jsonAd}`, 'debug')
+          // logger.serverLog(TAG, `jsonAd: ${jsonAd}`, 'debug')
           sendResponseMessage(page, senderId, firstName, lastName, accessToken, response, jsonAd.jsonAdMessages)
         })
         .catch(err => {
@@ -215,7 +215,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
                   if (err) {
                     logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`, 'error')
                   }
-                  logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`, 'debug')
+                  // logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`, 'debug')
                   let pageAccessToken = resp2.body.access_token
                   const options = {
                     url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
@@ -223,7 +223,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
                     method: 'GET'
 
                   }
-                  logger.serverLog(TAG, `options: ${JSON.stringify(options)}`, 'debug')
+                  // logger.serverLog(TAG, `options: ${JSON.stringify(options)}`, 'debug')
                   needle.get(options.url, options, (error, response) => {
                     if (error) {
                       // TODO remove this and use logger utility
