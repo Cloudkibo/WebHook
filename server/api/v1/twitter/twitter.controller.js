@@ -52,7 +52,9 @@ function webhookHandler (body) {
     }
   })
   if (webhookCalled) {
-    logger.serverLog(TAG, `webhook called`)
+  //  logger.serverLog(TAG, `webhook called`)
+      console.log('webhook called')
+
   } else {
     logger.serverLog(TAG, `No webhook for the given request schema`)
   }
