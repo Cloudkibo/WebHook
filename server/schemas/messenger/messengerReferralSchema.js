@@ -1,4 +1,4 @@
-exports.referralSchema = {
+exports.messengerReferralSchema = {
   'type': 'object',
   'properties': {
     'object': {
@@ -49,10 +49,18 @@ exports.referralSchema = {
                       'properties': {
                         'ref': {
                           'type': 'string'
+                        },
+                        'source': {
+                          'type': 'string',
+                          'enum': ['SHORTLINK']
+                        },
+                        'type': {
+                          'type': 'string',
+                          'enum': ['OPEN_THREAD']
                         }
                       },
                       'required': [
-                        'ref'
+                        'ref', 'source', 'type'
                       ]
                     }
                   },
