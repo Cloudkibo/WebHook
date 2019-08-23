@@ -29,6 +29,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
+                            console.log('subscriberCreated', subscriberCreated)
                             if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                               LogicLayer.sendWebhookForNewSubscriber(
                                 page.pageId,
@@ -55,9 +56,16 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 event.referral
                               )
                             }
+                            console.log('going to sessions')
                             callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
-                              .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
-                              .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
+                              .then(sessRes => {
+                                console.log('sessions response', sessRes)
+                                logger.serverLog(TAG, `response from sessions ${sessRes}`)
+                              })
+                              .catch(err => {
+                                console.log('sessions catch', err)
+                                logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error')
+                              })
                           })
                           .catch(err => {
                             logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`, 'error')
