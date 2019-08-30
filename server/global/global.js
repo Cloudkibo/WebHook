@@ -7,6 +7,8 @@ exports.getRefreshedPageAccessToken = (pageId, accessToken) => {
       (err, resp) => {
         if (err) {
           reject(err)
+        } else if (resp.body.error) {
+          reject(resp.body.error)
         } else {
           resolve(resp.body.access_token)
         }

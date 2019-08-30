@@ -51,6 +51,9 @@ const { customerMatchingWebhook } = require('../../../webhooks/messenger/custome
 const { checkboxPluginSchema } = require('../../../schemas/messenger/checkboxPluginSchema.js')
 const { checkboxPluginWebhook } = require('../../../webhooks/messenger/checkboxPluginWebhook.js')
 
+const { messengerReferralSchema } = require('../../../schemas/messenger/messengerReferralSchema.js')
+const { messengerReferralWebhook } = require('../../../webhooks/messenger/messengerReferralWebhook.js')
+
 function initRegistry () {
   init.registerCallback(postLikeSchema, (payload) => { postLikeWebhook(payload) })
   init.registerCallback(postCommentSchema, (payload) => { postCommentWebhook(payload) })
@@ -71,6 +74,7 @@ function initRegistry () {
   init.registerCallback(chatPluginSchema, (payload) => { chatPluginWebhook(payload) })
   init.registerCallback(customerMatchingSchema, (payload) => { customerMatchingWebhook(payload) })
   init.registerCallback(checkboxPluginSchema, (payload) => { checkboxPluginWebhook(payload) })
+  init.registerCallback(messengerReferralSchema, (payload) => { messengerReferralWebhook(payload) })
   init.registerCallback(messageReceivedSchema, (payload) => { newSubscriberWebhook(payload) })
 }
 

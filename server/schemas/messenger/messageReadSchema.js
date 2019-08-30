@@ -58,8 +58,7 @@ exports.messageReadSchema = {
                         }
                       },
                       'required': [
-                        'watermark',
-                        'seq'
+                        'watermark'
                       ]
                     }
                   },
