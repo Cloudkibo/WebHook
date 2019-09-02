@@ -94,17 +94,11 @@ const assignTag = (page, subscriber, tag, count) => {
         let tag = tags[0]
         needle('post', `https://graph.facebook.com/v2.11/${tag.labelFbId}/label?access_token=${page.accessToken}`, {'user': subscriber.senderId})
           .then(assignedLabel => {
-            if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
-            let subscriberTagsPayload = {
-              tagId: tag._id,
-              subscriberId: subscriber._id,
-              companyId: page.companyId
+            if (assignedLabel.error) {
+              logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
+            } else {
+              logger.serverLog(TAG, `label associated successfully!`)
             }
-            callApi(`tags_subscriber/`, 'post', subscriberTagsPayload, 'accounts')
-              .then(newRecord => {
-                logger.serverLog(TAG, `label associated successfully!`)
-              })
-              .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
           })
           .catch(err => logger.serverLog(TAG, `Error at save tag ${err}`, 'error'))
       }
