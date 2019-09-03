@@ -7,7 +7,10 @@ const { postCommentSchema } = require('../../../schemas/messenger/postCommentSch
 const { postCommentWebhook } = require('../../../webhooks/messenger/postCommentWebhook.js')
 
 const {postDeleteSchema} = require('../../../schemas/messenger/postDeleteSchema')
-const {postDeleteWebhook} = require('../../../webhooks/messenger/postDeleteWebhook') 
+const {postDeleteWebhook} = require('../../../webhooks/messenger/postDeleteWebhook')
+
+const {postEditSchema} = require('../../../schemas/messenger/postEditSchema')
+const {postEditWebhook} = require('../../../webhooks/messenger/postEditWebhook')
 
 const { postSchema } = require('../../../schemas/messenger/postSchema.js')
 const { postWebhook } = require('../../../webhooks/messenger/postWebhook.js')
@@ -60,7 +63,8 @@ const { messengerReferralWebhook } = require('../../../webhooks/messenger/messen
 function initRegistry () {
   init.registerCallback(postLikeSchema, (payload) => { postLikeWebhook(payload) })
   init.registerCallback(postCommentSchema, (payload) => { postCommentWebhook(payload) })
-  init.registerCallback(postDeleteSchema, (payload) => { postDeleteWebhook(payload)})
+  init.registerCallback(postDeleteSchema, (payload) => { postDeleteWebhook(payload) })
+  init.registerCallback(postEditSchema, (payload) => { postEditWebhook(payload) })
   init.registerCallback(postSchema, (payload) => { postWebhook(payload) })
   init.registerCallback(messageReadSchema, (payload) => { messageReadWebhook(payload) })
   init.registerCallback(messageDeliverySchema, (payload) => { messageDeliveryWebhook(payload) })
