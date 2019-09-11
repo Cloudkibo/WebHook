@@ -15,7 +15,6 @@ exports.postbackWebhook = (payload) => {
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
-console.log('Payload response', resp)
   if (!resp[0] && resp.survey_id) {
     callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
       .then((response) => {
@@ -49,6 +48,14 @@ console.log('Payload response', resp)
       })
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
+      })
+  } else if (!resp[0] && resp.action === 'send_sequence_message') {
+    callApi('messengerEvents/sendSequenceMessage', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
     var jsonMessageId = jsonAdPayload[1]
