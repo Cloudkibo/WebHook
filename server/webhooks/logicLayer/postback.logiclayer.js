@@ -170,25 +170,6 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
         })
       }
       resolve({payload})
-    } else if (body.componentType === 'list') {
-      payload = {
-        'messaging_type': messageType,
-        'recipient': JSON.stringify({
-          'id': subscriberId
-        }),
-        'message': JSON.stringify({
-          'attachment': {
-            'type': 'template',
-            'payload': {
-              'template_type': 'list',
-              'top_element_style': body.topElementStyle,
-              'elements': body.listItems,
-              'buttons': buttonPayload
-            }
-          }
-        })
-      }
-      resolve({payload})
     }
   })
 }
