@@ -76,6 +76,6 @@ exports.receiveSms = function (req, res) {
   return res.status(200).json({ status: 'success' })
 }
 exports.receiveWhatsApp = function (req, res) {
-  callApi.callApi('twilioEvents/whatsAppMessage', 'post', req.body, 'kibochat')
+  callApi.callApi('twilioEvents/whatsApp', 'post', req.body, 'kibochat')
   return res.status(200).json({ status: 'success' })
 }
