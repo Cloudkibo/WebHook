@@ -76,45 +76,6 @@ exports.receiveSms = function (req, res) {
   return res.status(200).json({ status: 'success' })
 }
 exports.receiveWhatsApp = function (req, res) {
-  console.log('recieved from whatsAppChat', req.body)
   callApi.callApi('twilioEvents/whatsApp', 'post', req.body, 'kibochat')
-  return res.status(200).json({ status: 'success' })
-}
-exports.sendMessage = function (req, res) {
-  let accountSid = 'ACe779810d0b992e2db1b67716bd2b4d80'
-  let authToken = '3d3fa38dc27fe0a0262ed97c63d181eb'
-  let client = require('twilio')(accountSid, authToken)
-  let MessageObject = {
-    from: `whatsapp:+14155238886`,
-    to: `whatsapp:+923322846897`,
-    statusCallback: `https://kibopush-anisha.ngrok.io/webhooks/twilio/trackStatusWhatsAppChat/1`
-  }
-  if (req.body.payload.componentType !== 'text') {
-    MessageObject.mediaUrl = req.body.payload.fileurl.url
-  } else {
-    MessageObject.body = req.body.payload.text
-  }
-  client.messages
-  .create(MessageObject)
-  .then(response => {
-    console.log('response from send message', response)
-  })
-  .catch(error => {
-    console.log('error at send message', error)
-  })
-  MessageObject = {
-    from: `whatsapp:+14155238886`,
-    to: `whatsapp:+923352134405`,
-    statusCallback: `https://kibopush-anisha.ngrok.io/webhooks/twilio/trackStatusWhatsAppChat/1`,
-    body: 'hey'
-  }
-  client.messages
-  .create(MessageObject)
-  .then(response => {
-    console.log('response from send message', response)
-  })
-  .catch(error => {
-    console.log('error at send message', error)
-  })
   return res.status(200).json({ status: 'success' })
 }
