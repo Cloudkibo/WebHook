@@ -1,21 +1,22 @@
 const express = require('express')
 const router = express.Router()
 
-const controller = require('./twilio.controller')
+const smsController = require('./sms.controller')
+const whatsAppController = require('./whatsApp.controller')
 const validate = require('express-jsonschema').validate
 const validationSchema = require('./validationSchema')
 
 //  SMS
-router.post('/trackDelivery/:id', controller.trackDelivery)
+router.post('/trackDelivery/:id', smsController.trackDelivery)
 router.post('/receiveSms',
   validate({body: validationSchema.payload}),
-  controller.receiveSms)
+  smsController.receiveSms)
 
 //  WhatsApp
-router.post('/trackDeliveryWhatsApp/:id', controller.trackDeliveryWhatsApp)
-router.post('/trackStatusWhatsAppChat/:id', controller.trackStatusWhatsAppChat)
+router.post('/trackDeliveryWhatsApp/:id', whatsAppController.trackDeliveryWhatsApp)
+router.post('/trackStatusWhatsAppChat/:id', whatsAppController.trackStatusWhatsAppChat)
 router.post('/receiveWhatsApp',
   validate({body: validationSchema.payload}),
-  controller.receiveWhatsApp)
+  whatsAppController.receiveWhatsApp)
 
 module.exports = router
