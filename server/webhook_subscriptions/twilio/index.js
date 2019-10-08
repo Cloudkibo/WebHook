@@ -17,5 +17,6 @@ router.post('/receiveSms',
 router.post('/receiveWhatsApp',
   validate({body: validationSchema.payload}),
   controller.receiveWhatsApp)
-
+router.post('/sendMessage',
+  controller.sendMessage)
 module.exports = router
