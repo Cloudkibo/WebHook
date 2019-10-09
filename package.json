@@ -13,7 +13,8 @@
     "start:arveen": "cross-env DEBUG=kibopush:* NODE_ENV=development DOMAIN=https://kibopush-arveen.ngrok.io nodemon server/app.js",
     "start:muzamil": "cross-env DEBUG=kibopush:* NODE_ENV=development DOMAIN=https://kibopush-muzamil.ngrok.io nodemon server/app.js",
     "lint": "echo 'Pre-commit checks...' && standard --fix && echo \"No code style errors found.\"",
-    "test": "echo \"Code tests are under construction by Sojharo\" && exit 0"
+    "test": "cross-env DEBUG=webhook:* NODE_ENV=testing jest  --coverage",
+    "test:watch": "cross-env DEBUG=webhook:* NODE_ENV=testing jest --watch"
   },
   "pre-commit": [
     "lint",
@@ -65,9 +66,11 @@
   "devDependencies": {
     "babel-eslint": "^7.2.3",
     "cross-env": "^5.0.1",
+    "jest": "^24.9.0",
     "nodemon": "^1.11.0",
     "pre-commit": "^1.2.2",
-    "standard": "^10.0.3"
+    "standard": "^10.0.3",
+    "supertest": "^4.0.2"
   },
   "standard": {
     "parser": "babel-eslint"
