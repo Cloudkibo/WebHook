@@ -3,52 +3,12 @@ const TAG = 'twilio.controller.js'
 const logger = require('../../../components/logger')
 
 exports.trackDeliveryWhatsApp = function (req, res) {
-  res.status(200).json({ status: 'success' })
-  let query = {}
-  if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'DELIVERED') {
-    query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {$inc: { sent: 1 }}
-    }
-  } else if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'READ') {
-    query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {$inc: { seen: 1 }}
-    }
-  }
-  if (query !== {}) {
-    callApi(`whatsAppBroadcasts`, 'put', query, 'engageDbLayer')
-      .then(updated => {
-      })
-    .catch(err => {
-      return res.status(500).json({
-        status: 'failed',
-        description: `Internal server error in updating plan usage ${err}`
-      })
-    })
-  }
+  callApi(`twilioEvents/trackDeliveryWhatsApp/${req.params.id}`, 'post', req.body, 'kiboengage')
+  return res.status(200).json({ status: 'success' })
 }
 
 exports.trackStatusWhatsAppChat = function (req, res) {
-  let query = {}
-  if (req.body.SmsStatus === 'delivered' && req.body.EventType && req.body.EventType === 'READ') {
-    query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {status: 'seen', seenDateTime: Date.now}
-    }
-    callApi(`whatsAppChat`, 'put', query, 'chatDbLayer')
-      .then(updated => {
-      })
-    .catch(err => {
-      return res.status(500).json({
-        status: 'failed',
-        description: `Internal server error in updating plan usage ${err}`
-      })
-    })
-  }
+  callApi(`twilioEvents/trackStatusWhatsAppChat/${req.params.id}`, 'post', req.body, 'kibochat')
   return res.status(200).json({ status: 'success' })
 }
 
