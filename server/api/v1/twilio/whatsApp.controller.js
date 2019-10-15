@@ -8,6 +8,7 @@ exports.trackDeliveryWhatsApp = function (req, res) {
 }
 
 exports.trackStatusWhatsAppChat = function (req, res) {
+  console.log('trackStatusWhatsAppChat', req.body)
   callApi(`twilioEvents/trackStatusWhatsAppChat/${req.params.id}`, 'post', req.body, 'kibochat')
   return res.status(200).json({ status: 'success' })
 }

@@ -99,4 +99,3 @@ exports.receiveWhatsApp = function (req, res) {
       logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
     })
 }
-function query
