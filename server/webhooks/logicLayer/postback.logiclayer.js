@@ -99,7 +99,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
           'attachment': {
             'type': body.componentType,
             'payload': {
-              'url': body.fileurl.url,
+              'url': body.file.fileurl.url,
               'is_reusable': true
             }
           }
@@ -123,7 +123,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
           'attachment': {
             'type': 'image',
             'payload': {
-              'url': body.fileurl
+              'url': body.file.fileurl
             }
           }
         })
