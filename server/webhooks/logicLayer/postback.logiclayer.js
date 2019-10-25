@@ -179,6 +179,40 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
       }
       resolve({payload})
     } else if (body.componentType === 'gallery') {
+      var cards = []
+      if (body.cards && body.cards.length > 0) {
+        for (var m = 0; m < body.cards.length; m++) {
+          var card = {}
+          card.title = body.cards[m].title
+          card.image_url = body.cards[m].image_url
+          card.subtitle = body.cards[m].subtitle
+          card.description = body.cards[m].description
+          var cardButtons = body.cards[m].buttons
+          if (jsonAdMessages && cardButtons) {
+            for (var c = 0; c < cardButtons.length; c++) {
+              var cButtons = []
+              var cbutton = cardButtons[c]
+              var jsonAdMessageId
+              if (cbutton.payload && cbutton.type === 'postback') {
+                for (var j = 0; j < jsonAdMessages.length; j++) {
+                  if ((cbutton.payload).toString() === (jsonAdMessages[j].jsonAdMessageId).toString()) {
+                    jsonAdMessageId = jsonAdMessages[j]._id
+                    break
+                  }
+                }
+              cbutton.payload = 'JSONAD-' + jsonAdMessageId
+              } else if (cbutton.type === 'web_url') {
+                if (cbutton.newUrl) {
+                  delete cbutton.newUrl
+                }
+              }
+              cButtons.push(cbutton)
+            }
+          }
+          card.buttons = cButtons
+          cards.push(card)
+        }
+      }
       payload = {
         'messaging_type': messageType,
         'recipient': JSON.stringify({
@@ -189,7 +223,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
             'type': 'template',
             'payload': {
               'template_type': 'generic',
-              'elements': body.cards
+              'elements': cards
             }
           }
         })
