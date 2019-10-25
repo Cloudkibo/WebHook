@@ -99,6 +99,31 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
           'attachment': {
             'type': body.componentType,
             'payload': {
+              'url': body.file.fileurl.url,
+              'is_reusable': true
+            }
+          }
+        })
+      }
+      //     fs.unlink(fileToStore)
+      //     resolve({payload})
+      //   })
+      // })
+      // todo test this one. we are not removing as we need to keep it for live chat
+      // if (!isForLiveChat) deleteFile(body.fileurl)
+      resolve({payload})
+    } else if (['media'].indexOf(
+      body.componentType) > -1) {
+      
+      payload = {
+        'messaging_type': messageType,
+        'recipient': JSON.stringify({
+          'id': subscriberId
+        }),
+        'message': JSON.stringify({
+          'attachment': {
+            'type': body.mediaType,
+            'payload': {
               'url': body.fileurl.url,
               'is_reusable': true
             }
@@ -123,7 +148,7 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
           'attachment': {
             'type': 'image',
             'payload': {
-              'url': body.fileurl
+              'url': body.file.fileurl
             }
           }
         })
