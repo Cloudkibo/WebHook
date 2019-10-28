@@ -102,9 +102,9 @@ exports.sendMessage = function (req, res) {
   .catch(error => {
     console.log('error at send message', error)
   })
-  let MessageObject = {
+  MessageObject = {
     from: `whatsapp:+14155238886`,
-    to: `whatsapp:+923322846897`,
+    to: `whatsapp:+923352134405`,
     statusCallback: `https://kibopush-anisha.ngrok.io/webhooks/twilio/trackStatusWhatsAppChat/1`,
     body: 'hey'
   }
