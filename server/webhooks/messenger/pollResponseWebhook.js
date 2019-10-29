@@ -4,11 +4,9 @@ const { callApi } = require('../../utility/api.caller.service')
 
 exports.pollResponseWebhook = (payload) => {
   let resp = JSON.parse(payload.entry[0].messaging[0].message.quick_reply.payload)
-  console.log('response value', resp)
   if (resp[0]) {
     for (let i = 0; i < resp.length; i++) {
       payload.entry[0].messaging[0].message.quick_reply.payload = JSON.stringify(resp[i])
-      console.log('payload', payload.entry[0].messaging[0].message.quick_reply.payload)
       if (resp[i].action && resp[i].action === 'subscribe_to_sequence') {
         callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
           .then((response) => {
