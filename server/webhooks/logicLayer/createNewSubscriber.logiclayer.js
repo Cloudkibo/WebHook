@@ -324,7 +324,7 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
               .catch((err) => {
                 logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
               })
-            // updateSubscriberAwaitingReply(subscriberFound._id)
+            updateSubscriberAwaitingReply(subscriberFound._id)
           }
         }
       })
