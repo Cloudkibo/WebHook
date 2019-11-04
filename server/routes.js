@@ -17,6 +17,7 @@ module.exports = function (app) {
 
   app.use('/webhooks/wordpress', require('./webhook_subscriptions/wordpress'))
 
+  // app.use('/webhooks/twilio', require('./api/v1/twilio'))
   app.use('/webhooks/twilio', require('./api/v1/twilio'))
 
   app.route('/:url(api|auth)/*').get((req, res) => {

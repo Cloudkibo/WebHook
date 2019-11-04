@@ -70,7 +70,6 @@ exports.assignDefaultTags = (page, subscriber) => {
   ]
   callApi('subscribers/aggregate', 'post', subscribersData, 'accounts')
     .then(subscribersCount => {
-      console.log('subscribersCount' , subscribersCount)
       let value = (subscribersCount[0].count - 1) % 10000
       let count = Math.floor(subscribersCount[0].count / 10000)
       if (value === 0 && subscribersCount[0].count > 10000) {
@@ -288,5 +287,57 @@ exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
     })
     .catch((err) => {
       logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
+    })
+}
+exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
+  payload.completeInfo = true
+  callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: {}}, 'accounts')
+    .then(updated => {
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
+    })
+}
+exports.checkCommentReply = (subscriberFound, page, payload, body) => {
+  if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.sendSecondMessage && subscriberFound.awaitingCommentReply.postId) {
+    callApi(`comment_capture/query`, 'post', {_id: subscriberFound.awaitingCommentReply.postId}, 'accounts')
+      .then(post => {
+        console.log('post found')
+        post = post[0]
+        if (post) {
+          if (post.secondReply && post.secondReply.action === 'reply') {
+            payload.awaitingCommentReply = subscriberFound.awaitingCommentReply
+            payload._id = subscriberFound._id
+            callApi('facebookEvents/sendSecondReplyToComment', 'post', {page: page, subscriber: payload, post: post}, 'kiboengage')
+              .then((response) => {
+                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+              })
+          } else if (post.secondReply && post.secondReply.action === 'subscribe') {
+            body.entry[0].messaging[0].postback = {
+              payload: JSON.stringify({sequenceId: post.secondReply.sequenceId})
+            }
+            console.log('sending to subscribe')
+            callApi('messengerEvents/subscribeToSequence', 'post', body, 'kiboengage')
+              .then((response) => {
+                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+              })
+              .catch((err) => {
+                logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+              })
+            // updateSubscriberAwaitingReply(subscriberFound._id)
+          }
+        }
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `failed to fetch post: ${err}`, 'error')
+      })
+  }
+}
+function updateSubscriberAwaitingReply (subscriberId) {
+  callApi(`subscribers/update`, 'put', {query: {_id: subscriberId}, newPayload: {awaitingCommentReply: {sendSecondMessage: false}}, options: {}}, 'accounts')
+    .then(updated => {
+    })
+    .catch(err => {
+      logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
     })
 }
