@@ -65,7 +65,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       } else {
                         subscriberFound = subscriberFound[0]
                         if (!event.message.is_echo) {
-                          console.log('inside checkCommentReply')
                           if (!subscriberFound.completeInfo) {
                             LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
                           }
