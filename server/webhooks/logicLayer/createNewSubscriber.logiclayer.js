@@ -316,7 +316,6 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
             body.entry[0].messaging[0].postback = {
               payload: JSON.stringify({sequenceId: post.secondReply.sequenceId})
             }
-            console.log('sending to subscribe')
             callApi('messengerEvents/subscribeToSequence', 'post', body, 'kiboengage')
               .then((response) => {
                 logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')

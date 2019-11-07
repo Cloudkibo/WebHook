@@ -64,10 +64,13 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                           })
                       } else {
                         subscriberFound = subscriberFound[0]
-                        if (!subscriberFound.completeInfo) {
-                          LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
+                        if (!event.message.is_echo) {
+                          console.log('inside checkCommentReply')
+                          if (!subscriberFound.completeInfo) {
+                            LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
+                          }
+                          LogicLayer.checkCommentReply(subscriberFound, page, payload, fullPayload)
                         }
-                        LogicLayer.checkCommentReply(subscriberFound, page, payload, fullPayload)
                         if (['messaging_referrals', 'landing_page'].indexOf(subscriberSource) !== -1) {
                           LogicLayer.informGrowthTools(
                             subscriberSource,
