@@ -8,7 +8,8 @@ exports.chatPluginWebhook = (payload) => {
   const event = payload.entry[0].messaging[0]
   const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
   const pageId = event.message && payload.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
-  createNewSubscriber(pageId, senderId, 'chat_plugin', '', null, event)
+  const ref = event.referral && event.referral.ref ? JSON.parse(event.referral.ref) : null
+  createNewSubscriber(pageId, senderId, 'chat_plugin', '', ref, event)
   // callApi('messengerEvents/subscriber', 'post', payload, 'accounts')
   //   .then((response) => {
   //     logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')

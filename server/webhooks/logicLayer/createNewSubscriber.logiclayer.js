@@ -41,6 +41,7 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
     payload.source = 'customer_matching'
   } else if (subscriberSource === 'chat_plugin') {
     payload.source = 'chat_plugin'
+    payload.siteInfo = ref
   } else if (subscriberSource === 'messaging_referrals') {
     payload.source = `https://m.me/${page._id}?ref=${ref}`
   } else if (subscriberSource === 'landing_page') {
@@ -298,6 +299,17 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
       logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
     })
 }
+
+exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
+  payload.siteInfo = siteInfo
+  callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: {}}, 'accounts')
+    .then(updated => {
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
+    })
+}
+
 exports.checkCommentReply = (subscriberFound, page, payload, body) => {
   if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.sendSecondMessage && subscriberFound.awaitingCommentReply.postId) {
     callApi(`comment_capture/query`, 'post', {_id: subscriberFound.awaitingCommentReply.postId}, 'accounts')
