@@ -10,29 +10,12 @@ exports.chatPluginSchema = {
         {
           'type': 'object',
           'properties': {
-            'id': {
-              'type': 'string'
-            },
-            'time': {
-              'type': 'integer'
-            },
             'messaging': {
               'type': 'array',
               'items': [
                 {
                   'type': 'object',
                   'properties': {
-                    'sender': {
-                      'type': 'object',
-                      'properties': {
-                        'id': {
-                          'type': 'string'
-                        }
-                      },
-                      'required': [
-                        'id'
-                      ]
-                    },
                     'recipient': {
                       'type': 'object',
                       'properties': {
@@ -44,39 +27,57 @@ exports.chatPluginSchema = {
                         'id'
                       ]
                     },
-                    'message': {
+                    'sender': {
                       'type': 'object',
                       'properties': {
-                        'tags': {
-                          'type': 'object',
-                          'properties': {
-                            'source': {
-                              'type': 'string',
-                              'enum': ['customer_chat_plugin']
-                            }
-                          },
-                          'required': [
-                            'source'
-                          ]
+                        'id': {
+                          'type': 'string'
                         }
                       },
                       'required': [
-                        'tags'
+                        'id'
+                      ]
+                    },
+                    'postback': {
+                      'type': 'object',
+                      'properties': {
+                        'referral': {
+                          'type': 'object',
+                          'properties': {
+                            'ref': {
+                              'type': 'string'
+                            },
+                            'source': {
+                              'type': 'string',
+                              'enum': ['CUSTOMER_CHAT_PLUGIN']
+                            }
+                          },
+                          'required': ['source', 'ref']
+                        },
+                        'payload': {
+                          'type': 'string'
+                        },
+                        'title': {
+                          'type': 'string'
+                        }
+                      },
+                      'required': [
+                        'referral',
+                        'payload',
+                        'title'
                       ]
                     }
                   },
                   'required': [
-                    'sender',
                     'recipient',
-                    'message'
+                    'sender',
+                    'postback'
                   ]
                 }
               ]
             }
           },
           'required': [
-            'id',
-            'time',
             'messaging'
           ]
         }
@@ -86,5 +87,63 @@ exports.chatPluginSchema = {
   'required': [
     'object',
     'entry'
+  ]
+}
+
+exports.referralSchema = {
+  '$schema': 'http://json-schema.org/draft-04/schema#',
+  'type': 'object',
+  'properties': {
+    'sender': {
+      'type': 'object',
+      'properties': {
+        'id': {
+          'type': 'string'
+        }
+      },
+      'required': [
+        'id'
+      ]
+    },
+    'recipient': {
+      'type': 'object',
+      'properties': {
+        'id': {
+          'type': 'string'
+        }
+      },
+      'required': [
+        'id'
+      ]
+    },
+    'timestamp': {
+      'type': 'integer'
+    },
+    'referral': {
+      'type': 'object',
+      'properties': {
+        'ref': {
+          'type': 'string'
+        },
+        'source': {
+          'type': 'string',
+          'enum': ['MESSENGER_CODE']
+        },
+        'type': {
+          'type': 'string'
+        }
+      },
+      'required': [
+        'ref',
+        'source',
+        'type'
+      ]
+    }
+  },
+  'required': [
+    'sender',
+    'recipient',
+    'timestamp',
+    'referral'
   ]
 }
