@@ -4,7 +4,7 @@ const logger = require('../../components/logger')
 const Global = require('../../global/global.js')
 const LogicLayer = require('./createNewSubscriber.logiclayer.js')
 
-exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, ref, event) => {
+exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, ref, event, fullPayload) => {
   callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(pages => {
       let page = pages[0]
@@ -55,7 +55,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 event.referral
                               )
                             }
-                            console.log('going to sessions')
                             callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
                             .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                             .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
@@ -65,6 +64,12 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                           })
                       } else {
                         subscriberFound = subscriberFound[0]
+                        if (!event.message.is_echo) {
+                          if (!subscriberFound.completeInfo) {
+                            LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
+                          }
+                          LogicLayer.checkCommentReply(subscriberFound, page, payload, fullPayload)
+                        }
                         if (['messaging_referrals', 'landing_page'].indexOf(subscriberSource) !== -1) {
                           LogicLayer.informGrowthTools(
                             subscriberSource,

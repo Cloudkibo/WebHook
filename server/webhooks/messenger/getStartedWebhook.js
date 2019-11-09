@@ -2,10 +2,19 @@ const TAG = 'webhooks/messenger/getStartedWebhook.js'
 const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
 const { newSubscriberWebhook } = require('./newSubscriberWebhook.js')
+const { createNewSubscriber } = require('../logicLayer/createNewSubscriber.js')
 
 exports.getStartedWebhook = (payload) => {
   // logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`)
-  sendWelcomeMessage(payload)
+  if (payload.entry[0].messaging[0].postback.referral) {
+    payload.entry[0].messaging[0].referral = payload.entry[0].messaging[0].postback.referral
+    const event = payload.entry[0].messaging[0]
+    const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
+    const pageId = event.message && event.message.is_echo ? event.sender.id : event.recipient.id
+    createNewSubscriber(pageId, senderId, 'messaging_referrals', '', null, event)
+  } else {
+    sendWelcomeMessage(payload)
+  }
 }
 
 function sendWelcomeMessage (payload) {
