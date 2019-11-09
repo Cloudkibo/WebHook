@@ -70,6 +70,9 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                           }
                           LogicLayer.checkCommentReply(subscriberFound, page, payload, fullPayload)
                         }
+                        if (subscriberSource === 'chat_plugin') {
+                          LogicLayer.addSiteInfoForSubscriber(subscriberFound, payload, ref)
+                        }
                         if (['messaging_referrals', 'landing_page'].indexOf(subscriberSource) !== -1) {
                           LogicLayer.informGrowthTools(
                             subscriberSource,
