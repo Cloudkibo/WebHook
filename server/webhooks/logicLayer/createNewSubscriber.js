@@ -64,7 +64,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                           })
                       } else {
                         subscriberFound = subscriberFound[0]
-                        if (!event.message.is_echo) {
+                        if (event.message && !event.message.is_echo) {
                           if (!subscriberFound.completeInfo) {
                             LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
                           }
@@ -102,7 +102,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       }
                     })
                     .catch(err => {
-                      logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`, 'error')
+                      logger.serverLog(TAG, `Failed to fetch subscriber ${err}`, 'error')
                     })
                 }
               })
