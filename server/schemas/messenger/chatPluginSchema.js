@@ -38,40 +38,24 @@ exports.chatPluginSchema = {
                         'id'
                       ]
                     },
-                    'postback': {
+                    'referral': {
                       'type': 'object',
                       'properties': {
-                        'referral': {
-                          'type': 'object',
-                          'properties': {
-                            'ref': {
-                              'type': 'string'
-                            },
-                            'source': {
-                              'type': 'string',
-                              'enum': ['CUSTOMER_CHAT_PLUGIN']
-                            }
-                          },
-                          'required': ['source', 'ref']
-                        },
-                        'payload': {
+                        'ref': {
                           'type': 'string'
                         },
-                        'title': {
-                          'type': 'string'
+                        'source': {
+                          'type': 'string',
+                          'enum': ['CUSTOMER_CHAT_PLUGIN']
                         }
                       },
-                      'required': [
-                        'referral',
-                        'payload',
-                        'title'
-                      ]
+                      'required': ['source', 'ref']
                     }
                   },
                   'required': [
                     'recipient',
                     'sender',
-                    'postback'
+                    'referral'
                   ]
                 }
               ]
