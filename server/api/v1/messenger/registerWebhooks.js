@@ -48,7 +48,7 @@ const { pollResponseWebhook } = require('../../../webhooks/messenger/pollRespons
 const { messageReceivedSchema } = require('../../../schemas/messenger/messageReceivedSchema.js')
 const { newSubscriberWebhook } = require('../../../webhooks/messenger/newSubscriberWebhook.js')
 
-const { chatPluginSchema } = require('../../../schemas/messenger/chatPluginSchema.js')
+const { chatPluginSchema, chatPluginWithPostBackSchema } = require('../../../schemas/messenger/chatPluginSchema.js')
 const { chatPluginWebhook } = require('../../../webhooks/messenger/chatPluginWebhook.js')
 
 const { customerMatchingSchema } = require('../../../schemas/messenger/customerMatchingSchema.js')
@@ -75,6 +75,7 @@ function initRegistry () {
   init.registerCallback(messengerCodeSchemas.referralSchema, (payload) => { messengerCodeWebhook(payload) })
   init.registerCallback(messengerCodeSchemas.postbackReferralSchema, (payload) => { messengerCodeWebhook(payload) })
   init.registerCallback(postbackSchemas.getStartedSchema, (payload) => { getStartedWebhook(payload) })
+  init.registerCallback(chatPluginWithPostBackSchema, (payload) => { chatPluginWebhook(payload) })
   init.registerCallback(postbackSchemas.postbackSchema, (payload) => { postbackWebhook(payload) })
   init.registerCallback(quickRepliesSchema, (payload) => { pollResponseWebhook(payload) })
   init.registerCallback(optinSchemas.shopifySchema, (payload) => { shopifyWebhook(payload) })
