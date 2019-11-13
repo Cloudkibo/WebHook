@@ -120,9 +120,6 @@ exports.chatPluginWithPostBackSchema = {
                         'payload': {
                           'type': 'string'
                         },
-                        'title': {
-                          'type': 'string'
-                        },
                         'referral': {
                           'type': 'object',
                           'properties': {
@@ -139,7 +136,6 @@ exports.chatPluginWithPostBackSchema = {
                       },
                       'required': [
                         'payload',
-                        'title',
                         'referral'
                       ]
                     }
