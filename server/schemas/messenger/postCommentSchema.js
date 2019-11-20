@@ -22,7 +22,7 @@ exports.postCommentSchema = {
                         },
                         'verb': {
                           'type': 'string',
-                          'enum': ['add', 'remove', 'delete']
+                          'enum': ['add', 'remove', 'delete', 'edited']
                         },
                         'comment_id': {'type': 'string'},
                         'sender_id': {'type': 'string'},
