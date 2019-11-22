@@ -299,7 +299,16 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
       logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
     })
 }
-
+ exports.updateConversionCount = (postId) => {
+  let newPayload = { $inc: { conversionCount : 1 } }
+  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayload, options: {}}, 'accounts')
+    .then(updated => {
+      logger.serverLog(TAG, `Conversion count updated ${JSON.stringify(updated)}`, 'updated')
+    })
+    .catch(err => {
+      logger.serverLog(TAG, `Failed to update conversion Count ${JSON.stringify(err)}`, 'error')
+    })
+}
 exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
   payload.siteInfo = siteInfo
   callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: {}}, 'accounts')
