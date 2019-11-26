@@ -320,6 +320,7 @@ exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
 }
 
 exports.checkCommentReply = (subscriberFound, page, payload, body) => {
+  updateSubscriberAwaitingReply(subscriberFound._id)
   if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.sendSecondMessage && subscriberFound.awaitingCommentReply.postId) {
     callApi(`comment_capture/query`, 'post', {_id: subscriberFound.awaitingCommentReply.postId}, 'accounts')
       .then(post => {
@@ -344,7 +345,6 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
               .catch((err) => {
                 logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
               })
-            updateSubscriberAwaitingReply(subscriberFound._id)
           }
         }
       })
