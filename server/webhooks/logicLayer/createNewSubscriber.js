@@ -67,6 +67,9 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                         if (event.message && !event.message.is_echo) {
                           if (!subscriberFound.completeInfo) {
                             LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
+                            if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.postId) {
+                              LogicLayer.updateConversionCount(subscriberFound.awaitingCommentReply.postId)
+                            }
                           }
                           LogicLayer.checkCommentReply(subscriberFound, page, payload, fullPayload)
                         }
