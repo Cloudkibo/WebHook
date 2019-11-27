@@ -300,14 +300,23 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
     })
 }
  exports.updateConversionCount = (postId) => {
-  let newPayload = { $inc: { conversionCount : 1 } }
-  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayload, options: {}}, 'accounts')
+  let newPayloadConversionCount = { $inc: { conversionCount : 1 } }
+  let newPayloadWaitingReply = { $inc: { waitingReply : -1 } }
+  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
     .then(updated => {
       logger.serverLog(TAG, `Conversion count updated ${JSON.stringify(updated)}`, 'updated')
     })
     .catch(err => {
       logger.serverLog(TAG, `Failed to update conversion Count ${JSON.stringify(err)}`, 'error')
     })
+
+    callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
+      .then(updated => {
+        logger.serverLog(TAG, `Waiting Reply updated ${JSON.stringify(updated)}`, 'updated')
+      })
+      .catch(err => {
+        logger.serverLog(TAG, `Failed to update Waiting Reply ${JSON.stringify(err)}`, 'error')
+      })
 }
 exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
   payload.siteInfo = siteInfo
@@ -320,6 +329,7 @@ exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
 }
 
 exports.checkCommentReply = (subscriberFound, page, payload, body) => {
+  updateSubscriberAwaitingReply(subscriberFound._id)
   if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.sendSecondMessage && subscriberFound.awaitingCommentReply.postId) {
     callApi(`comment_capture/query`, 'post', {_id: subscriberFound.awaitingCommentReply.postId}, 'accounts')
       .then(post => {
@@ -344,7 +354,6 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
               .catch((err) => {
                 logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
               })
-            updateSubscriberAwaitingReply(subscriberFound._id)
           }
         }
       })
