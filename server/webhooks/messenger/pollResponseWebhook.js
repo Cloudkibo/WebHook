@@ -70,6 +70,15 @@ exports.pollResponseWebhook = (payload) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
       }
+      if (resp[i].action && resp[i].action === 'hubspot') {
+        callApi('messengerEvents/hubspot', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
     }
   } else if (resp.option && resp.option === 'talkToHuman') {
     // logger.serverLog(TAG,

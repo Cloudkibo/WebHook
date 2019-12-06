@@ -57,6 +57,14 @@ exports.postbackWebhook = (payload) => {
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
+  } else if (!resp[0] && resp.action === 'hubspot') {
+    callApi('messengerEvents/hubspot', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
   } else if ((resp.action === 'send_tweet' || resp.action === 'do_not_send_tweet') && resp.autopostingId && resp.tweetId) {
     callApi('autoposting/handleTweetModeration', 'post', payload, 'kiboengage')
       .then((response) => {
