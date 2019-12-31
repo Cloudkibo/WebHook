@@ -71,7 +71,7 @@ exports.pollResponseWebhook = (payload) => {
           })
       }
       if (resp[i].action && resp[i].action === 'unsubscribe_from_rssFeed') {
-        callApi('messengerEvents/rssFeeds/subscribeOrUnsubscribe', 'post', payload, 'kiboengage')
+        callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
           .then((response) => {
             logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
           })
@@ -80,7 +80,7 @@ exports.pollResponseWebhook = (payload) => {
           })
       }
       if (resp[i].action && resp[i].action === 'subscribe_to_rssFeed') {
-        callApi('messengerEvents/rssFeeds/subscribeOrUnsubscribe', 'post', payload, 'kiboengage')
+        callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
           .then((response) => {
             logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
           })
