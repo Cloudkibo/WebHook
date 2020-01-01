@@ -70,6 +70,42 @@ exports.pollResponseWebhook = (payload) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
       }
+      if (resp[i].action && resp[i].action === 'unsubscribe_from_rssFeed') {
+        callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
+      if (resp[i].action && resp[i].action === 'subscribe_to_rssFeed') {
+        callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
+      if (resp[i].action && resp[i].action === 'show_more_topics') {
+        callApi('messengerEvents/rssFeeds/showMoreTopics', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
+      if (resp[i].action && resp[i].action === 'send_topic_feed') {
+        callApi('messengerEvents/rssFeeds/sendTopicFeed', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
       if (resp[i].action && resp[i].action === 'hubspot') {
         callApi('messengerEvents/hubspot', 'post', payload, 'kiboengage')
           .then((response) => {
