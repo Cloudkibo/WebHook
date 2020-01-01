@@ -34,7 +34,6 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
     email: '',
     senderId: senderId,
     pageId: page._id,
-    pageAccessToken: page.pageAccessToken,
     isSubscribed: true
   }
   if (subscriberSource === 'customer_matching') {

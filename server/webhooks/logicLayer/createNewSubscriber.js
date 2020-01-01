@@ -65,18 +65,16 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                           })
                       } else {
                         subscriberFound = subscriberFound[0]
-                        console.log('subscriberFound.waitingForUserInput', subscriberFound.waitingForUserInput)
-                        console.log('subscriberFound.waitingForUserInput.componentIndex', subscriberFound.waitingForUserInput.componentIndex)
-                        if (subscriberFound.waitingForUserInput && subscriberFound.waitingForUserInput.componentIndex !== -1) {
-                          callApi('messengerEvents/userInput', 'post', payload, 'kiboengage')
-                          .then((response) => {
-                            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-                          })
-                          .catch((err) => {
-                            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-                          })
-                        } 
                         if (event.message && !event.message.is_echo) {
+                          if (subscriberFound.waitingForUserInput && subscriberFound.waitingForUserInput.componentIndex !== -1) {
+                            callApi('messengerEvents/userInput', 'post', payload, 'kiboengage')
+                            .then((response) => {
+                              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+                            })
+                            .catch((err) => {
+                              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+                            })
+                          } 
                           if (!subscriberFound.completeInfo) {
                             LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
                             if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.postId) {
