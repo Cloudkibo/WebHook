@@ -66,7 +66,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                         subscriberFound = subscriberFound[0]
                         if (event.message && !event.message.is_echo) {
                           if (subscriberFound.waitingForUserInput && subscriberFound.waitingForUserInput.componentIndex !== -1) {
-                            callApi('messengerEvents/userInput', 'post', payload, 'kiboengage')
+                            callApi('messengerEvents/userInput', 'post', {payload: payload, message: event.message}, 'kiboengage')
                             .then((response) => {
                               logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
                             })
