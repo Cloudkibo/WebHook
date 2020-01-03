@@ -126,6 +126,36 @@ exports.pollResponseWebhook = (payload) => {
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
+  } else if (resp.option && resp.option === 'userInputSkip') {
+    logger.serverLog(TAG,
+      `userInputSkip ${JSON.stringify(payload)}`)
+    const event = payload.entry[0].messaging[0]
+    let message = event.message
+    message.quick_reply.payload = JSON.parse(message.quick_reply.payload)
+    const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
+    const pageId = event.message && event.message.is_echo ? event.sender.id : event.recipient.id
+    callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+    .then(pages => {
+      let page = pages[0]
+      let payload = {
+        senderId: senderId,
+        pageId: page._id,
+        isSubscribed: true,
+        companyId: page.companyId
+      }
+      console.log('payload in user input', payload)
+      console.log('message in user input', message)
+      callApi('messengerEvents/userInput', 'post', {payload: payload, message: message}, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from fetch pages: ${err}`, 'error')
+    })
   } else {
     // logger.serverLog(TAG,
     //   `in pollResponseWebhook ${JSON.stringify(payload)}`)
