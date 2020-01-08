@@ -14,6 +14,7 @@ exports.postbackWebhook = (payload) => {
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
+  console.log('resp value', resp)
   if (!resp[0] && resp.survey_id) {
     callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
       .then((response) => {
@@ -82,6 +83,30 @@ exports.postbackWebhook = (payload) => {
       })
   } else if (!resp[0] && resp.action === 'send_message_block') {
     callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+  } else if (!resp[0] && resp.action === 'unsubscribe_from_rssFeed') {
+    callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+  } else if (!resp[0] && resp.action === 'subscribe_to_rssFeed') {
+    callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+  } else if (!resp[0] && resp.action === 'show_more_topics') {
+    callApi('messengerEvents/rssFeeds/showMoreTopics', 'post', payload, 'kiboengage')
       .then((response) => {
         logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
