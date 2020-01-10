@@ -49,11 +49,14 @@ exports.postbackWebhook = (payload) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   } else if (!resp[0] && resp.action === 'google_sheets') {
+    console.log('sending request to googleSheet')
     callApi('messengerEvents/googleSheets', 'post', payload, 'kiboengage')
       .then((response) => {
+        console.log('send successfully googlesheet')
         logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
       .catch((err) => {
+        console.log('not send successfully googlesheet')
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
   } else if (!resp[0] && resp.action === 'hubspot') {
