@@ -299,24 +299,24 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
       logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
     })
 }
- exports.updateConversionCount = (postId) => {
-  let newPayloadConversionCount = { $inc: { conversionCount : 1 } }
-  let newPayloadWaitingReply = { $inc: { waitingReply : -1 } }
-  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
-    .then(updated => {
-      logger.serverLog(TAG, `Conversion count updated ${JSON.stringify(updated)}`, 'updated')
-    })
-    .catch(err => {
-      logger.serverLog(TAG, `Failed to update conversion Count ${JSON.stringify(err)}`, 'error')
-    })
+exports.updateConversionCount = (postId) => {
+ let newPayloadConversionCount = { $inc: { conversionCount : 1 } }
+ let newPayloadWaitingReply = { $inc: { waitingReply : -1 } }
+ callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
+   .then(updated => {
+     logger.serverLog(TAG, `Conversion count updated ${JSON.stringify(updated)}`, 'updated')
+   })
+   .catch(err => {
+     logger.serverLog(TAG, `Failed to update conversion Count ${JSON.stringify(err)}`, 'error')
+   })
 
-    callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
-      .then(updated => {
-        logger.serverLog(TAG, `Waiting Reply updated ${JSON.stringify(updated)}`, 'updated')
-      })
-      .catch(err => {
-        logger.serverLog(TAG, `Failed to update Waiting Reply ${JSON.stringify(err)}`, 'error')
-      })
+   callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
+     .then(updated => {
+       logger.serverLog(TAG, `Waiting Reply updated ${JSON.stringify(updated)}`, 'updated')
+     })
+     .catch(err => {
+       logger.serverLog(TAG, `Failed to update Waiting Reply ${JSON.stringify(err)}`, 'error')
+     })
 }
 exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
   payload.siteInfo = siteInfo
@@ -364,6 +364,19 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
 }
 function updateSubscriberAwaitingReply (subscriberId) {
   callApi(`subscribers/update`, 'put', {query: {_id: subscriberId}, newPayload: {awaitingCommentReply: {sendSecondMessage: false}}, options: {}}, 'accounts')
+    .then(updated => {
+    })
+    .catch(err => {
+      logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+    })
+}
+exports.updateSubscriptionForRss = (subscriber) => {
+  let query = {
+    purpose: 'updateAll',
+    match: {companyId: subscriber.companyId, defaultFeed: true},
+    updated: {$inc: {subscriptions: 1}}
+  }
+  callApi(`rssFeeds`, 'put', query, 'engageDbLayer')
     .then(updated => {
     })
     .catch(err => {
