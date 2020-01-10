@@ -7,19 +7,13 @@ const logicLayer = require('../logicLayer/postback.logiclayer.js')
 const { newSubscriberWebhook } = require('./newSubscriberWebhook.js')
 
 exports.postbackWebhook = (payload) => {
-  console.log('createNewSubscriber called', JSON.stringify(payload))
   let resp = ''
   if (logicLayer.isJsonString(payload.entry[0].messaging[0].postback.payload)) {
-    console.log('called if function')
     resp = JSON.parse(payload.entry[0].messaging[0].postback.payload)
   } else {
-    console.log('called else function')
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
-  console.log('resp value', resp)
-  console.log('resp.action', resp.action)
-  console.log('resp[0]', !resp[0])
   if (!resp[0] && resp.survey_id) {
     callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
       .then((response) => {
