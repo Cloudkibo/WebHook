@@ -5,6 +5,7 @@ const Global = require('../../global/global.js')
 const LogicLayer = require('./createNewSubscriber.logiclayer.js')
 
 exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, ref, event, fullPayload) => {
+  console.log('createNewSubscriber called', JSON.stringify(fullPayload))
   callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(pages => {
       let page = pages[0]
