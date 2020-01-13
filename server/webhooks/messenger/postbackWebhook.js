@@ -14,10 +14,10 @@ exports.postbackWebhook = (payload) => {
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
-  let data = JSON.parse(resp)
-  console.log('resp in postbackWebhook', data)
-  console.log('resp[0] in postbackWebhook', !data[0])
-  console.log('resp.action in postbackWebhook', data.action)
+  // let data = JSON.parse(resp)
+  console.log('resp in postbackWebhook', resp)
+  console.log('resp[0] in postbackWebhook', !resp[0])
+  console.log('resp.action in postbackWebhook', resp.action)
   if (!resp[0] && resp.survey_id) {
     callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
       .then((response) => {
