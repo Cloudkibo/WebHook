@@ -126,6 +126,16 @@ exports.pollResponseWebhook = (payload) => {
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
+  } else if (resp.option && resp.option === 'userInputSkip') {
+    logger.serverLog(TAG,
+      `userInputSkip ${JSON.stringify(payload)}`)
+    callApi('messengerEvents/userInput', 'post', {payload: payload, message: resp.option}, 'kiboengage')
+    .then((response) => {
+      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+    })
   } else {
     // logger.serverLog(TAG,
     //   `in pollResponseWebhook ${JSON.stringify(payload)}`)

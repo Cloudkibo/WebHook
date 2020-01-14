@@ -39,6 +39,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                               )
                             }
                             LogicLayer.assignDefaultTags(page, subscriberCreated)
+                            LogicLayer.updateSubscriptionForRss(subscriberCreated)
                             callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: senderId, pageId: page._id}, 'kiboengage')
                               .then(seqRes => logger.serverLog(TAG, `response from sequence subscriberJoins ${seqRes}`))
                               .catch(err => logger.serverLog(TAG, `Failed to get response from sequence subscriberJoins ${JSON.stringify(err)}`, 'error'))
@@ -65,6 +66,15 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       } else {
                         subscriberFound = subscriberFound[0]
                         if (event.message && !event.message.is_echo) {
+                          if (subscriberFound.waitingForUserInput && subscriberFound.waitingForUserInput.componentIndex !== -1) {
+                            callApi('messengerEvents/userInput', 'post', {payload: payload, message: event.message}, 'kiboengage')
+                            .then((response) => {
+                              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+                            })
+                            .catch((err) => {
+                              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+                            })
+                          }
                           if (!subscriberFound.completeInfo) {
                             LogicLayer.addCompleteInfoOfSubscriber(subscriberFound, payload)
                             if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.postId) {

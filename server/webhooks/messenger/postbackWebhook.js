@@ -88,6 +88,30 @@ exports.postbackWebhook = (payload) => {
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
+  } else if (!resp[0] && resp.action === 'unsubscribe_from_rssFeed') {
+    callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+  } else if (!resp[0] && resp.action === 'subscribe_to_rssFeed') {
+    callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+  } else if (!resp[0] && resp.action === 'show_more_topics') {
+    callApi('messengerEvents/rssFeeds/showMoreTopics', 'post', payload, 'kiboengage')
+      .then((response) => {
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
   } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
