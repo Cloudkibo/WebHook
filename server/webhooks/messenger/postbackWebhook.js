@@ -14,119 +14,178 @@ exports.postbackWebhook = (payload) => {
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
-  if (!resp[0] && resp.survey_id) {
-    callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.unsubscribe) {
-    handleUnsubscribe(resp, payload.entry[0].messaging[0])
-  } else if (!resp[0] && resp.action === 'subscribe') {
-    callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'unsubscribe') {
-    callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'set_custom_field') {
-    callApi('messengerEvents/setCustomField', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'google_sheets') {
-    callApi('messengerEvents/googleSheets', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'hubspot') {
-    callApi('messengerEvents/hubspot', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if ((resp.action === 'send_tweet' || resp.action === 'do_not_send_tweet') && resp.autopostingId && resp.tweetId) {
-    callApi('autoposting/handleTweetModeration', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'send_sequence_message') {
-    callApi('messengerEvents/sendSequenceMessage', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'send_message_block') {
-    callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'unsubscribe_from_rssFeed') {
-    callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'subscribe_to_rssFeed') {
-    callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-  } else if (!resp[0] && resp.action === 'show_more_topics') {
-    callApi('messengerEvents/rssFeeds/showMoreTopics', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
+  if (resp[0]) {
+    for (let i = 0; i < resp.length; i++) {
+      payload.entry[0].messaging[0].postback.payload = JSON.stringify(resp[i])
+      if (resp[i].action && resp[i].action === 'subscribe') {
+        callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+      } else if (resp[i].action && resp[i].action === 'unsubscribe') {
+        callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      } else if (resp[i].action && resp[i].action === 'set_custom_field') {
+        callApi('messengerEvents/setCustomField', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      } else if (resp[i].action && resp[i].action === 'google_sheets') {
+        callApi('messengerEvents/googleSheets', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      } else if (resp[i].action && resp[i].action === 'hubspot') {
+        callApi('messengerEvents/hubspot', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      } else if (resp[i].action && resp[i].action === 'send_sequence_message') {
+        callApi('messengerEvents/sendSequenceMessage', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      } else if (resp[i].action && resp[i].action === 'send_message_block') {
+        callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      } else if (resp[i].componentType) {
+        callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
+        .then((response) => {
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+      }
+    }
+  } else if (!resp[0]) {
+    if (resp.survey_id) {
+      callApi('messengerEvents/surveyResponse', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.unsubscribe) {
+      handleUnsubscribe(resp, payload.entry[0].messaging[0])
+    } else if (resp.action === 'subscribe') {
+      callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'unsubscribe') {
+      callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'set_custom_field') {
+      callApi('messengerEvents/setCustomField', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'google_sheets') {
+      callApi('messengerEvents/googleSheets', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'hubspot') {
+      callApi('messengerEvents/hubspot', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'send_sequence_message') {
+      callApi('messengerEvents/sendSequenceMessage', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'send_message_block') {
+      callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'unsubscribe_from_rssFeed') {
+      callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'subscribe_to_rssFeed') {
+      callApi('messengerEvents/rssFeeds/changeSubscription', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if (resp.action === 'show_more_topics') {
+      callApi('messengerEvents/rssFeeds/showMoreTopics', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
+    } else if ((resp.action === 'send_tweet' || resp.action === 'do_not_send_tweet') && resp.autopostingId && resp.tweetId) {
+      callApi('autoposting/handleTweetModeration', 'post', payload, 'kiboengage')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
+        })
+    }
   } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
-  } else {
-      if(payload.entry[0].messaging[0].postback && resp[0].componentType) {
-      callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
-      .then((response) => {
-        console.log(TAG, `response recieved from KiboPush: ${response}`)
-
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
   }
-}
 }
 
 function handleUnsubscribe (resp, req) {
