@@ -112,21 +112,28 @@ exports.postbackWebhook = (payload) => {
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
-  } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
-    var jsonMessageId = jsonAdPayload[1]
-    subscribeIncomingUser(payload, jsonMessageId)
-  } else {
-      if(payload.entry[0].messaging[0].postback && resp[0].componentType) {
-      callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
+  } else if (!resp[0] && resp.action === 'send_menu_reply') {
+    callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
       .then((response) => {
-        console.log(TAG, `response recieved from KiboPush: ${response}`)
-
+        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
       })
       .catch((err) => {
         logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
       })
+  } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
+    var jsonMessageId = jsonAdPayload[1]
+    subscribeIncomingUser(payload, jsonMessageId)
+  } else {
+    if (payload.entry[0].messaging[0].postback && (resp[0].componentType)) {
+      callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
+      .then((response) => {
+        console.log(TAG, `response recieved from KiboPush: ${response}`)
+      })
+      .catch((err) => {
+        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      })
+    }
   }
-}
 }
 
 function handleUnsubscribe (resp, req) {
