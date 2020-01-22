@@ -73,6 +73,13 @@ exports.postbackWebhook = (payload) => {
           .catch((err) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
+      } else if (resp[i].componentType) {
+        callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
+        .then((response) => {
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+        })
       }
     }
   } else if (!resp[0]) {
@@ -178,15 +185,6 @@ exports.postbackWebhook = (payload) => {
   } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
     var jsonMessageId = jsonAdPayload[1]
     subscribeIncomingUser(payload, jsonMessageId)
-  } else {
-    if (payload.entry[0].messaging[0].postback && resp[0].componentType) {
-      callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
-      .then((response) => {
-      })
-      .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-      })
-    }
   }
 }
 
