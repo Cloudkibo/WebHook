@@ -52,6 +52,15 @@ exports.pollResponseWebhook = (payload) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
       }
+      if (resp[i].action && resp[i].action === 'reply_with_a_message') {
+        callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
       if (resp[i].action && resp[i].action === 'send_message_block') {
         callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
           .then((response) => {
