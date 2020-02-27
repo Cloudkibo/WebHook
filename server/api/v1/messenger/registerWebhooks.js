@@ -60,6 +60,9 @@ const { checkboxPluginWebhook } = require('../../../webhooks/messenger/checkboxP
 const { messengerReferralSchema } = require('../../../schemas/messenger/messengerReferralSchema.js')
 const { messengerReferralWebhook } = require('../../../webhooks/messenger/messengerReferralWebhook.js')
 
+const { sponsoredMessagingSchema } = require('../../../schemas/messenger/sponsoredMessagingSchema.js')
+const { sponsoredMessagingWebhook } = require('../../../webhooks/messenger/sponsoredMessagingWebhook.js')
+
 function initRegistry () {
   init.registerCallback(postLikeSchema, (payload) => { postLikeWebhook(payload) })
   init.registerCallback(postCommentSchema, (payload) => { postCommentWebhook(payload) })
@@ -85,6 +88,7 @@ function initRegistry () {
   init.registerCallback(checkboxPluginSchema, (payload) => { checkboxPluginWebhook(payload) })
   init.registerCallback(messengerReferralSchema, (payload) => { messengerReferralWebhook(payload) })
   init.registerCallback(messageReceivedSchema, (payload) => { newSubscriberWebhook(payload) })
+  init.registerCallback(sponsoredMessagingSchema, (payload) => { sponsoredMessagingWebhook(payload) })
 }
 
 exports.registeryInit = () => {
