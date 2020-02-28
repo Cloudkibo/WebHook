@@ -370,14 +370,51 @@ function updateSubscriberAwaitingReply (subscriberId) {
       logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
     })
 }
-exports.updateSubscriptionForRss = (subscriber) => {
+exports.handleNewsSubscriptionForNewSubscriber = (subscriber) => {
   let query = {
     purpose: 'updateAll',
     match: {companyId: subscriber.companyId, defaultFeed: true},
     updated: {$inc: {subscriptions: 1}}
   }
-  callApi(`rssFeeds`, 'put', query, 'engageDbLayer')
+  callApi(`newsSections`, 'put', query, 'engageDbLayer')
     .then(updated => {
+    })
+    .catch(err => {
+      logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+    })
+}
+exports.handleNewsSubscriptionForOldSubscriber = (subscriber) => {
+  let findQuery = {
+    purpose: 'findAll',
+    match: {companyId: subscriber.companyId, defaultFeed: true}
+  }
+  callApi(`newsSections/query`, 'post', findQuery, 'engageDbLayer')
+    .then(newsSections => {
+      if (newsSections.length > 0) {
+        let newsSectionIds = newsSections.map(n => n._id)
+        let updateQuery = {
+          purpose: 'updateAll',
+          match: {'subscriberId._id': subscriber._id, subscription: false, newsSectionId: {$in: newsSectionIds}},
+          updated: {subscription: true}
+        }
+        callApi(`newsSubscriptions`, 'put', updateQuery, 'engageDbLayer')
+          .then(updated => {
+          })
+          .catch(err => {
+            logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+          })
+        let updatedQuery = {
+          purpose: 'updateAll',
+          match: {_id: {$in: newsSectionIds}},
+          updated: {$inc: {subscriptions: 1}}
+        }
+        callApi(`newsSections`, 'put', updatedQuery, 'engageDbLayer')
+          .then(updated => {
+          })
+          .catch(err => {
+            logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+          })
+      }
     })
     .catch(err => {
       logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
