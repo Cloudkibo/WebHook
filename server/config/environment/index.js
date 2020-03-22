@@ -47,7 +47,9 @@ const all = {
 
   demoSSAPageIds: ['382154169188869', '350372502408394'],
 
-  telcoPageId: ['975622025980854']
+  telcoPageId: ['975622025980854'],
+
+  covid19PageId: ['113059013658389']
 }
 
 module.exports = _.merge(
