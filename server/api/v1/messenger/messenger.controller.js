@@ -29,6 +29,8 @@ exports.webhook = function (req, res) {
       callApi('fbPost', 'post', data, 'demossa')
     } else if (pageId && config.telcoPageId.indexOf(pageId) > -1) {
       callApi('fbPost', 'post', data, 'telco')
+    } else if (pageId && config.covid19PageId.indexOf(pageId) > -1) {
+      callApi('fbPost', 'post', data, 'demossa')
     } else {
       webhookCalled = webhookHandler(req.body)
     }
