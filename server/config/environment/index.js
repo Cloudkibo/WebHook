@@ -49,7 +49,9 @@ const all = {
 
   telcoPageId: ['975622025980854'],
 
-  covid19PageId: ['113059013658389']
+  covid19PageId: ['113059013658389'],
+
+  healthAlertMePageId: ['103839534565995']
 }
 
 module.exports = _.merge(
