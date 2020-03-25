@@ -1,20 +1,20 @@
 const {callApi} = require('../../../utility/api.caller.service')
 const TAG = 'twilio.controller.js'
 const logger = require('../../../components/logger')
+const {sendResponseToTwilio} = require('../../global/twilio')
 
 exports.trackDeliveryWhatsApp = function (req, res) {
   callApi(`twilioEvents/trackDeliveryWhatsApp/${req.params.id}`, 'post', req.body, 'kiboengage')
-  return res.status(200).json({ status: 'success' })
+  sendResponseToTwilio(res)
 }
 
 exports.trackStatusWhatsAppChat = function (req, res) {
   callApi(`twilioEvents/trackStatusWhatsAppChat/${req.params.id}`, 'post', req.body, 'kibochat')
-  return res.status(200).json({ status: 'success' })
+  sendResponseToTwilio(res)
 }
 
 exports.receiveWhatsApp = function (req, res) {
   console.log('req.body', req.body)
-  res.status(200).json({ status: 'success' })
   let from = req.body.From.substring(9)
   callApi(`companyprofile/query`, 'post', {'twilioWhatsApp.accountSID': req.body.AccountSid}, 'accounts')
     .then(company => {
@@ -40,4 +40,5 @@ exports.receiveWhatsApp = function (req, res) {
     .catch(error => {
       logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
     })
+  sendResponseToTwilio(res)
 }
