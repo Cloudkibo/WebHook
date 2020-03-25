@@ -15,7 +15,6 @@ exports.trackStatusWhatsAppChat = function (req, res) {
 
 exports.receiveWhatsApp = function (req, res) {
   console.log('req.body', req.body)
-  sendResponseToTwilio(res)
   let from = req.body.From.substring(9)
   callApi(`companyprofile/query`, 'post', {'twilioWhatsApp.accountSID': req.body.AccountSid}, 'accounts')
     .then(company => {
@@ -41,4 +40,5 @@ exports.receiveWhatsApp = function (req, res) {
     .catch(error => {
       logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
     })
+  sendResponseToTwilio(res)
 }

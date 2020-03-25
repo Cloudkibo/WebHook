@@ -23,7 +23,6 @@ exports.trackDelivery = function (req, res) {
   sendResponseToTwilio(res)
 }
 exports.trackDeliveryWhatsApp = function (req, res) {
-  sendResponseToTwilio(res)
   let query = {}
   if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'DELIVERED') {
     query = {
@@ -49,6 +48,7 @@ exports.trackDeliveryWhatsApp = function (req, res) {
       })
     })
   }
+  sendResponseToTwilio(res)
 }
 
 exports.trackStatusWhatsAppChat = function (req, res) {
@@ -73,7 +73,6 @@ exports.trackStatusWhatsAppChat = function (req, res) {
 }
 
 exports.receiveWhatsApp = function (req, res) {
-  sendResponseToTwilio(res)
   let from = req.body.From.substring(9)
   callApi(`companyprofile/query`, 'post', {'twilioWhatsApp.accountSID': req.body.AccountSid}, 'accounts')
     .then(company => {
@@ -98,4 +97,5 @@ exports.receiveWhatsApp = function (req, res) {
     .catch(error => {
       logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
     })
+  sendResponseToTwilio(res)
 }
