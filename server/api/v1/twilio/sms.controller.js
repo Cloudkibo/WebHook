@@ -1,4 +1,5 @@
 const {callApi} = require('../../../utility/api.caller.service')
+const {sendResponseToTwilio} = require('../../global/twilio')
 
 exports.trackDelivery = function (req, res) {
   if (req.body.MessageStatus === 'delivered') {
@@ -17,10 +18,10 @@ exports.trackDelivery = function (req, res) {
       })
     })
   }
-  return res.status(200).json({ status: 'success' })
+  sendResponseToTwilio(res)
 }
 
 exports.receiveSms = function (req, res) {
   callApi('twilioEvents', 'post', req.body, 'kibochat')
-  return res.status(200).json({ status: 'success' })
+  sendResponseToTwilio(res)
 }
