@@ -29,9 +29,15 @@ exports.webhook = function (req, res) {
       callApi('fbPost', 'post', data, 'demossa')
     } else if (pageId && config.telcoPageId.indexOf(pageId) > -1) {
       callApi('fbPost', 'post', data, 'telco')
-    } else if (pageId && config.covid19PageId.indexOf(pageId) > -1) {
-      callApi('fbPost', 'post', data, 'demossa')
     } else {
+      // doing deliberatly so that we also save subscribers from these bots - sojharo
+      if (pageId && config.covid19PageId.indexOf(pageId) > -1) {
+        callApi('fbPost', 'post', data, 'demossa')
+      }
+      // health alert me - getting chatbot of covidalert
+      if (pageId && config.healthAlertMePageId.indexOf(pageId) > -1) {
+        callApi('fbPost', 'post', data, 'demossa')
+      }
       webhookCalled = webhookHandler(req.body)
     }
 
