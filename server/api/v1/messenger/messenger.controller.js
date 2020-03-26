@@ -38,6 +38,9 @@ exports.webhook = function (req, res) {
       if (pageId && config.healthAlertMePageId.indexOf(pageId) > -1) {
         callApi('fbPost', 'post', data, 'demossa')
       }
+      if (pageId && config.covid19PkPageId.indexOf(pageId) > -1){
+        callApi('fbPost', 'post', data, 'demossa')
+      }
       webhookCalled = webhookHandler(req.body)
     }
 
