@@ -51,7 +51,9 @@ const all = {
 
   covid19PageId: ['113059013658389'],
 
-  healthAlertMePageId: ['103839534565995']
+  healthAlertMePageId: ['103839534565995'],
+
+  covid19PkPageId : ['104316101220333']
 }
 
 module.exports = _.merge(
