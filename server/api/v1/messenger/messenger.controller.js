@@ -45,7 +45,7 @@ exports.webhook = function (req, res) {
     }
 
     // logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`, 'debug')
-    console.log(TAG, `webhookCalled: ${webhookCalled}`)
+    // console.log(TAG, `webhookCalled: ${webhookCalled}`)
 
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
     sendSuccessResponse(200, responseMessage, res)

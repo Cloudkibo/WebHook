@@ -8,17 +8,14 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
   callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(pages => {
       let page = pages[0]
-      console.log('page', page)
       if (page) {
         if (subscriberSource === 'customer_matching') {
           LogicLayer.updatePhoneNumberCustomerMatching(identifier, page._id, page.companyId)
         }
         Global.getRefreshedPageAccessToken(page.pageId, page.accessToken)
           .then(pageAccessToken => {
-            console.log('pageAccessToken', pageAccessToken)
             LogicLayer.getSubscriberInfoFromFB(senderId, pageAccessToken, page)
               .then(response => {
-                console.log('response from facebook', response.body)
                 if (response.body.error) {
                   logger.serverLog(TAG, `Error occured while fetching subscriber details from facebook ${JSON.stringify(response.body.error)}`)
                 } else {
@@ -29,7 +26,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                   }
                   callApi(`subscribers/query`, 'post', {senderId: senderId, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
-                      console.log('subscriberFound', subscriberFound)
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
@@ -114,16 +110,9 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                             LogicLayer.handleNewsSubscriptionForOldSubscriber(subscriberFound)
                           }
                         }
-                        console.log('calling messengerEvents/sessions')
                         callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
-                          .then(sessRes => {
-                            console.log(TAG, `response from sessions ${sessRes}`)
-                            logger.serverLog(TAG, `response from sessions ${sessRes}`)
-                          })
-                          .catch(err => {
-                            console.log(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`)
-                            logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error')
-                          })
+                          .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
+                          .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
                       }
                     })
                     .catch(err => {
