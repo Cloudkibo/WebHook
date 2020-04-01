@@ -60,6 +60,7 @@ function webhookHandler (body) {
   let webhookCalled = false
   init.getRegistry().map((entry) => {
     if (validator.validate(body, entry.schema).valid && !webhookCalled) {
+      console.log('webhook entry', entry)
       entry.callback(_cloneDeep(body))
       webhookCalled = true
     }
