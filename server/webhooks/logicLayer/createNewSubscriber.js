@@ -113,6 +113,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                             LogicLayer.handleNewsSubscriptionForOldSubscriber(subscriberFound)
                           }
                         }
+                        console.log('calling function messenger Events in else condition')
                         callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
                           .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                           .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
