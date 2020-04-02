@@ -64,11 +64,14 @@ function handlePageAdminSubscription (event) {
   callApi(`user/query`, 'post', {_id: event.optin.ref}, 'accounts')
     .then(user => {
       if (user.length > 0) {
+        logger.serverLog(TAG, `in addAdminAsSubscriberWebhook user${JSON.stringify(user)}`)
         user = user[0]
         callApi(`companyUser/query`, 'post', { domain_email: user.domain_email }, 'accounts')
           .then(companyUser => {
+            logger.serverLog(TAG, `in addAdminAsSubscriberWebhook companyId${JSON.stringify(companyUser.companyId)}`)
             callApi(`pages/query`, 'post', { pageId: event.recipient.id, companyId: companyUser.companyId }, 'accounts')
               .then(pages => {
+                logger.serverLog(TAG, `in addAdminAsSubscriberWebhook pages${JSON.stringify(pages)}`)
                 if (pages.length > 0) {
                   let page = pages[0]
                   let pageAdminPayload = {
@@ -77,6 +80,7 @@ function handlePageAdminSubscription (event) {
                     subscriberId: event.sender.id,
                     pageId: page._id
                   }
+                  logger.serverLog(TAG, `in addAdminAsSubscriberWebhook pageAdminPayload${JSON.stringify(pageAdminPayload)}`)
                   callApi(`adminsubscriptions`, 'post', pageAdminPayload, 'kiboengage')
                     .then(record => {
                       logger.serverLog(TAG, `Admin subscription added: ${JSON.stringify(record)}`)
