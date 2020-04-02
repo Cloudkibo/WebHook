@@ -77,6 +77,7 @@ function handlePageAdminSubscription (event) {
                     subscriberId: event.sender.id,
                     pageId: page._id
                   }
+                  console.log('pageAdminPayload', pageAdminPayload)
                   callApi(`adminsubscriptions`, 'post', pageAdminPayload, 'kiboengage')
                     .then(record => {
                       logger.serverLog(TAG, `Admin subscription added: ${JSON.stringify(record)}`)
