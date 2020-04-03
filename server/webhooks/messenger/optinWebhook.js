@@ -69,7 +69,7 @@ function handlePageAdminSubscription (event) {
         callApi(`companyUser/query`, 'post', { domain_email: user.domain_email }, 'accounts')
           .then(companyUser => {
             logger.serverLog(TAG, `in addAdminAsSubscriberWebhook companyId${JSON.stringify(companyUser.companyId)}`)
-            callApi(`pages/query`, 'post', { pageId: event.recipient.id, companyId: companyUser.companyId }, 'accounts')
+            callApi(`pages/query`, 'post', { pageId: event.recipient.id, companyId: companyUser.companyId, connected: true }, 'accounts')
               .then(pages => {
                 logger.serverLog(TAG, `in addAdminAsSubscriberWebhook pages${JSON.stringify(pages)}`)
                 if (pages.length > 0) {
