@@ -70,6 +70,15 @@ exports.pollResponseWebhook = (payload) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
       }
+      if (resp[i].action && resp[i].action === 'chatbot') {
+        callApi('messengerEvents/quickReply', 'post', payload, 'kibochat')
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
+      }
       if (resp[i].action && resp[i].action === 'set_custom_field') {
         callApi('messengerEvents/setCustomField', 'post', payload, 'kiboengage')
           .then((response) => {
