@@ -1,4 +1,4 @@
-const TAG = 'webhooks/messenger/shopifyAndAdminWebhook.js'
+const TAG = 'webhooks/messenger/optinWebhook.js'
 const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
 const needle = require('needle')
