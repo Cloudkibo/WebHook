@@ -70,7 +70,7 @@ exports.pollResponseWebhook = (payload) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
       }
-      if (resp[i].action && resp[i].action === 'chatbot') {
+      if (resp[i].action && resp[i].action === '_chatbot') {
         callApi('messengerEvents/quickReply', 'post', payload, 'kibochat')
           .then((response) => {
             logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
