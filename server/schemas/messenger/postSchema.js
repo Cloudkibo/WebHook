@@ -25,11 +25,8 @@ exports.postSchema = {
                         'item': {
                           'type': 'string'
                         },
-                        'sender_name': {
-                          'type': 'string'
-                        },
-                        'sender_id': {
-                          'type': 'string'
+                        'from': {
+                          'type': 'object'
                         },
                         'post_id': {
                           'type': 'string'
@@ -53,8 +50,7 @@ exports.postSchema = {
                       },
                       'required': [
                         'item',
-                        'sender_name',
-                        'sender_id',
+                        'from',
                         'post_id',
                         'verb',
                         'published',
