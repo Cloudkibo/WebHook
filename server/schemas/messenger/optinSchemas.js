@@ -72,7 +72,7 @@ exports.chatbotSchema = {
                       'properties': {
                         'ref': {
                           'type': 'string',
-                          'enum': ['CHATBOT']
+                          'enum': ['_chatbot']
                         }
                       },
                       'required': [
