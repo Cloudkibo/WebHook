@@ -363,7 +363,7 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
   }
 }
 function updateSubscriberAwaitingReply (subscriberId) {
-  callApi(`subscribers/update`, 'put', {query: {_id: subscriberId}, newPayload: {awaitingCommentReply: {sendSecondMessage: false}}, options: {}}, 'accounts')
+  callApi(`subscribers/update`, 'put', {query: {_id: subscriberId}, newPayload: {'awaitingCommentReply.sendSecondMessage': false}, options: {}}, 'accounts')
     .then(updated => {
     })
     .catch(err => {
