@@ -26,24 +26,27 @@ function sendWelcomeMessage (payload) {
       callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender, companyId: page.companyId }, 'accounts')
         .then(subscriber => {
           subscriber = subscriber[0]
-          if (subscriber) {
-            callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
-              .then((response) => {
-                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-              })
-              .catch((err) => {
-                logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-              })
-          } else {
+          if (!subscriber) {
             newSubscriberWebhook(prepareSubscriberPayload(sender, pageId))
-            callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
-              .then((response) => {
-                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-              })
-              .catch((err) => {
-                logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-              })
           }
+          callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
+            .then((response) => {
+              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+            })
+            .catch((err) => {
+              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+            })
+          // sending both page and subscriber to kibochat to save
+          // two DB queries for these on kibochat server
+          payload.subscriber = subscriber
+          payload.page = page
+          callApi('messengerEvents/welcomeMessage', 'post', payload, 'kibochat')
+            .then((response) => {
+              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+            })
+            .catch((err) => {
+              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+            })
         })
         .catch(err => {
           logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`, 'error')
