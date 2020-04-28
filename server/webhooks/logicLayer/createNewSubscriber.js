@@ -26,7 +26,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                   }
                   callApi(`subscribers/query`, 'post', {senderId: senderId, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
-                      console.log('subscriberFound.length', subscriberFound.length)
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
@@ -57,7 +56,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 event.referral
                               )
                             }
-                            console.log('calling function messenger Events')
                             callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
                             .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                             .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
