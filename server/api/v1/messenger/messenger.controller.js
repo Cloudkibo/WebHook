@@ -38,20 +38,20 @@ exports.webhook = function (req, res) {
       if (pageId && config.healthAlertMePageId.indexOf(pageId) > -1) {
         callApi('fbPost', 'post', data, 'demossa')
       }
-      if (pageId && config.covid19PkPageId.indexOf(pageId) > -1){
+      if (pageId && config.covid19PkPageId.indexOf(pageId) > -1) {
         callApi('fbPost', 'post', data, 'demossa')
       }
       webhookCalled = webhookHandler(req.body)
     }
 
-    //logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`, 'debug')
-    //console.log(TAG, `webhookCalled: ${webhookCalled}`)
+    // logger.serverLog(TAG, `webhookCalled: ${webhookCalled}`, 'debug')
+    // console.log(TAG, `webhookCalled: ${webhookCalled}`)
 
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
     sendSuccessResponse(200, responseMessage, res)
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
-    //console.log('Error on webhook', e)
+    // console.log('Error on webhook', e)
     sendErrorResponse(500, e, res)
   }
 }
