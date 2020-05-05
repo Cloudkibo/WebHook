@@ -73,7 +73,7 @@ function handleUnsubscribe (resp, req) {
                   .then(unsubscribeTag => {
                     unsubscribeTag = unsubscribeTag[0]
                     // assign tag
-                    needle('post', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
+                    needle('post', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
                       .then(response => {
                         if (response.body.error) {
                           logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`, 'error')
@@ -114,7 +114,7 @@ function handleUnsubscribe (resp, req) {
     }
   }
   needle.get(
-    `https://graph.facebook.com/v2.10/${req.recipient.id}?fields=access_token&access_token=${resp.userToken}`,
+    `https://graph.facebook.com/v6.0/${req.recipient.id}?fields=access_token&access_token=${resp.userToken}`,
     (err3, response) => {
       if (err3) {
         logger.serverLog(TAG,
@@ -126,7 +126,7 @@ function handleUnsubscribe (resp, req) {
         message: messageData
       }
       needle.post(
-        `https://graph.facebook.com/v2.6/me/messages?access_token=${response.body.access_token}`,
+        `https://graph.facebook.com/v6.0/me/messages?access_token=${response.body.access_token}`,
         data, (err4, respp) => {
           logger.serverLog(TAG, `ressp.body ${JSON.stringify(respp.body)}`, 'debug')
           logger.serverLog(TAG,

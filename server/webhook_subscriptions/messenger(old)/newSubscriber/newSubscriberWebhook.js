@@ -192,7 +192,7 @@ function assignTag (page, subscriber, tag, count) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
         let tag = tags[0]
-        needle('post', `https://graph.facebook.com/v2.11/me/${tag.labelFbId}/label?access_token=${page.accessToken}`, 'post', {'user': subscriber.senderId})
+        needle('post', `https://graph.facebook.com/v6.0/me/${tag.labelFbId}/label?access_token=${page.accessToken}`, 'post', {'user': subscriber.senderId})
           .then(assignedLabel => {
             if (assignedLabel.error) logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
             let subscriberTagsPayload = {
@@ -215,7 +215,7 @@ function assignTag (page, subscriber, tag, count) {
 }
 
 function createTag (page, subscriber, tag) {
-  needle('post', `https://graph.facebook.com/v2.11/me/custom_labels?accessToken=${page.accessToken}`)
+  needle('post', `https://graph.facebook.com/v6.0/me/custom_labels?accessToken=${page.accessToken}`)
     .then(label => {
       if (label.id) {
         let tagData = {

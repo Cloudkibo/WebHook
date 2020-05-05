@@ -104,7 +104,7 @@ function handleUnsubscribe (resp, req) {
                   .then(unsubscribeTag => {
                     unsubscribeTag = unsubscribeTag[0]
                     // assign tag
-                    needle('post', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
+                    needle('post', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
                       .then(response => {
                         if (response.body.error) {
                           logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`, 'error')
@@ -145,7 +145,7 @@ function handleUnsubscribe (resp, req) {
     }
   }
   needle.get(
-    `https://graph.facebook.com/v2.10/${req.recipient.id}?fields=access_token&access_token=${resp.userToken}`,
+    `https://graph.facebook.com/v6.0/${req.recipient.id}?fields=access_token&access_token=${resp.userToken}`,
     (err3, response) => {
       if (err3) {
         logger.serverLog(TAG,
@@ -157,7 +157,7 @@ function handleUnsubscribe (resp, req) {
         message: messageData
       }
       needle.post(
-        `https://graph.facebook.com/v2.6/me/messages?access_token=${response.body.access_token}`,
+        `https://graph.facebook.com/v6.0/me/messages?access_token=${response.body.access_token}`,
         data, (err4, respp) => {
           logger.serverLog(TAG,
             `Sending unsubscribe confirmation response to subscriber  ${JSON.stringify(
@@ -177,7 +177,7 @@ function sendResponseMessage (page, senderId, firstName, lastName, accessToken, 
               'method': 'POST',
               'json': true,
               'formData': result.payload,
-              'uri': 'https://graph.facebook.com/v2.6/me/messages?access_token=' +
+              'uri': 'https://graph.facebook.com/v6.0/me/messages?access_token=' +
                 accessToken
             },
             (err, res) => {
@@ -249,7 +249,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
           } else {
             newSubscriberWebhook(logicLayer.prepareSubscriberPayload(sender, pageId))
             needle.get(
-              `https://graph.facebook.com/v2.10/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
+              `https://graph.facebook.com/v6.0/${page.pageId}?fields=access_token&access_token=${page.accessToken}`,
               (err, resp2) => {
                 if (err) {
                   logger.serverLog(TAG, `ERROR ${JSON.stringify(err)}`, 'error')
@@ -257,7 +257,7 @@ function subscribeIncomingUser (payload, jsonMessageId) {
                 logger.serverLog(TAG, `page access token: ${JSON.stringify(resp2.body)}`, 'debug')
                 let pageAccessToken = resp2.body.access_token
                 const options = {
-                  url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+                  url: `https://graph.facebook.com/v6.0/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
                   qs: { access_token: page.accessToken },
                   method: 'GET'
 

@@ -6,7 +6,7 @@ const logger = require('../../components/logger')
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {
     const options = {
-      url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+      url: `https://graph.facebook.com/v6.0/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
       qs: { access_token: page.accessToken },
       method: 'GET'
     }
@@ -92,7 +92,7 @@ const assignTag = (page, subscriber, tag, count) => {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
         let tag = tags[0]
-        needle('post', `https://graph.facebook.com/v2.11/${tag.labelFbId}/label?access_token=${page.accessToken}`, {'user': subscriber.senderId})
+        needle('post', `https://graph.facebook.com/v6.0/${tag.labelFbId}/label?access_token=${page.accessToken}`, {'user': subscriber.senderId})
           .then(assignedLabel => {
             if (assignedLabel.error) {
               logger.serverLog(TAG, `Error at save tag ${assignedLabel.error}`, 'error')
@@ -109,7 +109,7 @@ const assignTag = (page, subscriber, tag, count) => {
 }
 
 const createTag = (page, subscriber, tag) => {
-  needle('post', `https://graph.facebook.com/v2.11/me/custom_labels?accessToken=${page.accessToken}`)
+  needle('post', `https://graph.facebook.com/v6.0/me/custom_labels?accessToken=${page.accessToken}`)
     .then(label => {
       if (label.id) {
         let tagData = {
@@ -270,7 +270,7 @@ exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
       callApi(`tags/query`, 'post', {tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId}, 'accounts')
         .then(unsubscribeTag => {
           unsubscribeTag = unsubscribeTag[0]
-          needle('delete', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
+          needle('delete', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
             .then(response => {
               if (response.body.error) {
                 logger.serverLog(TAG, `failed to unassigned unsubscribe tag: ${JSON.stringify(response.body.error)}`, 'error')
