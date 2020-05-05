@@ -37,7 +37,7 @@ exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
       callApi.callApi(`tags/query`, 'post', {tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId}, 'accounts')
         .then(unsubscribeTag => {
           unsubscribeTag = unsubscribeTag[0]
-          needle('delete', `https://graph.facebook.com/v2.11/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
+          needle('delete', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
             .then(response => {
               if (response.body.error) {
                 logger.serverLog(TAG, `failed to unassigned unsubscribe tag: ${JSON.stringify(response.body.error)}`, 'error')
@@ -81,7 +81,7 @@ exports.updatePhoneNumberCustomerMatching = (identifier, pageId, companyId) => {
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {
     const options = {
-      url: `https://graph.facebook.com/v2.10/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
+      url: `https://graph.facebook.com/v6.0/${sender}?fields=gender,first_name,last_name,locale,profile_pic,timezone&access_token=${pageAccessToken}`,
       qs: { access_token: page.accessToken },
       method: 'GET'
     }
