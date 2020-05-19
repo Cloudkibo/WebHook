@@ -3,6 +3,7 @@ const TAG = 'LogicLayer/createNewSubscriber.js'
 const logger = require('../../components/logger')
 const Global = require('../../global/global.js')
 const LogicLayer = require('./createNewSubscriber.logiclayer.js')
+const { updateCompanyUsage } = require('../../global/billingPricing')
 
 exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, ref, event, fullPayload) => {
   console.log('called createNewSubscriber function')
@@ -31,6 +32,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
+                            updateCompanyUsage(page.companyId, 'subscribers', 1)
                             if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                               LogicLayer.sendWebhookForNewSubscriber(
                                 page.pageId,
