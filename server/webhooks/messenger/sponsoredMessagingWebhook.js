@@ -3,7 +3,7 @@ const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
 
 exports.sponsoredMessagingWebhook = (payload) => {
-  // logger.serverLog(TAG, `in shopifyWebhook ${JSON.stringify(payload)}`)
+  logger.serverLog(TAG, `in sponsored messaging ${JSON.stringify(payload)}`)
   callApi('messengerEvents/sponsoredMessaging', 'post', payload, 'kiboengage')
     .then((response) => {
       logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
