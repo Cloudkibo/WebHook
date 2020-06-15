@@ -17,7 +17,7 @@ exports.postbackWebhook = (payload) => {
   if (resp[0]) {
     for (let i = 0; i < resp.length; i++) {
       payload.entry[0].messaging[0].postback.payload = JSON.stringify(resp[i])
-      if (resp[i].action && resp[i].action === 'subscribe') {
+      if (resp[i].action && (resp[i].action === 'subscribe' || resp[i].action === 'subscribe_to_sequence')) {
         callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
@@ -25,7 +25,7 @@ exports.postbackWebhook = (payload) => {
         .catch((err) => {
           logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
         })
-      } else if (resp[i].action && resp[i].action === 'unsubscribe') {
+      } else if (resp[i].action && (resp[i].action === 'unsubscribe' || resp[i].action === 'unsubscribe_from_sequence')) {
         callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
           .then((response) => {
             logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
@@ -93,7 +93,7 @@ exports.postbackWebhook = (payload) => {
         })
     } else if (resp.unsubscribe) {
       handleUnsubscribe(resp, payload.entry[0].messaging[0])
-    } else if (resp.action === 'subscribe') {
+    } else if (resp.action === 'subscribe' || resp.action === 'subscribe_to_sequence') {
       callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
@@ -101,7 +101,7 @@ exports.postbackWebhook = (payload) => {
         .catch((err) => {
           logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
         })
-    } else if (resp.action === 'unsubscribe') {
+    } else if (resp.action === 'unsubscribe' || resp.action === 'unsubscribe_from_sequence') {
       callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
