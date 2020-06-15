@@ -5,7 +5,6 @@ const Global = require('../../global/global.js')
 const LogicLayer = require('./createNewSubscriber.logiclayer.js')
 
 exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, ref, event, fullPayload) => {
-  console.log('called createNewSubscriber function')
   callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(pages => {
       let page = pages[0]
@@ -27,7 +26,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                   }
                   callApi(`subscribers/query`, 'post', {senderId: senderId, pageId: page._id}, 'accounts')
                     .then(subscriberFound => {
-                      console.log('subscriberFound.length', subscriberFound.length)
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
@@ -58,7 +56,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 event.referral
                               )
                             }
-                            console.log('calling function messenger Events')
                             callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event}, 'kibochat')
                             .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                             .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
@@ -113,7 +110,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                             LogicLayer.handleNewsSubscriptionForOldSubscriber(subscriberFound)
                           }
                         }
-                        console.log('calling function messenger Events in else condition')
                         callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
                           .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                           .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
