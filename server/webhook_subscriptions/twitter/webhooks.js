@@ -3,7 +3,7 @@ const logger = require('../../components/logger')
 const callApi = require('../../utility/api.caller.service')
 
 exports.simpleTweet = (payload) => {
-  // logger.serverLog(TAG, `in simpleTweet ${JSON.stringify(payload)}`)
+  console.log('tweet got', payload)
   callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload, 'kiboengage')
     .then((response) => {
       logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
