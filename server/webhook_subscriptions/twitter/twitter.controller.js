@@ -33,7 +33,6 @@ exports.verifyHook = function (req, res) {
 }
 
 exports.webhook = function (req, res) {
-  logger.serverLog(TAG, `connect functio called in webhook_subscriptions ${req.body}`)
   try {
     let webhookCalled = webhookHandler(req.body)
     // @TODO : Need to fix the response mechanism
@@ -63,7 +62,7 @@ function webhookHandler (body) {
 let stream
 
 function connect () {
-  logger.serverLog(TAG, `connect functio called in webhook_subscriptions`)
+  // logger.serverLog(TAG, `connect functio called`)
   callApi.callApi('twitterEvents/findAutoposting', 'get', {}, 'kiboengage').then((response) => {
     let autoposting = response
     if (autoposting.length > 0) {
