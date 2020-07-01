@@ -5,7 +5,6 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development' // production
 
 const express = require('express')
-const mongoose = require('mongoose')
 const config = require('./config/environment/index')
 
 const app = express()
@@ -33,4 +32,5 @@ require('./webhook_subscriptions/twitter/twitter.controller').connect()
 require('./api/v1/messenger/registerWebhooks').registeryInit()
 require('./webhook_subscriptions/twitter/registerWebhooks').registeryInit()
 require('./webhook_subscriptions/wordpress/registerWebhooks').registeryInit()
+require('./api/v1/zoom/registerWebhooks').registeryInit()
 require('./routes')(appObj)
