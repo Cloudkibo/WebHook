@@ -8,7 +8,7 @@ exports.index = function (req, res) {
 exports.messageReceived = function (req, res) {
   res.status(200).json({status: 'success'})
   let query = [
-    {$match: {'flockSendWhatsApp.token': req.body.user_id}}
+    {$match: {'flockSendWhatsApp.accessToken': req.body.user_id}}
   ]
   let number = `+${req.body.phone_number}`
   callApi(`companyprofile/aggregate`, 'post', query, 'accounts')
