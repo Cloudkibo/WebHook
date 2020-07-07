@@ -10,4 +10,9 @@ router.post('/',
   validate({body: validationSchema.payload}),
   controller.messageReceived)
 
+router.post('/messageStatus',
+  controller.messageStatus)
+router.get('/messageStatus',
+  controller.messageStatus)
+
 module.exports = router
