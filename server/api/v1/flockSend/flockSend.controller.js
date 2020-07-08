@@ -11,34 +11,52 @@ exports.messageStatus = function (req, res) {
 }
 exports.messageReceived = function (req, res) {
   res.status(200).json({status: 'success'})
+  createContact(req.body)
+  .then(result => {
+    callApi('flockSendEvents/messageReceived', 'post', req.body, 'kibochat')
+  })
+  .catch(error => {
+    logger.serverLog(TAG, `Failed to save contact ${error}`, 'error')
+  })
+}
+function createContact (body) {
+  let number = `+${body.phone_number}`
   let query = [
-    {$match: {'flockSendWhatsApp.accessToken': req.body.user_id}}
+    {$match: {'flockSendWhatsApp.accessToken': body.user_id}}
   ]
-  let number = `+${req.body.phone_number}`
-  callApi(`companyprofile/aggregate`, 'post', query, 'accounts')
-    .then(companies => {
-      companies.forEach((company) => {
-        callApi(`whatsAppContacts/query`, 'post', {number: number, companyId: company._id}, 'accounts')
-          .then(contact => {
-            contact = contact[0]
-            if (contact) {
-              callApi('flockSendEvents/messageReceived', 'post', req.body, 'kibochat')
-            } else {
-              callApi(`whatsAppContacts`, 'post', {
-                name: number,
-                number: number,
-                companyId: company._id}, 'accounts')
-                .then(contact => {
-                  callApi('flockSendEvents/messageReceived', 'post', req.body, 'kibochat')
-                })
-            }
+  return new Promise((resolve, reject) => {
+    callApi(`companyprofile/aggregate`, 'post', query, 'accounts')
+      .then(companies => {
+        if (companies && companies.length > 0) {
+          companies.forEach((company, index) => {
+            callApi(`whatsAppContacts/query`, 'post', {number: number, companyId: company._id}, 'accounts')
+              .then(contact => {
+                contact = contact[0]
+                if (!contact) {
+                  callApi(`whatsAppContacts`, 'post', {
+                    name: number,
+                    number: number,
+                    companyId: company._id}, 'accounts')
+                    .then(contact => {
+                      if (index === companies.length - 1) {
+                        resolve()
+                      }
+                    })
+                }
+                if (index === companies.length - 1) {
+                  resolve()
+                }
+              })
+              .catch(error => {
+                reject(error)
+              })
           })
-          .catch(error => {
-            logger.serverLog(TAG, `Failed to fetch contact ${JSON.stringify(error)}`, 'error')
-          })
+        } else {
+          reject(new Error())
+        }
       })
-    })
-    .catch(error => {
-      logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
-    })
+      .catch(error => {
+        reject(error)
+      })
+  })
 }
