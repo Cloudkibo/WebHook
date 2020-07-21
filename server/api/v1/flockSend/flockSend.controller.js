@@ -6,8 +6,8 @@ exports.index = function (req, res) {
   return res.status(200).json({status: 'success'})
 }
 exports.messageStatus = function (req, res) {
-  console.log('messageStatus received', req.body)
-  return res.status(200).json({status: 'success'})
+  res.status(200).json({status: 'success'})
+  callApi('flockSendEvents/messageStatus', 'post', req.body, 'kiboengage')
 }
 exports.messageReceived = function (req, res) {
   res.status(200).json({status: 'success'})
