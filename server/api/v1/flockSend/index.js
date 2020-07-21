@@ -11,8 +11,7 @@ router.post('/',
   controller.messageReceived)
 
 router.post('/messageStatus',
-  controller.messageStatus)
-router.get('/messageStatus',
+  validate({body: validationSchema.messageStatus}),
   controller.messageStatus)
 
 module.exports = router
