@@ -35,7 +35,7 @@ function createContact (body) {
                 contact = contact[0]
                 if (!contact) {
                   callApi(`whatsAppContacts`, 'post', {
-                    name: number,
+                    name: body.wa_user_name && body.wa_user_name !== '' ? body.wa_user_name : number,
                     number: number,
                     companyId: company._id}, 'accounts')
                     .then(contact => {
@@ -43,9 +43,24 @@ function createContact (body) {
                         resolve()
                       }
                     })
-                }
-                if (index === companies.length - 1) {
-                  resolve()
+                    .catch(() => {
+                      if (index === companies.length - 1) {
+                        resolve()
+                      }
+                    })
+                } else {
+                  if (contact.name === contact.number && body.wa_user_name && body.wa_user_name !== '') {
+                    callApi(`whatsAppContacts/update`, 'put', {
+                      query: {_id: contact._id},
+                      newPayload: {name: body.wa_user_name},
+                      options: {}
+                    }, 'accounts')
+                      .then(contact => {
+                      })
+                  }
+                  if (index === companies.length - 1) {
+                    resolve()
+                  }
                 }
               })
               .catch(error => {
