@@ -17,7 +17,7 @@ exports.uninstallAppSchema = {
           'type': 'string'
         },
         'user_data_retention': {
-          'type': 'boolean',
+          'type': 'string',
           'required': true
         },
         'deauthorization_time': {
