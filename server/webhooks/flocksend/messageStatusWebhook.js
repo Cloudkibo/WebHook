@@ -1,6 +1,10 @@
 const { callApi } = require('../../../utility/api.caller.service')
 
 exports.messageStatusWebhook = (payload) => {
-  callApi('whatsAppEvents/messageStatus', 'post', payload, 'kiboengage')
-  callApi('whatsAppEvents/messageStatus', 'post', payload, 'kibochat')
+  let data = {
+    provider: 'flockSend',
+    event: payload
+  }
+  callApi('whatsAppEvents/messageStatus', 'post', data, 'kiboengage')
+  callApi('whatsAppEvents/messageStatus', 'post', data, 'kibochat')
 }

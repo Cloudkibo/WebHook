@@ -3,7 +3,11 @@ const { callApi } = require('../../utility/api.caller.service')
 // const logger = require('../../../components/logger')
 
 exports.messageReceivedWebhook = function (payload) {
-  callApi(`whatsAppEvents/messageReceived`, 'post', payload, 'kibochat')
+  let data = {
+    provider: 'twilio',
+    event: payload
+  }
+  callApi(`whatsAppEvents/messageReceived`, 'post', data, 'kibochat')
   //   console.log('Twilio receiveWhatsApp', req.body)
   //   let from = req.body.From.substring(9)
   //   callApi(`companyprofile/query`, 'post', {'twilioWhatsApp.accountSID': req.body.AccountSid}, 'accounts')
