@@ -1,101 +1,36 @@
-const {callApi} = require('../../../utility/api.caller.service')
-const TAG = 'twilio.controller.js'
+const init = require('./initWebhooks')
+const Validator = require('jsonschema').Validator
+const _cloneDeep = require('lodash/cloneDeep')
+const validator = new Validator()
 const logger = require('../../../components/logger')
-const {sendResponseToTwilio} = require('../../global/twilio')
+const TAG = '/server/api/v1/twilio/twilio.controller.js'
+// const { sendSuccessResponse, sendErrorResponse } = require('../../../global/global.js')
+const { sendResponseToTwilio } = require('../../global/twilio')
 
-exports.trackDelivery = function (req, res) {
-  if (req.body.MessageStatus === 'delivered') {
-    let query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {$inc: { sent: 1 }}
-    }
-    callApi(`smsBroadcasts`, 'put', query, 'engageDbLayer')
-      .then(updated => {
-      })
-    .catch(err => {
-      return res.status(500).json({
-        status: 'failed',
-        description: `Internal server error in updating plan usage ${err}`
-      })
-    })
-  }
+exports.webhook = function (req, res) {
+  console.log('twilio event received', JSON.stringify(req.body))
+  let webhookCalled = false
   sendResponseToTwilio(res)
-}
-exports.trackDeliveryWhatsApp = function (req, res) {
-  let query = {}
-  if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'DELIVERED') {
-    query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {$inc: { sent: 1 }}
-    }
-  } else if (req.body.SmsStatus === 'delivered' && req.body.EventType === 'READ') {
-    query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {$inc: { seen: 1 }}
-    }
+  try {
+    webhookCalled = webhookHandler(req.body)
+    let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
+    logger.serverLog(TAG, `${responseMessage}`, 'info')
+    // sendSuccessResponse(200, responseMessage, res)
+  } catch (e) {
+    logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
+    // sendErrorResponse(500, e, res)
   }
-  if (query !== {}) {
-    callApi(`whatsAppBroadcasts`, 'put', query, 'engageDbLayer')
-      .then(updated => {
-      })
-    .catch(err => {
-      return res.status(500).json({
-        status: 'failed',
-        description: `Internal server error in updating plan usage ${err}`
-      })
-    })
-  }
-  sendResponseToTwilio(res)
 }
 
-exports.trackStatusWhatsAppChat = function (req, res) {
-  let query = {}
-  if (req.body.SmsStatus === 'delivered' && req.body.EventType && req.body.EventType === 'READ') {
-    query = {
-      purpose: 'updateOne',
-      match: {_id: req.params.id},
-      updated: {status: 'seen', seenDateTime: Date.now}
+function webhookHandler (body) {
+  let webhookCalled = false
+  init.getRegistry().map((entry) => {
+    if (validator.validate(body, entry.schema).valid && !webhookCalled) {
+      entry.callback(_cloneDeep(body))
+      webhookCalled = true
     }
-    callApi(`whatsAppChat`, 'put', query, 'chatDbLayer')
-      .then(updated => {
-      })
-    .catch(err => {
-      return res.status(500).json({
-        status: 'failed',
-        description: `Internal server error in updating plan usage ${err}`
-      })
-    })
-  }
-  sendResponseToTwilio(res)
+  })
+  return webhookCalled
 }
 
-exports.receiveWhatsApp = function (req, res) {
-  let from = req.body.From.substring(9)
-  callApi(`companyprofile/query`, 'post', {'twilioWhatsApp.accountSID': req.body.AccountSid}, 'accounts')
-    .then(company => {
-      callApi(`whatsAppContacts/query`, 'post', {number: from, companyId: company._id}, 'accounts')
-        .then(contact => {
-          if (contact.length > 0) {
-            callApi('twilioEvents/whatsAppMessage', 'post', req.body, 'kibochat')
-          } else {
-            callApi(`whatsAppContacts`, 'post', {
-              name: from,
-              number: from,
-              companyId: company._id}, 'accounts')
-              .then(contact => {
-                callApi('twilioEvents/whatsAppMessage', 'post', req.body, 'kibochat')
-              })
-          }
-        })
-        .catch(error => {
-          logger.serverLog(TAG, `Failed to fetch contact ${JSON.stringify(error)}`, 'error')
-        })
-    })
-    .catch(error => {
-      logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
-    })
-  sendResponseToTwilio(res)
-}
+exports.webhookHandler = webhookHandler
