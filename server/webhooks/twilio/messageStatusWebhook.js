@@ -1,8 +1,12 @@
 const { callApi } = require('../../utility/api.caller.service')
 
 exports.messageStatusWebhook = function (payload) {
-  // callApi(`whatsAppEvents/messageStatus`, 'post', payload, 'kiboengage')
-  callApi(`whatsAppEvents/messageStatus`, 'post', payload, 'kibochat')
+  let data = {
+    provider: 'twilio',
+    event: payload
+  }
+  callApi(`whatsAppEvents/messageStatus`, 'post', data, 'kiboengage')
+  callApi(`whatsAppEvents/messageStatus`, 'post', data, 'kibochat')
 }
 
 // exports.trackDeliveryWhatsApp = function (req, res) {

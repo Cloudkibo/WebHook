@@ -3,7 +3,11 @@ const { callApi } = require('../../utility/api.caller.service')
 // const TAG = 'flockSend.controller.js'
 
 exports.messageReceivedWebhook = (payload) => {
-  callApi('whatsAppEvents/messageReceived', 'post', payload, 'kibochat')
+  let data = {
+    provider: 'flockSend',
+    event: payload
+  }
+  callApi('whatsAppEvents/messageReceived', 'post', data, 'kibochat')
   // createContact(payload)
   //   .then(result => {
   //     callApi('flockSendEvents/messageReceived', 'post', payload, 'kibochat')
