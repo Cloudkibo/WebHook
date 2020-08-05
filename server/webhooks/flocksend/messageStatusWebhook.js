@@ -1,4 +1,4 @@
-const { callApi } = require('../../../utility/api.caller.service')
+const { callApi } = require('../../utility/api.caller.service')
 
 exports.messageStatusWebhook = (payload) => {
   let data = {
