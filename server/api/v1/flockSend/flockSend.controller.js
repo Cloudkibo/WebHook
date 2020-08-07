@@ -1,78 +1,33 @@
-const {callApi} = require('../../../utility/api.caller.service')
+const init = require('./initWebhooks')
+const Validator = require('jsonschema').Validator
+const _cloneDeep = require('lodash/cloneDeep')
+const validator = new Validator()
 const logger = require('../../../components/logger')
-const TAG = 'flockSend.controller.js'
+const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
+const { sendSuccessResponse, sendErrorResponse } = require('../../../global/global.js')
 
-exports.index = function (req, res) {
-  return res.status(200).json({status: 'success'})
+exports.webhook = function (req, res) {
+  console.log('flocksend event received', JSON.stringify(req.body))
+  let webhookCalled = false
+  try {
+    webhookCalled = webhookHandler(req.body)
+    let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
+    sendSuccessResponse(200, responseMessage, res)
+  } catch (e) {
+    logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
+    sendErrorResponse(500, e, res)
+  }
 }
-exports.messageStatus = function (req, res) {
-  res.status(200).json({status: 'success'})
-  callApi('flockSendEvents/messageStatus', 'post', req.body, 'kiboengage')
-  callApi('flockSendEvents/messageStatus', 'post', req.body, 'kibochat')
-}
-exports.messageReceived = function (req, res) {
-  res.status(200).json({status: 'success'})
-  createContact(req.body)
-  .then(result => {
-    callApi('flockSendEvents/messageReceived', 'post', req.body, 'kibochat')
+
+function webhookHandler (body) {
+  let webhookCalled = false
+  init.getRegistry().map((entry) => {
+    if (validator.validate(body, entry.schema).valid && !webhookCalled) {
+      entry.callback(_cloneDeep(body))
+      webhookCalled = true
+    }
   })
-  .catch(error => {
-    logger.serverLog(TAG, `Failed to save contact ${error}`, 'error')
-  })
+  return webhookCalled
 }
-function createContact (body) {
-  let number = `+${body.phone_number}`
-  let query = [
-    {$match: {'flockSendWhatsApp.accessToken': body.user_id}}
-  ]
-  return new Promise((resolve, reject) => {
-    callApi(`companyprofile/aggregate`, 'post', query, 'accounts')
-      .then(companies => {
-        if (companies && companies.length > 0) {
-          companies.forEach((company, index) => {
-            callApi(`whatsAppContacts/query`, 'post', {number: number, companyId: company._id}, 'accounts')
-              .then(contact => {
-                contact = contact[0]
-                if (!contact) {
-                  callApi(`whatsAppContacts`, 'post', {
-                    name: body.wa_user_name && body.wa_user_name !== '' ? body.wa_user_name : number,
-                    number: number,
-                    companyId: company._id}, 'accounts')
-                    .then(contact => {
-                      if (index === companies.length - 1) {
-                        resolve()
-                      }
-                    })
-                    .catch(() => {
-                      if (index === companies.length - 1) {
-                        resolve()
-                      }
-                    })
-                } else {
-                  if (contact.name === contact.number && body.wa_user_name && body.wa_user_name !== '') {
-                    callApi(`whatsAppContacts/update`, 'put', {
-                      query: {_id: contact._id},
-                      newPayload: {name: body.wa_user_name},
-                      options: {}
-                    }, 'accounts')
-                      .then(contact => {
-                      })
-                  }
-                  if (index === companies.length - 1) {
-                    resolve()
-                  }
-                }
-              })
-              .catch(error => {
-                reject(error)
-              })
-          })
-        } else {
-          reject(new Error())
-        }
-      })
-      .catch(error => {
-        reject(error)
-      })
-  })
-}
+
+exports.webhookHandler = webhookHandler

@@ -1,4 +1,4 @@
-exports.payload = {
+exports.messageReceivedSchema = {
   type: 'object',
   properties: {
     message_id: {
@@ -18,19 +18,6 @@ exports.payload = {
       required: true
     },
     user_id: {
-      type: 'string',
-      required: true
-    }
-  }
-}
-exports.messageStatus = {
-  type: 'object',
-  properties: {
-    id: {
-      type: 'string',
-      required: true
-    },
-    status: {
       type: 'string',
       required: true
     }
