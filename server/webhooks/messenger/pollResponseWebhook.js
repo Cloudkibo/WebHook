@@ -10,6 +10,13 @@ exports.pollResponseWebhook = (payload) => {
   } else {
     resp = payload.entry[0].messaging[0].message.quick_reply.payload
   }
+  callApi('messengerEvents/quickReply', 'post', payload, 'kibochat')
+    .then((response) => {
+      logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+    })
   if (typeof resp === 'string') {
     callApi('messengerEvents/welcomeMessage/emailNumberQuickReply', 'post', payload, 'kiboengage')
       .then((response) => {
@@ -80,15 +87,6 @@ exports.pollResponseWebhook = (payload) => {
           callApi('messengerEvents/sendMessageBlock', 'post', payload, 'kiboengage')
             .then((response) => {
               logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-            })
-            .catch((err) => {
-              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-            })
-        }
-        if (resp[i].action && resp[i].action === '_chatbot') {
-          callApi('messengerEvents/quickReply', 'post', payload, 'kibochat')
-            .then((response) => {
-              logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
             })
             .catch((err) => {
               logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
