@@ -95,7 +95,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                             event.referral
                           )
                         }
-                        if (!subscriberFound.isSubscribed) {
+                        if (!subscriberFound.isSubscribed && subscriberFound.unSubscribedBy === 'subscriber') {
                           // subscribing the subscriber again in case he
                           // or she unsubscribed and removed chat
                           var messageText = ''
