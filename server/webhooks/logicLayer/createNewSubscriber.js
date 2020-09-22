@@ -56,7 +56,8 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 event.referral
                               )
                             }
-                            callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event, pushPendingSessionInfo: true, newSubscriber: true}, 'kibochat')
+                            let payload = {page: page, subscriber: subscriberCreated, event: event, pushPendingSessionInfo: true, newSubscriber: true}
+                            callApi('messengerEvents/sessions', 'post', payload, 'kibochat')
                             .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                             .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
                           })
