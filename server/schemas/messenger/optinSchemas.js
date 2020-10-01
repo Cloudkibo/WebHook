@@ -72,7 +72,7 @@ exports.chatbotSchema = {
                       'properties': {
                         'ref': {
                           'type': 'string',
-                          'enum': ['_chatbot', '_shopify_chatbot']
+                          'enum': ['_chatbot', '_commerce_chatbot']
                         }
                       },
                       'required': [
