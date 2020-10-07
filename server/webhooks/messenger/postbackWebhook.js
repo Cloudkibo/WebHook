@@ -19,12 +19,12 @@ exports.postbackWebhook = (payload) => {
       payload.entry[0].messaging[0].postback.payload = JSON.stringify(resp[i])
       if (resp[i].action && (resp[i].action === 'subscribe' || resp[i].action === 'subscribe_to_sequence')) {
         callApi('messengerEvents/subscribeToSequence', 'post', payload, 'kiboengage')
-        .then((response) => {
-          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
-        })
-        .catch((err) => {
-          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-        })
+          .then((response) => {
+            logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
       } else if (resp[i].action && (resp[i].action === 'unsubscribe' || resp[i].action === 'unsubscribe_from_sequence')) {
         callApi('messengerEvents/unsubscribeFromSequence', 'post', payload, 'kiboengage')
           .then((response) => {
@@ -75,11 +75,11 @@ exports.postbackWebhook = (payload) => {
           })
       } else if (resp[i].componentType) {
         callApi('messengerEvents/menuReply', 'post', payload, 'kiboengage')
-        .then((response) => {
-        })
-        .catch((err) => {
-          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
-        })
+          .then((response) => {
+          })
+          .catch((err) => {
+            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+          })
       }
     }
   } else if (!resp[0]) {
@@ -189,6 +189,14 @@ exports.postbackWebhook = (payload) => {
         .catch((err) => {
           logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
         })
+    } else if (resp.type === 'DYNAMIC' || resp.type === 'STATIC') {
+      callApi('messengerEvents/postback', 'post', payload, 'kibochat')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboChat: ${err}`, 'error')
+        })
     }
   } else if (jsonAdPayload && jsonAdPayload.length > 0 && jsonAdPayload[0] === 'JSONAD') {
     var jsonMessageId = jsonAdPayload[1]
@@ -206,7 +214,7 @@ function handleUnsubscribe (resp, req) {
       .then(pages => {
         let page = pages[0]
         if (page) {
-          callApi(`subscribers/update`, 'put', {query: { senderId: req.sender.id, pageId: page._id }, newPayload: { isSubscribed: false }, options: {}}, 'accounts')
+          callApi(`subscribers/update`, 'put', { query: { senderId: req.sender.id, pageId: page._id }, newPayload: { isSubscribed: false }, options: {} }, 'accounts')
             .then(updated => {
               // logger.serverLog(TAG, `updated subscriber: ${JSON.stringify(updated)}`, 'debug')
               callApi(`subscribers/query`, 'post', { senderId: req.sender.id, pageId: page._id }, 'accounts')
@@ -217,7 +225,7 @@ function handleUnsubscribe (resp, req) {
                     .then(unsubscribeTag => {
                       unsubscribeTag = unsubscribeTag[0]
                       // assign tag
-                      needle('post', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, {'user': req.sender.id})
+                      needle('post', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, { 'user': req.sender.id })
                         .then(response => {
                           if (response.body.error) {
                             logger.serverLog(TAG, `Failed to assign unsubscribeTag ${JSON.stringify(response.body.error)}`, 'error')
@@ -233,7 +241,7 @@ function handleUnsubscribe (resp, req) {
                       logger.serverLog(TAG, `Failed to fetch default tag ${JSON.stringify(err)}`, 'error')
                     })
                   logger.serverLog(TAG, `subscriber fetched ${JSON.stringify(subscriber)}`, 'debug')
-                  callApi('featureUsage/updateCompany', 'put', {query: {companyId: subscriber.companyId}, newPayload: { $inc: { subscribers: -1 } }, options: {}}, 'accounts')
+                  callApi('featureUsage/updateCompany', 'put', { query: { companyId: subscriber.companyId }, newPayload: { $inc: { subscribers: -1 } }, options: {} }, 'accounts')
                     .then(updated => {
                       logger.serverLog(TAG, `company usage incremented succssfully ${JSON.stringify(updated)}`, 'debug')
                     })
@@ -250,9 +258,9 @@ function handleUnsubscribe (resp, req) {
             })
         }
       })
-    .catch(err => {
-      logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`, 'error')
-    })
+      .catch(err => {
+        logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`, 'error')
+      })
   } else {
     messageData = {
       text: 'You can unsubscribe anytime by saying stop.'
@@ -284,11 +292,11 @@ function handleUnsubscribe (resp, req) {
 function handleNewsSubscription (subscriber) {
   let defaultQuery = {
     purpose: 'findAll',
-    match: {defaultFeed: true, companyId: subscriber.companyId}
+    match: { defaultFeed: true, companyId: subscriber.companyId }
   }
   let subscriptionQuery = {
     purpose: 'findAll',
-    match: {'subscriberId._id': subscriber._id}
+    match: { 'subscriberId._id': subscriber._id }
   }
   callApi(`newsSections/query`, 'post', defaultQuery, 'engageDbLayer')
     .then(defaultNewsSections => {
@@ -297,33 +305,33 @@ function handleNewsSubscription (subscriber) {
           if (newsSubscriptions.length > 0) {
             let subscriptionIds = newsSubscriptions.filter(n => n.subscription === true).map(s => s._id)
             let newsIds = newsSubscriptions.filter(a => a.subscription === true).map(n => n.newsSectionId)
-            updateSubscription({_id: {$in: subscriptionIds}})
-            updateSubscriptionCount({_id: {$in: newsIds}})
+            updateSubscription({ _id: { $in: subscriptionIds } })
+            updateSubscriptionCount({ _id: { $in: newsIds } })
             let defaultSubscriptions = []
             let defaultNewsSectionIds = defaultNewsSections.map(a => a._id)
             let newsSubscriptionsIds = newsSubscriptions.map(n => n.newsSectionId)
             defaultSubscriptions = defaultNewsSectionIds.filter((item) => !newsSubscriptionsIds.includes(item))
             if (defaultSubscriptions.length > 0) {
-              updateSubscriptionCount({_id: {$in: defaultSubscriptions}})
+              updateSubscriptionCount({ _id: { $in: defaultSubscriptions } })
             }
           } else {
-            updateSubscriptionCount({defaultFeed: true, companyId: subscriber.companyId})
+            updateSubscriptionCount({ defaultFeed: true, companyId: subscriber.companyId })
           }
         })
         .catch(err => {
           logger.serverLog(TAG, `Failed to fetch subscriptions ${JSON.stringify(err)}`, 'error')
         })
     })
-  .catch(err => {
-    logger.serverLog(TAG, `Failed to default feeds ${err}`, 'error')
-  })
+    .catch(err => {
+      logger.serverLog(TAG, `Failed to default feeds ${err}`, 'error')
+    })
 }
 
 function updateSubscriptionCount (query) {
   let updateQuery = {
     purpose: 'updateAll',
     match: query,
-    updated: {$inc: {subscriptions: -1}}
+    updated: { $inc: { subscriptions: -1 } }
   }
   callApi(`newsSections`, 'put', updateQuery, 'engageDbLayer')
     .then(updated => {
@@ -337,7 +345,7 @@ function updateSubscription (query) {
   let updateQuery = {
     purpose: 'updateAll',
     match: query,
-    updated: {subscription: false}
+    updated: { subscription: false }
   }
   callApi(`newsSubscriptions`, 'put', updateQuery, 'engageDbLayer')
     .then(updated => {
@@ -352,28 +360,28 @@ function sendResponseMessage (page, senderId, firstName, lastName, accessToken, 
     if (response.messageContent) {
       for (let i = 0; i < response.messageContent.length; i++) {
         logicLayer.prepareSendAPIPayload(senderId, response.messageContent[i], firstName, lastName, true, jsonAdMessages)
-        .then(result => {
-          request(
-            {
-              'method': 'POST',
-              'json': true,
-              'formData': result.payload,
-              'uri': 'https://graph.facebook.com/v6.0/me/messages?access_token=' +
-                accessToken
-            },
-            (err, res) => {
-              if (err) {
-                logger.serverLog(TAG,
-                  `At send message jsonAd response ${JSON.stringify(err)}`, 'error')
-              } else {
-                if (res.statusCode !== 200) {
+          .then(result => {
+            request(
+              {
+                'method': 'POST',
+                'json': true,
+                'formData': result.payload,
+                'uri': 'https://graph.facebook.com/v6.0/me/messages?access_token=' +
+                  accessToken
+              },
+              (err, res) => {
+                if (err) {
                   logger.serverLog(TAG,
-                    `At send message jsonAd response ${JSON.stringify(
-                      res.body.error)}`, 'error')
+                    `At send message jsonAd response ${JSON.stringify(err)}`, 'error')
+                } else {
+                  if (res.statusCode !== 200) {
+                    logger.serverLog(TAG,
+                      `At send message jsonAd response ${JSON.stringify(
+                        res.body.error)}`, 'error')
+                  }
                 }
-              }
-            })
-        })
+              })
+          })
       }
     }
   }

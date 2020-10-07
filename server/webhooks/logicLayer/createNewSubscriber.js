@@ -56,7 +56,8 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 event.referral
                               )
                             }
-                            callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberCreated, event: event, pushPendingSessionInfo:true}, 'kibochat')
+                            let payloadData = {page: page, subscriber: subscriberCreated, event: event, pushPendingSessionInfo: true, newSubscriber: true}
+                            callApi('messengerEvents/sessions', 'post', payloadData, 'kibochat')
                             .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
                             .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
                           })
@@ -95,7 +96,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                             event.referral
                           )
                         }
-                        if (!subscriberFound.isSubscribed) {
+                        if (!subscriberFound.isSubscribed && subscriberFound.unSubscribedBy === 'subscriber') {
                           // subscribing the subscriber again in case he
                           // or she unsubscribed and removed chat
                           var messageText = ''
