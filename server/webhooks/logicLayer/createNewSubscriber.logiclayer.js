@@ -103,7 +103,7 @@ exports.assignDefaultTags = (page, subscriber) => {
       if (value === 0 && subscribersCount[0].count > 10000) {
         createTag(page, subscriber, `_${page.pageId}_${count + 1}`)
       } else {
-        console.log('Assign tag in else condition')
+        logger.serverLog(TAG, `Assign tag in else condition`, 'debug')
         assignTag(page, subscriber, `_${page.pageId}_${count + 1}`, count)
       }
       assignTag(page, subscriber, subscriber.gender, count)
@@ -156,7 +156,7 @@ const createTag = (page, subscriber, tag) => {
             logger.serverLog(TAG, `Error at save tag ${err}`, 'error')
           })
       } else {
-        logger.serverLog(TAG, `Error at create tag on Facebook ${label.data}`, 'error')
+        logger.serverLog(TAG, `Response from custom label facebook ${JSON.stringify(label)}`, 'debug')
       }
     })
     .catch(err => {
