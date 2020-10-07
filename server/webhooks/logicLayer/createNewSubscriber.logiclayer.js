@@ -156,7 +156,7 @@ const createTag = (page, subscriber, tag) => {
             logger.serverLog(TAG, `Error at save tag ${err}`, 'error')
           })
       } else {
-        logger.serverLog(TAG, `Error at create tag on Facebook ${JSON.stringify(label)}`, 'error')
+        logger.serverLog(TAG, `Error at create tag on Facebook ${label}`, 'error')
       }
     })
     .catch(err => {
