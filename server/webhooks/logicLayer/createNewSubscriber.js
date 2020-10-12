@@ -38,7 +38,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                                 subscriberCreated._id
                               )
                             }
-                            LogicLayer.assignDefaultTags(page, subscriberCreated)
                             LogicLayer.handleNewsSubscriptionForNewSubscriber(subscriberCreated)
                             callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: senderId, pageId: page._id}, 'kiboengage')
                               .then(seqRes => logger.serverLog(TAG, `response from sequence subscriberJoins ${seqRes}`))
