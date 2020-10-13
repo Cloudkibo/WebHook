@@ -11,4 +11,11 @@ exports.messageDeliveryWebhook = (payload) => {
     .catch((err) => {
       logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
     })
+  callApi('messengerEvents/delivery', 'post', payload, 'kibochat')
+    .then((response) => {
+      logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboChat: ${err}`, 'error')
+    })
 }

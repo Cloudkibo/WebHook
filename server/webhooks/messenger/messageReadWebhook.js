@@ -11,4 +11,11 @@ exports.messageReadWebhook = (payload) => {
     .catch((err) => {
       logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
     })
+  callApi('messengerEvents/seen', 'post', payload, 'kibochat')
+    .then((response) => {
+      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+    })
+    .catch((err) => {
+      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+    })
 }
