@@ -49,7 +49,7 @@ exports.chatPluginSchema = {
                           'enum': ['CUSTOMER_CHAT_PLUGIN']
                         }
                       },
-                      'required': ['source', 'ref']
+                      'required': ['source']
                     }
                   },
                   'required': [
@@ -131,7 +131,7 @@ exports.chatPluginWithPostBackSchema = {
                               'enum': ['CUSTOMER_CHAT_PLUGIN']
                             }
                           },
-                          'required': ['source', 'ref']
+                          'required': ['source']
                         }
                       },
                       'required': [

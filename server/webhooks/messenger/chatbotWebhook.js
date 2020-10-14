@@ -28,11 +28,11 @@ exports.chatbotWebhook = (payload) => {
                 logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
               })
               .catch((err) => {
-                logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+                logger.serverLog(TAG, `error from KiboPush: ${JSON.stringify(err)}`, 'error')
               })
           })
           .catch(err => {
-            logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+            logger.serverLog(TAG, `error from KiboPush: ${JSON.stringify(err)}`, 'error')
           })
       }
     })
