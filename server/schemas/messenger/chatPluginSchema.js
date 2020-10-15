@@ -49,7 +49,7 @@ exports.chatPluginSchema = {
                           'enum': ['CUSTOMER_CHAT_PLUGIN']
                         },
                         'is_guest_user': {
-                          'type': 'string'
+                          'type': 'boolean'
                         }
                       },
                       'required': ['source', 'is_guest_user']
@@ -134,7 +134,7 @@ exports.chatPluginWithPostBackSchema = {
                               'enum': ['CUSTOMER_CHAT_PLUGIN']
                             },
                             'is_guest_user': {
-                              'type': 'string'
+                              'type': 'boolean'
                             }
                           },
                           'required': ['source', 'is_guest_user']
