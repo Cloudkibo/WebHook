@@ -74,44 +74,41 @@ exports.updatePhoneNumberCustomerMatching = (identifier, pageId, companyId) => {
     })
 }
 
-exports.sendWebhookForNewSubscriber = (pageId, companyId, identifier, subscriber, _id) => {
-  callApi('webhooks/query', 'post', {companyId: companyId, pageId: pageId}, 'accounts')
-  .then(webhook => {
-    webhook = webhook[0]
-    if (webhook && webhook.isEnabled) {
-      needle.get(webhook.webhook_url, (err, r) => {
-        if (err) {
-          logger.serverLog(TAG, err, 'error')
-        } else if (r.statusCode === 200) {
-          if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-            var data = {
-              subscription_type: 'NEW_SUBSCRIBER',
-              payload: JSON.stringify({
-                subscriberRefId: identifier,
-                payload: {
-                  firstName: subscriber.first_name,
-                  lastName: subscriber.last_name,
-                  locale: subscriber.locale,
-                  gender: subscriber.gender,
-                  timezone: subscriber.timezone,
-                  profilePic: subscriber.profile_pic,
-                  subscriberSenderId: _id
-                }})
-            }
-            needle.post(webhook.webhook_url, data, {json: true},
-              (error, response) => {
-                if (error) logger.serverLog(TAG, err, 'error')
-              })
-          }
-        } else {
-          // webhookUtility.saveNotification(webhook)
-        }
-      })
+exports.sendWebhookForNewSubscriber = (subscriber, page) => {
+  let payload = {
+    type: 'NEW_SUBSCRIBER',
+    platform: 'messenger',
+    page: page,
+    payload: {
+      firstName: subscriber.firstName,
+      lastName: subscriber.lastName,
+      locale: subscriber.locale,
+      timezone: subscriber.timezone,
+      gender: subscriber.gender,
+      facebookSubscriberId: subscriber.senderId,
+      profilePic: subscriber.profilePic,
+      facebookPageId: page.pageId,
+      source: subscriber.source,
+      isSubscribed: subscriber.isSubscribed,
+      lastActivityTime: subscriber.last_activity_time,
+      lastMessageFromSubscriberAt: subscriber.lastMessagedAt,
+      userRefIdForCheckBox: subscriber.userRefIdForCheckBox,
+      createdAt: subscriber.datetime,
+      assignedTo: subscriber.assigned_to,
+      isAssigned: subscriber.is_assigned,
+      pendingResponse: subscriber.pendingResponse,
+      unreadCount: subscriber.unreadCount,
+      messagesCount: subscriber.messagesCount,
+      siteInfo: subscriber.siteInfo,
+      commerceCustomer: subscriber.commerceCustomer,
+      shoppingCart: subscriber.shoppingCart,
+      lastMessageSentByBot: subscriber.lastMessageSentByBot,
+      usingChatBot: subscriber.usingChatBot
     }
-  })
-  .catch((err) => {
-    logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`, 'error')
-  })
+  }
+  callApi('webhooks/sendWebhook', 'post', payload, 'kibochat')
+  .then(res => logger.serverLog(TAG, `response from sendWebhook ${res}`))
+  .catch(err => logger.serverLog(TAG, `Failed to get response from sendWebhook ${JSON.stringify(err)}`, 'error'))
 }
 
 exports.informGrowthTools = (subscriberSource, recipientId, senderId, companyId, referral) => {
