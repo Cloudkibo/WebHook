@@ -29,15 +29,12 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       if (subscriberFound.length === 0) {
                         callApi(`subscribers`, 'post', payload, 'accounts')
                           .then(subscriberCreated => {
-                            if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
-                              LogicLayer.sendWebhookForNewSubscriber(
-                                page.pageId,
-                                page.companyId,
-                                identifier,
-                                subscriber,
-                                subscriberCreated._id
-                              )
-                            }
+                            // if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
+                            LogicLayer.sendWebhookForNewSubscriber(
+                              subscriberCreated,
+                              page
+                            )
+                            // }
                             LogicLayer.handleNewsSubscriptionForNewSubscriber(subscriberCreated)
                             callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: senderId, pageId: page._id}, 'kiboengage')
                               .then(seqRes => logger.serverLog(TAG, `response from sequence subscriberJoins ${seqRes}`))
