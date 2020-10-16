@@ -42,7 +42,10 @@ exports.chatPluginSchema = {
                       'type': 'object',
                       'properties': {
                         'ref': {
-                          'type': 'string'
+                          'anyOf': [
+                            { type: 'string' },
+                            { type: 'null' }
+                          ]
                         },
                         'source': {
                           'type': 'string',
@@ -127,7 +130,10 @@ exports.chatPluginWithPostBackSchema = {
                           'type': 'object',
                           'properties': {
                             'ref': {
-                              'type': 'string'
+                              'anyOf': [
+                                { type: 'string' },
+                                { type: 'null' }
+                              ]
                             },
                             'source': {
                               'type': 'string',
