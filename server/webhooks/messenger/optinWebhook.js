@@ -20,11 +20,16 @@ exports.optinWebhook = (payload) => {
       .then(page => {
         page = page[0]
         if (page) {
-          let payload = refPayload
-          payload.subscriberRefId = userRefIdForCheckBox
+          let payload = {
+            subscriberRefId: userRefIdForCheckBox,
+            cartId: refPayload.cart_id,
+            type: refPayload.type,
+            industry: refPayload.industry,
+            timestamp: Date.now()
+          }
           let dataToSend = {
-            type: 'CHECKBOX_OPT_IN',
-            platform: 'messenger',
+            type: 'CHECKBOX_OPTIN',
+            platform: 'facebook',
             page,
             payload
           }

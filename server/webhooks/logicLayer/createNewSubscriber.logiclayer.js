@@ -2,6 +2,7 @@ const needle = require('needle')
 const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.logiclayer.js'
 const logger = require('../../components/logger')
+const config = require('../../config/environment/index')
 
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {
@@ -77,33 +78,23 @@ exports.updatePhoneNumberCustomerMatching = (identifier, pageId, companyId) => {
 exports.sendWebhookForNewSubscriber = (subscriber, page) => {
   let payload = {
     type: 'NEW_SUBSCRIBER',
-    platform: 'messenger',
+    platform: 'facebook',
     page: page,
     payload: {
-      firstName: subscriber.firstName,
-      lastName: subscriber.lastName,
+      name: subscriber.firstName + ' ' + subscriber.lastName,
       locale: subscriber.locale,
       timezone: subscriber.timezone,
       gender: subscriber.gender,
-      facebookSubscriberId: subscriber.senderId,
+      psid: subscriber.senderId,
       profilePic: subscriber.profilePic,
       facebookPageId: page.pageId,
       source: subscriber.source,
-      isSubscribed: subscriber.isSubscribed,
-      lastActivityTime: subscriber.last_activity_time,
-      lastMessageFromSubscriberAt: subscriber.lastMessagedAt,
-      userRefIdForCheckBox: subscriber.userRefIdForCheckBox,
-      createdAt: subscriber.datetime,
-      assignedTo: subscriber.assigned_to,
-      isAssigned: subscriber.is_assigned,
-      pendingResponse: subscriber.pendingResponse,
-      unreadCount: subscriber.unreadCount,
-      messagesCount: subscriber.messagesCount,
+      subscriberRefId: subscriber.userRefIdForCheckBox,
+      timestamp: Date.now(),
       siteInfo: subscriber.siteInfo,
-      commerceCustomer: subscriber.commerceCustomer,
-      shoppingCart: subscriber.shoppingCart,
-      lastMessageSentByBot: subscriber.lastMessageSentByBot,
-      usingChatBot: subscriber.usingChatBot
+      livechatUrl: config.env === 'staging'
+      ? `https://skibochat.cloudkibo.com/liveChat/${subscriber.firstName}-${subscriber.lastName}-${subscriber.senderId}`
+      : `https://kibochat.cloudkibo.com/liveChat/${subscriber.firstName}-${subscriber.lastName}-${subscriber.senderId}`
     }
   }
   callApi('webhooks/sendWebhook', 'post', payload, 'kibochat')
