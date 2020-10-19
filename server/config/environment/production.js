@@ -35,7 +35,8 @@ module.exports = {
   TELCO_URL: 'https://zircon-spatula.glitch.me/',
 
   ENGAGE_DBLAYER: `http://142.93.179.77/api/v1/`,
-  
-  CHAT_DBLAYER: `http://104.248.240.146/api/v1/`
 
+  CHAT_DBLAYER: `http://104.248.240.146/api/v1/`,
+
+  papertrail_log_levels: process.env.PAPERTRAIL_LOG_LEVELS
 }
