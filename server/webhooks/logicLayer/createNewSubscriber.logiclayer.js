@@ -2,6 +2,7 @@ const needle = require('needle')
 const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.logiclayer.js'
 const logger = require('../../components/logger')
+const config = require('../../config/environment/index')
 const { updateCompanyUsage } = require('../../global/billingPricing')
 
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
@@ -101,44 +102,31 @@ exports.updatePhoneNumberCustomerMatching = (identifier, pageId, companyId) => {
     })
 }
 
-exports.sendWebhookForNewSubscriber = (pageId, companyId, identifier, subscriber, _id) => {
-  callApi('webhooks/query', 'post', {companyId: companyId, pageId: pageId}, 'accounts')
-  .then(webhook => {
-    webhook = webhook[0]
-    if (webhook && webhook.isEnabled) {
-      needle.get(webhook.webhook_url, (err, r) => {
-        if (err) {
-          logger.serverLog(TAG, err, 'error')
-        } else if (r.statusCode === 200) {
-          if (webhook && webhook.optIn.NEW_SUBSCRIBER) {
-            var data = {
-              subscription_type: 'NEW_SUBSCRIBER',
-              payload: JSON.stringify({
-                subscriberRefId: identifier,
-                payload: {
-                  firstName: subscriber.first_name,
-                  lastName: subscriber.last_name,
-                  locale: subscriber.locale,
-                  gender: subscriber.gender,
-                  timezone: subscriber.timezone,
-                  profilePic: subscriber.profile_pic,
-                  subscriberSenderId: _id
-                }})
-            }
-            needle.post(webhook.webhook_url, data, {json: true},
-              (error, response) => {
-                if (error) logger.serverLog(TAG, err, 'error')
-              })
-          }
-        } else {
-          // webhookUtility.saveNotification(webhook)
-        }
-      })
+exports.sendWebhookForNewSubscriber = (subscriber, page) => {
+  let payload = {
+    type: 'NEW_SUBSCRIBER',
+    platform: 'facebook',
+    page: page,
+    payload: {
+      name: subscriber.firstName + ' ' + subscriber.lastName,
+      locale: subscriber.locale,
+      timezone: subscriber.timezone,
+      gender: subscriber.gender,
+      psid: subscriber.senderId,
+      profilePic: subscriber.profilePic,
+      facebookPageId: page.pageId,
+      source: subscriber.source,
+      subscriberRefId: subscriber.userRefIdForCheckBox,
+      timestamp: Date.now(),
+      siteInfo: subscriber.siteInfo,
+      livechatUrl: config.env === 'staging'
+      ? `https://skibochat.cloudkibo.com/liveChat/${subscriber.firstName}-${subscriber.lastName}-${subscriber.senderId}`
+      : `https://kibochat.cloudkibo.com/liveChat/${subscriber.firstName}-${subscriber.lastName}-${subscriber.senderId}`
     }
-  })
-  .catch((err) => {
-    logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks: ${err}`, 'error')
-  })
+  }
+  callApi('webhooks/sendWebhook', 'post', payload, 'kibochat')
+  .then(res => logger.serverLog(TAG, `response from sendWebhook ${res}`))
+  .catch(err => logger.serverLog(TAG, `Failed to get response from sendWebhook ${JSON.stringify(err)}`, 'error'))
 }
 
 exports.informGrowthTools = (subscriberSource, recipientId, senderId, companyId, referral) => {
