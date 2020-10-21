@@ -7,7 +7,7 @@ const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
 const { callApi } = require('../../../utility/api.caller.service')
 const config = require('../../../config/environment')
 const { sendSuccessResponse, sendErrorResponse } = require('../../../global/global.js')
-const { sendOpAlert } = require('../../global/operationalAlert')
+const { sendAlert } = require('../../global/sentry')
 const Raven = require('raven')
 
 exports.verifyHook = function (req, res) {
@@ -56,7 +56,7 @@ exports.webhook = function (req, res) {
     sendSuccessResponse(200, responseMessage, res)
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
-    sendOpAlert(e, 'Error on Messenger Webhook', '', '', '')
+    sendAlert(e, 'Error on Messenger Webhook', '', '', '')
     // console.log('Error on webhook', e)
     sendErrorResponse(500, e, res)
   }
