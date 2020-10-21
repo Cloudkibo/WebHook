@@ -7,6 +7,8 @@ const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
 const { callApi } = require('../../../utility/api.caller.service')
 const config = require('../../../config/environment')
 const { sendSuccessResponse, sendErrorResponse } = require('../../../global/global.js')
+const { sendOpAlert } = require('../../global/operationalAlert')
+const Raven = require('raven')
 
 exports.verifyHook = function (req, res) {
   if (req.query['hub.verify_token'] === 'VERIFY_ME') {
@@ -19,6 +21,9 @@ exports.verifyHook = function (req, res) {
 exports.webhook = function (req, res) {
   // logger.serverLog(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
   console.log(TAG, `something received from facebook ${JSON.stringify(req.body)}`)
+  Raven.setContext({
+    payload: req.body
+  })
   const event = (req.body.entry && req.body.entry[0] && req.body.entry[0].messaging) ? req.body.entry[0].messaging[0] : ''
   const pageId = event !== '' ? event.recipient.id : ''
   let data = req.body
@@ -51,6 +56,7 @@ exports.webhook = function (req, res) {
     sendSuccessResponse(200, responseMessage, res)
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
+    sendOpAlert(e, 'Error on Messenger Webhook', '', '', '')
     // console.log('Error on webhook', e)
     sendErrorResponse(500, e, res)
   }
