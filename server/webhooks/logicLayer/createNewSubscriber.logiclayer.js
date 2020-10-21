@@ -87,7 +87,7 @@ exports.sendWebhookForNewSubscriber = (subscriber, page) => {
       gender: subscriber.gender,
       psid: subscriber.senderId,
       profilePic: subscriber.profilePic,
-      facebookPageId: page.pageId,
+      pageId: page.pageId,
       source: subscriber.source,
       subscriberRefId: subscriber.userRefIdForCheckBox,
       timestamp: Date.now(),
