@@ -208,7 +208,8 @@ function handleUnsubscribe (resp, req) {
   let messageData = {}
   if (resp.action === 'yes') {
     messageData = {
-      text: 'You have unsubscribed from our broadcasts. Send "start" to subscribe again.'
+      text: 'You have unsubscribed from our broadcasts. Send "start" to subscribe again.',
+      'metadata': 'This is a meta data'
     }
     callApi(`pages/query`, 'post', { pageId: req.recipient.id, connected: true }, 'accounts')
       .then(pages => {
