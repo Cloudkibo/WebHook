@@ -1,7 +1,6 @@
 const TAG = 'webhooks/messenger/optinWebhook.js'
 const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
-const needle = require('needle')
 const { createNewSubscriber } = require('../logicLayer/createNewSubscriber.js')
 const logicLayer = require('../logicLayer/postback.logiclayer.js')
 
@@ -15,35 +14,32 @@ exports.optinWebhook = (payload) => {
     refPayload = payload.entry[0].messaging[0].optin.ref
   }
   if (refPayload && refPayload.type === 'checkbox' && refPayload.industry === 'commerce') {
-    let companyId = refPayload.company_id
     let pageId = payload.entry[0].messaging[0].recipient.id
     userRefIdForCheckBox = payload.entry[0].messaging[0].optin.user_ref
-    callApi('webhooks/query', 'post', {companyId, pageId}, 'accounts')
-      .then(webhook => {
-        webhook = webhook[0]
-        if (webhook && webhook.isEnabled) {
-          needle.get(webhook.webhook_url, (err, r) => {
-            if (err) {
-              logger.serverLog(TAG, err, 'error')
-            } else if (r.statusCode === 200) {
-              if (webhook && webhook.optIn.NEW_OPTIN) {
-                var data = {
-                  subscription_type: 'NEW_OPTIN',
-                  payload: JSON.stringify({ subscriberRefId: userRefIdForCheckBox, payload: refPayload })
-                }
-                needle.post(webhook.webhook_url, data, {json: true},
-                  (error, response) => {
-                    if (error) logger.serverLog(TAG, err, 'error')
-                  })
-              }
-            } else {
-              // webhookUtility.saveNotification(webhook)
-            }
-          })
+    callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+      .then(page => {
+        page = page[0]
+        if (page) {
+          let payload = {
+            subscriberRefId: userRefIdForCheckBox,
+            cartId: refPayload.cart_id,
+            type: refPayload.type,
+            industry: refPayload.industry,
+            timestamp: Date.now()
+          }
+          let dataToSend = {
+            type: 'CHECKBOX_OPTIN',
+            platform: 'facebook',
+            page,
+            payload
+          }
+          callApi('webhooks/sendWebhook', 'post', dataToSend, 'kibochat')
+          .then(res => logger.serverLog(TAG, `response from sendWebhook ${res}`))
+          .catch(err => logger.serverLog(TAG, `Failed to get response from sendWebhook ${JSON.stringify(err)}`, 'error'))
         }
       })
       .catch((err) => {
-        logger.serverLog(TAG, `error from KiboPush on Fetching Webhooks on Optin: ${err}`, 'error')
+        logger.serverLog(TAG, `Failed to fetch page: ${err}`, 'error')
       })
     return
   }
