@@ -56,7 +56,7 @@ exports.webhook = function (req, res) {
     sendSuccessResponse(200, responseMessage, res)
   } catch (e) {
     logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
-    sentry.sendAlert(e, 'Error on Messenger Webhook', '', '', '')
+    sentry.sendAlert(e, 'Error on Messenger Webhook', '', '', '', JSON.stringify(req.body))
     // console.log('Error on webhook', e)
     sendErrorResponse(500, e, res)
   }
