@@ -8,7 +8,12 @@ exports.chatPluginWebhook = (payload) => {
   const event = payload.entry[0].messaging[0]
   const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
   const pageId = event.message && payload.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
-  let ref = event.referral && event.referral.ref ? JSON.parse(event.referral.ref) : JSON.parse(event.postback.referral.ref)
+  let ref = null
+  if (event.referral && event.referral.ref) {
+    ref = JSON.parse(event.referral.ref)
+  } else if (event.postback && event.postback.referral) {
+    ref = JSON.parse(event.postback.referral.ref)
+  }
   if (ref === null) {
     ref = {}
   }
