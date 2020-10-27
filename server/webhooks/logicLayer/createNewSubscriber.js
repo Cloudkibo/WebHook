@@ -115,7 +115,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
             }
           })
           .catch(err => {
-            logger.serverLog(TAG, `Failed to refresh access token ${JSON.stringify(err)}`, 'error')
+            logger.serverLog(TAG, `Failed to fetch subscriber details ${JSON.stringify(err)}`, 'error')
           })
       }
     })

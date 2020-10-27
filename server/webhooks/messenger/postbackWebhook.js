@@ -189,7 +189,7 @@ exports.postbackWebhook = (payload) => {
         .catch((err) => {
           logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
         })
-    } else if (resp.type === 'DYNAMIC' || resp.type === 'STATIC') {
+    } else if (resp.type === 'DYNAMIC' || resp.type === 'STATIC' || resp.action === '_chatbot') {
       callApi('messengerEvents/postback', 'post', payload, 'kibochat')
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
