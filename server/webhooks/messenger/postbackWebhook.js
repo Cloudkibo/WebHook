@@ -81,6 +81,14 @@ exports.postbackWebhook = (payload) => {
           .catch((err) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
+      } else if (resp[i].action === '_chatbot') {
+        callApi('messengerEvents/postback', 'post', payload, 'kibochat')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboChat: ${err}`, 'error')
+        })
       }
     }
   } else if (!resp[0]) {
@@ -190,7 +198,7 @@ exports.postbackWebhook = (payload) => {
         .catch((err) => {
           logger.serverLog(TAG, `error from KiboEngage: ${err}`, 'error')
         })
-    } else if (resp.type === 'DYNAMIC' || resp.type === 'STATIC' || resp.action === '_chatbot') {
+    } else if (resp.type === 'DYNAMIC' || resp.type === 'STATIC') {
       callApi('messengerEvents/postback', 'post', payload, 'kibochat')
         .then((response) => {
           logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
