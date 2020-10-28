@@ -14,6 +14,7 @@ exports.postbackWebhook = (payload) => {
     resp = payload.entry[0].messaging[0].postback.payload
     var jsonAdPayload = resp.split('-')
   }
+  console.log(`postbackWebhook ${JSON.stringify(resp)}`)
   if (resp[0]) {
     for (let i = 0; i < resp.length; i++) {
       payload.entry[0].messaging[0].postback.payload = JSON.stringify(resp[i])
