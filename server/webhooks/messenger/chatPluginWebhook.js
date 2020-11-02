@@ -6,7 +6,8 @@ const { createNewSubscriber } = require('../logicLayer/createNewSubscriber.js')
 exports.chatPluginWebhook = (payload) => {
   logger.serverLog(TAG, `in chatPluginWebhook ${JSON.stringify(payload)}`, 'info')
   const event = payload.entry[0].messaging[0]
-  const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
+  // const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
+  const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.user_ref
   const pageId = event.message && payload.entry[0].messaging[0].message.is_echo ? event.sender.id : event.recipient.id
   let ref = null
   if (event.referral && event.referral.ref) {
