@@ -5,6 +5,7 @@ const Global = require('../../global/global.js')
 const LogicLayer = require('./createNewSubscriber.logiclayer.js')
 
 exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, ref, event, fullPayload) => {
+  const refId = event.message && event.message.is_echo ? event.recipient.id : event.sender.user_ref
   callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(pages => {
       let page = pages[0]
@@ -22,7 +23,13 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
               if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                 payload.userRefIdForCheckBox = identifier
               }
-              callApi(`subscribers/query`, 'post', {senderId: senderId, pageId: page._id}, 'accounts')
+              let subscriberQueryPayload = {pageId: page._id}
+              if (refId) {
+                subscriberQueryPayload.user_ref = refId
+              } else {
+                subscriberQueryPayload.senderId = senderId
+              }
+              callApi(`subscribers/query`, 'post', subscriberQueryPayload, 'accounts')
                 .then(subscriberFound => {
                   if (subscriberFound.length === 0) {
                     callApi(`subscribers`, 'post', payload, 'accounts')
@@ -79,7 +86,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       LogicLayer.checkCommentReply(subscriberFound, page, payload, fullPayload)
                     }
                     if (subscriberSource === 'chat_plugin') {
-                      LogicLayer.addSiteInfoForSubscriber(subscriberFound, payload, ref, senderId)
+                      LogicLayer.addSiteInfoForSubscriber(subscriberFound, payload, ref, senderId, refId)
                     }
                     if (['messaging_referrals', 'landing_page'].indexOf(subscriberSource) !== -1) {
                       LogicLayer.informGrowthTools(

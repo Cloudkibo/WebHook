@@ -235,10 +235,11 @@ exports.updateConversionCount = (postId) => {
        logger.serverLog(TAG, `Failed to update Waiting Reply ${JSON.stringify(err)}`, 'error')
      })
 }
-exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId) => {
+exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId, refId) => {
   payload.siteInfo = siteInfo
-  payload.user_ref = senderId
-  callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: {}}, 'accounts')
+  payload.user_ref = refId
+  payload.completeInfo = subscriber.completeInfo ? subscriber.completeInfo : false
+  callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: { upsert: true }}, 'accounts')
     .then(updated => {
     })
     .catch((err) => {
