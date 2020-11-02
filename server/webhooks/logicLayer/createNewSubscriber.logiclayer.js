@@ -43,6 +43,8 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
   } else if (subscriberSource === 'chat_plugin') {
     payload.source = 'chat_plugin'
     payload.siteInfo = ref
+    payload.user_ref = senderId
+    payload.senderId = undefined
   } else if (subscriberSource === 'messaging_referrals') {
     payload.source = `https://m.me/${page._id}?ref=${ref}`
   } else if (subscriberSource === 'landing_page') {
@@ -233,8 +235,9 @@ exports.updateConversionCount = (postId) => {
        logger.serverLog(TAG, `Failed to update Waiting Reply ${JSON.stringify(err)}`, 'error')
      })
 }
-exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo) => {
+exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId) => {
   payload.siteInfo = siteInfo
+  payload.user_ref = senderId
   callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: {}}, 'accounts')
     .then(updated => {
     })

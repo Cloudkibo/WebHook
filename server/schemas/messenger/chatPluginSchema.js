@@ -30,12 +30,12 @@ exports.chatPluginSchema = {
                     'sender': {
                       'type': 'object',
                       'properties': {
-                        'id': {
+                        'user_ref': {
                           'type': 'string'
                         }
                       },
                       'required': [
-                        'id'
+                        'user_ref'
                       ]
                     },
                     'referral': {
@@ -112,12 +112,12 @@ exports.chatPluginWithPostBackSchema = {
                     'sender': {
                       'type': 'object',
                       'properties': {
-                        'id': {
+                        'user_ref': {
                           'type': 'string'
                         }
                       },
                       'required': [
-                        'id'
+                        'user_ref'
                       ]
                     },
                     'postback': {
