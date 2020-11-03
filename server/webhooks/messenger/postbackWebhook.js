@@ -80,6 +80,14 @@ exports.postbackWebhook = (payload) => {
           .catch((err) => {
             logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
           })
+      } else if (resp[i].action === '_chatbot') {
+        callApi('messengerEvents/postback', 'post', payload, 'kibochat')
+        .then((response) => {
+          logger.serverLog(TAG, `response recieved from KiboChat: ${response}`, 'debug')
+        })
+        .catch((err) => {
+          logger.serverLog(TAG, `error from KiboChat: ${err}`, 'error')
+        })
       }
     }
   } else if (!resp[0]) {
