@@ -3,13 +3,13 @@ const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
 
 exports.policyEnforcementWebhook = (payload) => {
-  // logger.serverLog(TAG, `in policyWebhook ${JSON.stringify(payload)}`)
   let data = {pageId: payload.recipient.id, policy: payload['policy-enforcement']}
   callApi('messengerEvents/policyNotification', 'post', data, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.policyEnforcementWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.policyEnforcementWebhook`, {}, {payload}, 'error')
     })
 }

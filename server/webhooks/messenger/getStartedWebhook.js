@@ -5,7 +5,7 @@ const { newSubscriberWebhook } = require('./newSubscriberWebhook.js')
 const { createNewSubscriber } = require('../logicLayer/createNewSubscriber.js')
 
 exports.getStartedWebhook = (payload) => {
-  logger.serverLog(TAG, `in getStartedWebhook ${JSON.stringify(payload)}`, 'info')
+  logger.serverLog('In get started webhook', `${TAG}: exports.getStartedWebhook`, {}, {payload}, 'debug')
   if (payload.entry[0].messaging[0].postback && payload.entry[0].messaging[0].postback.referral) {
     payload.entry[0].messaging[0].referral = payload.entry[0].messaging[0].postback.referral
     const event = payload.entry[0].messaging[0]
@@ -31,10 +31,11 @@ function sendWelcomeMessage (payload) {
           }
           callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
             .then((response) => {
-              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+              logger.serverLog('Response from KiboEngage', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
             })
             .catch((err) => {
-              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+              const message = err || 'Error response from KiboEngage'
+              logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
             })
           // sending both page and subscriber to kibochat to save
           // two DB queries for these on kibochat server
@@ -42,18 +43,21 @@ function sendWelcomeMessage (payload) {
           payload.page = page
           callApi('messengerEvents/welcomeMessage', 'post', payload, 'kibochat')
             .then((response) => {
-              logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+              logger.serverLog('Response from KiboChat', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
             })
             .catch((err) => {
-              logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+              const message = err || 'Error response from KiboChat'
+              logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
             })
         })
         .catch(err => {
-          logger.serverLog(TAG, `Failed to fetch subscriber ${JSON.stringify(err)}`, 'error')
+          const message = err || 'Failed to fetch subscriber'
+          logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
         })
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to fetch page ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Failed to fetch page'
+      logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
     })
 }
 

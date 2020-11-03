@@ -114,7 +114,6 @@ function prepareSendAPIPayload (subscriberId, body, fname, lname, isResponse, js
       resolve({payload})
     } else if (['media'].indexOf(
       body.componentType) > -1) {
-      
       payload = {
         'messaging_type': messageType,
         'recipient': JSON.stringify({

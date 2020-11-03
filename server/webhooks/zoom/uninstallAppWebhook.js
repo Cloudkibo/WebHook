@@ -3,12 +3,13 @@ const logger = require('../../components/logger')
 const { callApi } = require('../../utility/api.caller.service')
 
 exports.uninstallAppWebhook = (payload) => {
-  logger.serverLog(TAG, `someone uninstalled zoom app ${JSON.stringify(payload)}`)
+  logger.serverLog('Someone uninstalled zoom app', `${TAG}: exports.uninstallAppWebhook`, {}, {payload}, 'debug')
   callApi('zoomEvents/uninstallApp', 'post', payload, 'kibochat')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from Kibochat', `${TAG}: exports.uninstallAppWebhook`, {}, {payload, response}, 'error')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error from KiboChat'
+      logger.serverLog(message, `${TAG}: exports.uninstallAppWebhook`, {}, {payload}, 'error')
     })
 }
