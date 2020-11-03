@@ -3,6 +3,7 @@ const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.logiclayer.js'
 const logger = require('../../components/logger')
 const config = require('../../config/environment/index')
+const { updateCompanyUsage } = require('../../global/billingPricing')
 
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {
@@ -19,6 +20,32 @@ exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
         resolve(response)
       }
     })
+  })
+}
+
+exports.createSubscriber = (payload, page) => {
+  return new Promise((resolve, reject) => {
+    callApi('companyprofile/query', 'post', {_id: page.companyId}, 'accounts')
+      .then(company => {
+        const planUsagePromise = callApi('featureUsage/planQuery', 'post', {planId: company.planId._id}, 'accounts')
+        const companyUsagePromise = callApi('featureUsage/companyQuery', 'post', {companyId: company._id}, 'accounts')
+        Promise.all([planUsagePromise, companyUsagePromise])
+          .then(results => {
+            const planUsage = results[0][0]
+            const companyUsage = results[1][0]
+            if (companyUsage.subscribers >= planUsage.subscribers) {
+              payload.disabledByPlan = true
+            }
+            callApi(`subscribers`, 'post', payload, 'accounts')
+              .then(subscriberCreated => {
+                updateCompanyUsage(page.companyId, 'subscribers', 1)
+                resolve(subscriberCreated)
+              })
+              .catch(err => reject(err))
+          })
+          .catch(err => reject(err))
+      })
+      .catch(err => reject(err))
   })
 }
 
@@ -232,9 +259,9 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
     })
 }
 exports.updateConversionCount = (postId) => {
- let newPayloadConversionCount = { $inc: { conversionCount : 1 } }
- let newPayloadWaitingReply = { $inc: { waitingReply : -1 } }
- callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
+  let newPayloadConversionCount = { $inc: { conversionCount: 1 } }
+  let newPayloadWaitingReply = { $inc: { waitingReply: -1 } }
+  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
    .then(updated => {
      logger.serverLog('Conversion count updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'debug')
    })
@@ -245,7 +272,7 @@ exports.updateConversionCount = (postId) => {
 
   callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
     .then(updated => {
-      logger.serverLog('Waiting Reply updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
+      logger.serverLog('Waiting Reply updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'debug')
     })
     .catch(err => {
       const message = err || 'failed to update waiting reply'
