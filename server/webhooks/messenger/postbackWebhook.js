@@ -415,7 +415,7 @@ function sendResponseMessage (page, senderId, firstName, lastName, accessToken, 
                   logger.serverLog(message, `${TAG}: function::sendResponseMessage`, {}, {page, senderId}, 'error')
                 } else {
                   if (res.statusCode !== 200) {
-                    const message = res.body.error ? res.body.error.message : 'Error send message jsonAd response'
+                    const message = res.body && res.body.error ? res.body.error.message : 'Error send message jsonAd response'
                     logger.serverLog(message, `${TAG}: function::sendResponseMessage`, {}, {page, senderId, error: res.body.error}, 'error')
                   }
                 }
