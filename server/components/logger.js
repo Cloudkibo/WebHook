@@ -1,6 +1,6 @@
 const config = require('../config/environment/index')
 const sentry = require('../global/sentry')
-const papertrail = require('../global/sentry')
+const papertrail = require('../global/papertrail')
 
 exports.serverLog = function (message, path, data, otherInfo, level = 'info') {
   const namespace = `Webhook:${path}`
