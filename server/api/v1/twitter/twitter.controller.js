@@ -16,7 +16,8 @@ let twitterClient = new Twit({
   consumer_key: config.twitter.consumer_key,
   consumer_secret: config.twitter.consumer_secret,
   access_token: config.twitter.consumer_token,
-  access_token_secret: config.twitter.consumer_token_secret
+  access_token_secret: config.twitter.consumer_token_secret,
+  timeout_ms: 60 * 1000
 })
 
 const init = require('./initWebhooks')

@@ -34,5 +34,7 @@ module.exports = {
 
   ENGAGE_DBLAYER: `http://localhost:3031/api/v1/`,
 
-  CHAT_DBLAYER: `http://localhost:3030/api/v1/`
+  CHAT_DBLAYER: `http://localhost:3030/api/v1/`,
+
+  papertrail_log_levels: process.env.PAPERTRAIL_LOG_LEVELS || 'error'
 }
