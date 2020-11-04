@@ -1,5 +1,5 @@
 const {callApi} = require('../../../utility/api.caller.service')
-const TAG = 'twilio.controller.js'
+const TAG = 'whatsApp.controller.js'
 const logger = require('../../../components/logger')
 const {sendResponseToTwilio} = require('../../global/twilio')
 
@@ -34,11 +34,13 @@ exports.receiveWhatsApp = function (req, res) {
           }
         })
         .catch(error => {
-          logger.serverLog(TAG, `Failed to fetch contact ${JSON.stringify(error)}`, 'error')
+          const message = error || 'Failed to fetch contact'
+          logger.serverLog(message, `${TAG}: exports.receiveWhatsApp`, req.body, {companyId: company._id}, 'error')
         })
     })
     .catch(error => {
-      logger.serverLog(TAG, `Failed to company profile ${JSON.stringify(error)}`, 'error')
+      const message = error || 'Failed to fetch company profile'
+      logger.serverLog(message, `${TAG}: exports.receiveWhatsApp`, req.body, {}, 'error')
     })
   sendResponseToTwilio(res)
 }

@@ -6,9 +6,10 @@ exports.postEditWebhook = (payload) => {
   // logger.serverLog(TAG, `in commentWebhook ${JSON.stringify(payload)}`, 'debug')
   callApi('facebookEvents/post', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from Kiboengage: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.postEditWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from Kiboengage: ${err}`, 'error')
+      const message = err || 'Error response from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.postEditWebhook`, {}, {payload}, 'error')
     })
 }

@@ -6,9 +6,10 @@ exports.shopifyWebhook = (payload) => {
   // logger.serverLog(TAG, `in shopifyWebhook ${JSON.stringify(payload)}`)
   callApi('messengerEvents/shopify', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.shopifyWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error response from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.shopifyWebhook`, {}, {payload}, 'error')
     })
 }

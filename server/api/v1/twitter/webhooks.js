@@ -6,10 +6,11 @@ exports.simpleTweet = (payload) => {
   // logger.serverLog(TAG, `in simpleTweet ${JSON.stringify(payload)}`)
   callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`)
+      logger.serverLog(`response recieved from KiboEngage: ${response}`, `${TAG}: exports.simpleTweet`, {}, {payload: payload}, 'info')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      const message = err || 'response recieved from kiboengage error'
+      logger.serverLog(message, `${TAG}: exports.simpleTweet`, {}, {payload: payload}, 'error')
     })
 }
 
@@ -17,9 +18,10 @@ exports.mediaTweet = (payload) => {
   // logger.serverLog(TAG, `in mediaTweet Webhook ${JSON.stringify(payload)}`)
   callApi.callApi('twitterEvents/twitterAutoposting', 'post', payload, 'kiboengage')
       .then((response) => {
-        logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'kiboengage')
+        logger.serverLog(`response recieved from KiboEngage: ${response}`, `${TAG}: exports.mediaTweet`, {}, {payload: payload}, 'info')
       })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`)
+      const message = err || 'response recieved from KiboPush error'
+      logger.serverLog(message, `${TAG}: exports.mediaTweet`, {}, {payload: payload}, 'error')
     })
 }

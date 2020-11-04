@@ -6,9 +6,10 @@ exports.sponsoredMessagingWebhook = (payload) => {
   logger.serverLog(TAG, `in sponsored messaging ${JSON.stringify(payload)}`)
   callApi('messengerEvents/sponsoredMessaging', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.sponsoredMessagingWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error response from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.sponsoredMessagingWebhook`, {}, {payload}, 'error')
     })
 }

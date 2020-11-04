@@ -6,16 +6,18 @@ exports.messageReadWebhook = (payload) => {
   logger.serverLog(TAG, `in seenWebhook ${JSON.stringify(payload)}`)
   callApi('messengerEvents/seen', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.messageReadWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.messageReadWebhook`, {}, {payload}, 'error')
     })
   callApi('messengerEvents/seen', 'post', payload, 'kibochat')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboChat', `${TAG}: exports.messageReadWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error from KiboChat'
+      logger.serverLog(message, `${TAG}: exports.messageReadWebhook`, {}, {payload}, 'error')
     })
 }

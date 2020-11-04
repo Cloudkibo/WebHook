@@ -6,9 +6,10 @@ exports.postLikeWebhook = (payload) => {
   // logger.serverLog(TAG, `in likesWebhook ${JSON.stringify(payload)}`, 'debug')
   callApi('facebookEvents/likes', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.postLikeWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error response from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.postLikeWebhook`, {}, {payload}, 'error')
     })
 }

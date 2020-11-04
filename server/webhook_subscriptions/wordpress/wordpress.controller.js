@@ -22,7 +22,8 @@ exports.webhook = function (req, res) {
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`, 'error')
+    const message = e || `Error on Wordpress Webhook`
+    logger.serverLog(message, `${TAG}: exports.webhook`, req.body, {}, 'error')
     return res.status(500).json({status: 'failed', err: e})
   }
 }

@@ -38,7 +38,8 @@ exports.webhook = function (req, res) {
     // @TODO : Need to fix the response mechanism
     return res.status(200).json({status: webhookCalled ? 'Success' : 'No webhook for the given request schema'})
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${JSON.stringify(e)}`, 'error')
+    const message = e || 'Error on Twitter Webhook'
+    logger.serverLog(message, `${TAG}: exports.webhook`, req.body, {}, 'error')
     return res.status(500).json({status: 'failed', err: e})
   }
 }
@@ -55,7 +56,7 @@ function webhookHandler (body) {
   //  logger.serverLog(TAG, `webhook called`)
 
   } else {
-    logger.serverLog(TAG, `No webhook for the given request schema`)
+    logger.serverLog('No webhook for the given request schema', `${TAG}: function::whebhookHandler`, body, {}, 'error')
   }
   return webhookCalled
 }
@@ -83,17 +84,19 @@ function connect () {
         webhookHandler(tweet)
       })
       stream.on('error', error => {
-        logger.serverLog(TAG, `Stream Error ${error}`, 'error')
+        const message = error || 'Stream Error Twitter'
+        logger.serverLog(message, `${TAG}: function::connect`, {}, {}, 'error')
       })
     }
   })
   .catch(error => {
-    logger.serverLog(TAG, `Error in fetching autoposting ${error}`, 'error')
+    const message = error || 'Error in fetching autoposting'
+    logger.serverLog(message, `${TAG}: function::connect`, {}, {}, 'error')
   })
 }
 
 function restart () {
-  logger.serverLog(TAG, `KiboPush called me`, 'debug')
+  logger.serverLog('KiboPush called me', `${TAG}: function::restart`, {}, {}, 'debug')
   if (stream) stream.stop()
   connect()
 }

@@ -14,11 +14,10 @@ exports.webhook = function (req, res) {
   try {
     webhookCalled = webhookHandler(req.body)
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
-    logger.serverLog(TAG, `${responseMessage}`, 'info')
-    // sendSuccessResponse(200, responseMessage, res)
+    logger.serverLog('Error on Twilio Webhook', `${TAG}: exports.webhook`, req.body, {responseMessage: responseMessage}, 'info')
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
-    // sendErrorResponse(500, e, res)
+    const message = e || 'Error on Twilio Webhook'
+    logger.serverLog(message, `${TAG}: exports.webhook`, req.body, {}, 'error')
   }
 }
 
