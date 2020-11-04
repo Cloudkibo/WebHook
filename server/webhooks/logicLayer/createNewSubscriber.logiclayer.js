@@ -227,8 +227,8 @@ exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
           needle('delete', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
             .then(response => {
               if (response.body.error) {
-                const message = response.body.error || 'failed to unassigned unsubscribe tag'
-                logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
+                const message = response.body.error ? response.body.error.message : 'failed to unassigned unsubscribe tag'
+                logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound, error: response.body.error}, 'error')
               } else {
                 logger.serverLog(`unsubscribe tag unassigned successfully!`, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'debug')
               }
