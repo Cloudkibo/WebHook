@@ -7,14 +7,15 @@ const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
 const { sendSuccessResponse, sendErrorResponse } = require('../../../global/global.js')
 
 exports.webhook = function (req, res) {
-  console.log('flocksend event received', JSON.stringify(req.body))
+  logger.serverLog('flocksend event received', `${TAG}: exports.webhook`, req.body, {}, 'debug')
   let webhookCalled = false
   try {
     webhookCalled = webhookHandler(req.body)
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
     sendSuccessResponse(200, responseMessage, res)
   } catch (e) {
-    logger.serverLog(TAG, `Error on Webhook ${e}`, 'error')
+    let message = e || 'Error on FlockSend Webhook'
+    logger.serverLog(message, `${TAG}: exports.webhook`, req.body, {}, 'error')
     sendErrorResponse(500, e, res)
   }
 }

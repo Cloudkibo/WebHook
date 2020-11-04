@@ -5,7 +5,7 @@ const { createNewSubscriber } = require('../logicLayer/createNewSubscriber.js')
 const logicLayer = require('../logicLayer/postback.logiclayer.js')
 
 exports.optinWebhook = (payload) => {
-  logger.serverLog(TAG, `in optin ${JSON.stringify(payload)}`)
+  logger.serverLog('In option', `${TAG}: exports.optinWebhook`, {}, {payload}, 'debug')
   let userRefIdForCheckBox
   let refPayload = ''
   if (logicLayer.isJsonString(payload.entry[0].messaging[0].optin.ref)) {
@@ -34,12 +34,18 @@ exports.optinWebhook = (payload) => {
             payload
           }
           callApi('webhooks/sendWebhook', 'post', dataToSend, 'kibochat')
-          .then(res => logger.serverLog(TAG, `response from sendWebhook ${res}`))
-          .catch(err => logger.serverLog(TAG, `Failed to get response from sendWebhook ${JSON.stringify(err)}`, 'error'))
+          .then(res => {
+            logger.serverLog('Response from KiboChat', `${TAG}: exports.optinWebhook`, {}, {payload}, 'debug')
+          })
+          .catch(err => {
+            const message = err || 'Error response from kibochat sendwebhook'
+            logger.serverLog(message, `${TAG}: exports.optinWebhook`, {}, {payload}, 'error')
+          })
         }
       })
       .catch((err) => {
-        logger.serverLog(TAG, `Failed to fetch page: ${err}`, 'error')
+        const message = err || 'Failed to fetch page'
+        logger.serverLog(message, `${TAG}: exports.optinWebhook`, {}, {payload}, 'error')
       })
     return
   }
@@ -56,18 +62,14 @@ exports.optinWebhook = (payload) => {
 }
 
 function handlePageAdminSubscription (event) {
-  logger.serverLog(TAG, `in addAdminAsSubscriberWebhook ${JSON.stringify(event)}`)
   callApi(`user/query`, 'post', {_id: event.optin.ref}, 'accounts')
     .then(user => {
       if (user.length > 0) {
-        logger.serverLog(TAG, `in addAdminAsSubscriberWebhook user${JSON.stringify(user)}`)
         user = user[0]
         callApi(`companyUser/query`, 'post', { domain_email: user.domain_email }, 'accounts')
           .then(companyUser => {
-            logger.serverLog(TAG, `in addAdminAsSubscriberWebhook companyId${JSON.stringify(companyUser.companyId)}`)
             callApi(`pages/query`, 'post', { pageId: event.recipient.id, companyId: companyUser.companyId, connected: true }, 'accounts')
               .then(pages => {
-                logger.serverLog(TAG, `in addAdminAsSubscriberWebhook pages${JSON.stringify(pages)}`)
                 if (pages.length > 0) {
                   let page = pages[0]
                   let pageAdminPayload = {
@@ -76,26 +78,29 @@ function handlePageAdminSubscription (event) {
                     subscriberId: event.sender.id,
                     pageId: page._id
                   }
-                  logger.serverLog(TAG, `in addAdminAsSubscriberWebhook pageAdminPayload${JSON.stringify(pageAdminPayload)}`)
                   callApi(`adminsubscriptions`, 'post', pageAdminPayload, 'kiboengage')
                     .then(record => {
-                      logger.serverLog(TAG, `Admin subscription added: ${JSON.stringify(record)}`)
+                      logger.serverLog('Admin subscription added', `${TAG}: exports.handlePageAdminSubscription`, {}, {event}, 'debug')
                     })
                     .catch(err => {
-                      logger.serverLog(TAG, `Error: Unable to create admin subscription ${JSON.stringify(err)}`, 'error')
+                      const message = err || 'Unable to create admin subscription'
+                      logger.serverLog(message, `${TAG}: exports.handlePageAdminSubscription`, {}, {event}, 'error')
                     })
                 }
               })
               .catch(err => {
-                logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`)
+                const message = err || 'Unable to get pages'
+                logger.serverLog(message, `${TAG}: exports.handlePageAdminSubscription`, {}, {event}, 'error')
               })
           })
           .catch(err => {
-            logger.serverLog(TAG, `Error: Unable to get company user ${JSON.stringify(err)}`, 'error')
+            const message = err || 'Unable to get company user'
+            logger.serverLog(message, `${TAG}: exports.handlePageAdminSubscription`, {}, {event}, 'error')
           })
       }
     })
     .catch(err => {
-      logger.serverLog(TAG, `Error: Unable to get user ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Unable to get user'
+      logger.serverLog(message, `${TAG}: exports.handlePageAdminSubscription`, {}, {event}, 'error')
     })
 }

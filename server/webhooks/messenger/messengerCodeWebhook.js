@@ -6,9 +6,10 @@ exports.messengerCodeWebhook = (payload) => {
   // logger.serverLog(TAG, `in messenger code ${JSON.stringify(payload)}`)
   callApi('messenger_code/webhook', 'post', payload.entry[0].messaging[0], 'accounts')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from accounts', `${TAG}: exports.messengerCodeWebhook`, {}, {payload, response}, 'debug')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error from Account'
+      logger.serverLog(message, `${TAG}: exports.messengerCodeWebhook`, {}, {payload}, 'error')
     })
 }

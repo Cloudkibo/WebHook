@@ -12,7 +12,7 @@ exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
       method: 'GET'
     }
     needle.get(options.url, options, (error, response) => {
-      logger.serverLog(TAG, `Subscriber response git from facebook: ${JSON.stringify(response.body)}`, 'debug')
+      logger.serverLog(`Subscriber response git from facebook`, `${TAG}: exports.getSubscriberInfoFromFB`, {}, {response: response.body, page: page}, 'debug')
       if (error) {
         reject(error)
       } else {
@@ -60,20 +60,22 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
 exports.incrementSubscriberForCompany = (companyId) => {
   callApi(`featureUsage/updateCompany`, 'put', {query: {companyId: companyId}, newPayload: { $inc: { subscribers: 1 } }, options: {}}, 'accounts')
     .then(updated => {
-      logger.serverLog(TAG, `company usage incremented successfully`, 'debug')
+      logger.serverLog(`company usage incremented successfully`, `${TAG}: exports.incrementSubscriberForCompany`, {}, {companyId: companyId}, 'debug')
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to update company usage ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Failed to update company usage'
+      logger.serverLog(message, `${TAG}: exports.incrementSubscriberForCompany`, {}, {companyId: companyId}, 'error')
     })
 }
 
 exports.updatePhoneNumberCustomerMatching = (identifier, pageId, companyId) => {
   callApi(`phone/update`, 'post', {query: {number: identifier, pageId: pageId, companyId: companyId}, newPayload: {hasSubscribed: true}, options: {}}, 'accounts')
     .then(phonenumberupdated => {
-      logger.serverLog(TAG, `phone number updated successfully ${JSON.stringify(phonenumberupdated)}`, 'debug')
+      logger.serverLog(`phone number updated successfully`, `${TAG}: exports.updatePhoneNumberCustomerMatching`, {}, {companyId: companyId, pageId: pageId, identifier: identifier}, 'debug')
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to update phone number ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Failed to update phone number'
+      logger.serverLog(message, `${TAG}: exports.updatePhoneNumberCustomerMatching`, {}, {companyId: companyId, pageId: pageId, identifier: identifier}, 'error')
     })
 }
 
@@ -100,8 +102,13 @@ exports.sendWebhookForNewSubscriber = (subscriber, page) => {
     }
   }
   callApi('webhooks/sendWebhook', 'post', payload, 'kibochat')
-  .then(res => logger.serverLog(TAG, `response from sendWebhook ${res}`))
-  .catch(err => logger.serverLog(TAG, `Failed to get response from sendWebhook ${JSON.stringify(err)}`, 'error'))
+  .then(res => {
+    logger.serverLog(`response from sendWebhook ${res}`, `${TAG}: exports.sendWebhookForNewSubscriber`, {}, {subscriber, page}, 'debug')
+  })
+  .catch(err => {
+    const message = err || 'Error response from sendWebhook'
+    logger.serverLog(message, `${TAG}: exports.sendWebhookForNewSubscriber`, {}, {subscriber, page}, 'debug')
+  })
 }
 
 exports.informGrowthTools = (subscriberSource, recipientId, senderId, companyId, referral) => {
@@ -127,10 +134,11 @@ const informMessengerRefUrlOfSubscriber = (recipientId, senderId, referral) => {
     senderId: senderId,
     referral: referral }, 'kiboengage')
   .then((response) => {
-    logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`, 'debug')
+    logger.serverLog(`response from KiboEngage ${response}`, `${TAG}: exports.informMessengerRefUrlOfSubscriber`, {}, {recipientId, senderId, referral}, 'debug')
   })
   .catch((err) => {
-    logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+    const message = err || 'Error response from KiboEngage'
+    logger.serverLog(message, `${TAG}: exports.informMessengerRefUrlOfSubscriber`, {}, {recipientId, senderId, referral}, 'error')
   })
 }
 
@@ -141,10 +149,11 @@ const informLandingPageOfSubscriber = (recipientId, senderId, companyId) => {
     companyId: companyId
   }, 'kiboengage')
   .then((response) => {
-    logger.serverLog(TAG, `response recieved from KiboEngage: ${response}`, 'debug')
+    logger.serverLog(`response from KiboEngage ${response}`, `${TAG}: exports.informLandingPageOfSubscriber`, {}, {recipientId, senderId, companyId}, 'debug')
   })
   .catch((err) => {
-    logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+    const message = err || 'Error response from KiboEngage'
+    logger.serverLog(message, `${TAG}: exports.informLandingPageOfSubscriber`, {}, {recipientId, senderId, companyId}, 'error')
   })
 }
 
@@ -167,14 +176,16 @@ exports.updateList = (phoneNumber, sender, page) => {
             }
             callApi(`lists/update`, 'put', {query: { listName: number[0].fileName, companyId: page.companyId }, newPayload: {content: temp}, options: {}}, 'accounts')
               .then(savedList => {
-                logger.serverLog(TAG, `list updated successfully ${JSON.stringify(savedList)}`, 'debug')
+                logger.serverLog(`list updated successfully ${JSON.stringify(savedList)}`, `${TAG}: exports.updateList`, {}, {phoneNumber, sender, page}, 'debug')
               })
               .catch(err => {
-                logger.serverLog(TAG, `Failed to update list ${JSON.stringify(err)}`, 'error')
+                const message = err || 'Failed to update list'
+                logger.serverLog(message, `${TAG}: exports.updateList`, {}, {phoneNumber, sender, page}, 'error')
               })
           })
           .catch(err => {
-            logger.serverLog(TAG, `Failed to update update subscriber ${JSON.stringify(err)}`, 'error')
+            const message = err || 'Failed to update subscriber'
+            logger.serverLog(message, `${TAG}: exports.updateList`, {}, {phoneNumber, sender, page}, 'error')
           })
       }
     })
@@ -183,28 +194,31 @@ exports.updateList = (phoneNumber, sender, page) => {
 exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
   callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
     .then(subscriber => {
-      logger.serverLog(TAG, subscriber, 'debug')
       callApi(`tags/query`, 'post', {tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId}, 'accounts')
         .then(unsubscribeTag => {
           unsubscribeTag = unsubscribeTag[0]
           needle('delete', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
             .then(response => {
               if (response.body.error) {
-                logger.serverLog(TAG, `failed to unassigned unsubscribe tag: ${JSON.stringify(response.body.error)}`, 'error')
+                const message = response.body.error || 'failed to unassigned unsubscribe tag'
+                logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
               } else {
-                logger.serverLog(TAG, `unsubscribe tag unassigned successfully!`)
+                logger.serverLog(`unsubscribe tag unassigned successfully!`, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'debug')
               }
             })
             .catch((err) => {
-              logger.serverLog(TAG, `failed to unassigned unsubscribe tag: ${JSON.stringify(err)}`, 'error')
+              const message = err || 'failed to unassigned unsubscribe tag'
+              logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
             })
         })
         .catch((err) => {
-          logger.serverLog(TAG, `failed to fetch unsubscribe tag: ${err}`, 'error')
+          const message = err || 'failed to fetch unsubscribe tag'
+          logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
         })
     })
     .catch((err) => {
-      logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
+      const message = err || 'failed to update subscriber'
+      logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
     })
 }
 exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
@@ -213,7 +227,8 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
     .then(updated => {
     })
     .catch((err) => {
-      logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
+      const message = err || 'failed to update subscriber'
+      logger.serverLog(message, `${TAG}: exports.addCompleteInfoOfSubscriber`, {}, {payload, subscriber}, 'error')
     })
 }
 exports.updateConversionCount = (postId) => {
@@ -221,19 +236,21 @@ exports.updateConversionCount = (postId) => {
  let newPayloadWaitingReply = { $inc: { waitingReply : -1 } }
  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
    .then(updated => {
-     logger.serverLog(TAG, `Conversion count updated ${JSON.stringify(updated)}`, 'updated')
+     logger.serverLog('Conversion count updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'debug')
    })
    .catch(err => {
-     logger.serverLog(TAG, `Failed to update conversion Count ${JSON.stringify(err)}`, 'error')
+     const message = err || 'failed to update conversion count'
+     logger.serverLog(message, `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
    })
 
-   callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
-     .then(updated => {
-       logger.serverLog(TAG, `Waiting Reply updated ${JSON.stringify(updated)}`, 'updated')
-     })
-     .catch(err => {
-       logger.serverLog(TAG, `Failed to update Waiting Reply ${JSON.stringify(err)}`, 'error')
-     })
+  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
+    .then(updated => {
+      logger.serverLog('Waiting Reply updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
+    })
+    .catch(err => {
+      const message = err || 'failed to update waiting reply'
+      logger.serverLog(message, `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
+    })
 }
 exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId, refId) => {
   payload.siteInfo = siteInfo
@@ -243,7 +260,8 @@ exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId, ref
     .then(updated => {
     })
     .catch((err) => {
-      logger.serverLog(TAG, `failed to update subscriber: ${err}`, 'error')
+      const message = err || 'failed to update subscriber'
+      logger.serverLog(message, `${TAG}: exports.addSiteInfoForSubscriber`, {}, {payload, subscriber}, 'error')
     })
 }
 
@@ -260,7 +278,7 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
             payload._id = subscriberFound._id
             callApi('facebookEvents/sendSecondReplyToComment', 'post', {page: page, subscriber: payload, post: post}, 'kiboengage')
               .then((response) => {
-                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+                logger.serverLog('Response sendSecondReplyToComment from KiboEngage', `${TAG}: exports.checkCommentReply`, {}, {subscriberFound, page, payload, body}, 'debug')
               })
           } else if (post.secondReply && post.secondReply.action === 'subscribe') {
             body.entry[0].messaging[0].postback = {
@@ -268,16 +286,18 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
             }
             callApi('messengerEvents/subscribeToSequence', 'post', body, 'kiboengage')
               .then((response) => {
-                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+                logger.serverLog('Response subscribeToSequence from KiboEngage', `${TAG}: exports.checkCommentReply`, {}, {subscriberFound, page, payload, body}, 'debug')
               })
               .catch((err) => {
-                logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+                const message = err || 'Error from KiboEngage Subscribe to Sequence'
+                logger.serverLog(message, `${TAG}: exports.checkCommentReply`, {}, {subscriberFound, page, payload, body}, 'error')
               })
           }
         }
       })
       .catch((err) => {
-        logger.serverLog(TAG, `failed to fetch post: ${err}`, 'error')
+        const message = err || 'Failed to fetch post'
+        logger.serverLog(message, `${TAG}: exports.checkCommentReply`, {}, {subscriberFound, page, payload, body}, 'error')
       })
   }
 }
@@ -286,7 +306,8 @@ function updateSubscriberAwaitingReply (subscriberId) {
     .then(updated => {
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Failed to update subscriber'
+      logger.serverLog(message, `${TAG}: exports.updateSubscriberAwaitingReply`, {}, {subscriberId}, 'error')
     })
 }
 exports.handleNewsSubscriptionForNewSubscriber = (subscriber) => {
@@ -299,7 +320,8 @@ exports.handleNewsSubscriptionForNewSubscriber = (subscriber) => {
     .then(updated => {
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Failed to update subscriber'
+      logger.serverLog(message, `${TAG}: exports.handleNewsSubscriptionForNewSubscriber`, {}, {subscriber}, 'error')
     })
 }
 exports.handleNewsSubscriptionForOldSubscriber = (subscriber) => {
@@ -320,7 +342,8 @@ exports.handleNewsSubscriptionForOldSubscriber = (subscriber) => {
           .then(updated => {
           })
           .catch(err => {
-            logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+            const message = err || 'Failed to update newsSubscriptions'
+            logger.serverLog(message, `${TAG}: exports.handleNewsSubscriptionForOldSubscriber`, {}, {subscriber}, 'error')
           })
         let updatedQuery = {
           purpose: 'updateAll',
@@ -331,11 +354,13 @@ exports.handleNewsSubscriptionForOldSubscriber = (subscriber) => {
           .then(updated => {
           })
           .catch(err => {
-            logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+            const message = err || 'Failed to update newsSections'
+            logger.serverLog(message, `${TAG}: exports.handleNewsSubscriptionForOldSubscriber`, {}, {subscriber}, 'error')
           })
       }
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to udpate subscriber ${JSON.stringify(err)}`, 'error')
+      const message = err || 'Failed to fetch newsSections'
+      logger.serverLog(message, `${TAG}: exports.handleNewsSubscriptionForOldSubscriber`, {}, {subscriber}, 'error')
     })
 }

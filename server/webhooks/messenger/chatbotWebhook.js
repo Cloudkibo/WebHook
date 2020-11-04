@@ -25,14 +25,16 @@ exports.chatbotWebhook = (payload) => {
             payload.subscriberInfo = subscriberInfo
             callApi('messengerEvents/chatbotOptin', 'post', payload, 'kibochat')
               .then((response) => {
-                logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+                logger.serverLog('Response from KiboChat', `${TAG}: exports.chatbotWebhook`, {}, {payload, response}, 'error')
               })
               .catch((err) => {
-                logger.serverLog(TAG, `error from KiboPush: ${JSON.stringify(err)}`, 'error')
+                const message = err || 'Error from KiboChat'
+                logger.serverLog(message, `${TAG}: exports.chatbotWebhook`, {}, {payload}, 'error')
               })
           })
           .catch(err => {
-            logger.serverLog(TAG, `error from KiboPush: ${JSON.stringify(err)}`, 'error')
+            const message = err || 'Error from Get Refresh Access Token'
+            logger.serverLog(message, `${TAG}: exports.chatbotWebhook`, {}, {payload}, 'error')
           })
       }
     })

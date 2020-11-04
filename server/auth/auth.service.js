@@ -9,11 +9,7 @@
 const compose = require('composable-middleware')
 // const validateJwt = expressJwt({secret: config.secrets.session})
 // const _ = require('lodash')
-
-const logger = require('../components/logger')
 const config = require('../config/environment')
-
-const TAG = 'auth/auth.service.js'
 
 // NOTE: Modify this for your work
 // eslint-disable-next-line no-unused-vars

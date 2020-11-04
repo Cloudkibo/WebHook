@@ -16,7 +16,8 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
         LogicLayer.getSubscriberInfoFromFB(senderId, page.accessToken, page)
           .then(response => {
             if (response.body.error) {
-              logger.serverLog(TAG, `Error occured while fetching subscriber details from facebook ${JSON.stringify(response.body.error)}`)
+              const message = response.body.error || 'Error occured while fetching subscriber details from facebook'
+              logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId, senderId: senderId}, 'error')
             } else {
               const subscriber = response.body
               const payload = LogicLayer.prepareNewSubscriberPayload(subscriber, page, subscriberSource, identifier, senderId, ref)
@@ -42,8 +43,13 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                         // }
                         LogicLayer.handleNewsSubscriptionForNewSubscriber(subscriberCreated)
                         callApi(`messengerEvents/sequence/subscriberJoins`, 'post', {companyId: page.companyId, senderId: senderId, pageId: page._id}, 'kiboengage')
-                          .then(seqRes => logger.serverLog(TAG, `response from sequence subscriberJoins ${seqRes}`))
-                          .catch(err => logger.serverLog(TAG, `Failed to get response from sequence subscriberJoins ${JSON.stringify(err)}`, 'error'))
+                          .then(seqRes => {
+                            logger.serverLog(`response from sequence subscriberJoins ${seqRes}`, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, senderId: senderId}, 'debug')
+                          })
+                          .catch(err => {
+                            const message = err || 'Failed to get response from sequence subscriberJoins'
+                            logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, senderId: senderId}, 'error')
+                          })
                         LogicLayer.incrementSubscriberForCompany(page.companyId)
                         if (subscriberSource === 'customer_matching') {
                           LogicLayer.updateList(identifier, senderId, page)
@@ -59,11 +65,17 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                         }
                         let payloadData = {page: page, subscriber: subscriberCreated, event: event, pushPendingSessionInfo: true, newSubscriber: true}
                         callApi('messengerEvents/sessions', 'post', payloadData, 'kibochat')
-                        .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
-                        .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
+                        .then(sessRes => {
+                          logger.serverLog(`response from sessions ${sessRes}`, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, subscriber: subscriberCreated}, 'debug')
+                        })
+                        .catch(err => {
+                          const message = err || 'Failed to get response from sessions'
+                          logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, subscriber: subscriberCreated}, 'error')
+                        })
                       })
                       .catch(err => {
-                        logger.serverLog(TAG, `Failed to create subscriber ${JSON.stringify(err)}`, 'error')
+                        const message = err || 'Failed to create subscriber'
+                        logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
                       })
                   } else {
                     subscriberFound = subscriberFound[0]
@@ -71,10 +83,11 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       if (subscriberFound.waitingForUserInput && subscriberFound.waitingForUserInput.componentIndex !== -1) {
                         callApi('messengerEvents/userInput', 'post', {payload: payload, message: event.message}, 'kiboengage')
                         .then((response) => {
-                          logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+                          logger.serverLog(`response recieved from Kiboengage: ${response}`, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, subscriber: subscriberFound}, 'debug')
                         })
                         .catch((err) => {
-                          logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+                          const message = err || 'response recieved from Kiboengage'
+                          logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, subscriber: subscriberFound}, 'error')
                         })
                       }
                       if (!subscriberFound.completeInfo) {
@@ -113,21 +126,29 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                       }
                     }
                     callApi('messengerEvents/sessions', 'post', {page: page, subscriber: subscriberFound, event: event}, 'kibochat')
-                      .then(sessRes => logger.serverLog(TAG, `response from sessions ${sessRes}`))
-                      .catch(err => logger.serverLog(TAG, `Failed to get response from sessions ${JSON.stringify(err)}`, 'error'))
+                      .then(sessRes => {
+                        logger.serverLog(`response from sessions kibochat ${sessRes}`, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, subscriber: subscriberFound}, 'debug')
+                      })
+                      .catch(err => {
+                        const message = err || `Error response from sessions kibochat`
+                        logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, page: page, subscriber: subscriberFound}, 'error')
+                      })
                   }
                 })
                 .catch(err => {
-                  logger.serverLog(TAG, `Failed to fetch subscriber ${err}`, 'error')
+                  const message = err || `Failed to fetch subscriber`
+                  logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
                 })
             }
           })
           .catch(err => {
-            logger.serverLog(TAG, `Failed to fetch subscriber details ${JSON.stringify(err)}`, 'error')
+            const message = err || `Failed to fetch subscriber details`
+            logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
           })
       }
     })
     .catch(err => {
-      logger.serverLog(TAG, `Failed to fetch pages ${JSON.stringify(err)}`, 'error')
+      const message = err || `Failed to fetch pages`
+      logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
     })
 }

@@ -20,9 +20,10 @@ exports.checkboxPluginWebhook = (payload) => {
 function additionalWorkForShopify (payload) {
   callApi('messengerEvents/shopifyNewSubscriber', 'post', payload, 'kiboengage')
     .then((response) => {
-      logger.serverLog(TAG, `response recieved from KiboPush: ${response}`, 'debug')
+      logger.serverLog('Response from KiboEngage', `${TAG}: exports.additionalWorkForShopify`, {}, {payload, response}, 'error')
     })
     .catch((err) => {
-      logger.serverLog(TAG, `error from KiboPush: ${err}`, 'error')
+      const message = err || 'Error from KiboEngage'
+      logger.serverLog(message, `${TAG}: exports.additionalWorkForShopify`, {}, {payload}, 'error')
     })
 }
