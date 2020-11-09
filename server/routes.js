@@ -39,7 +39,8 @@ module.exports = function (app) {
     res.status(500).send('Something broke!')
   })
 
-  if (config.env === 'production' || config.env === 'staging') {
+ /* if (config.env === 'production' || config.env === 'staging') {
     app.use(Sentry.Handlers.errorHandler())
-  }
+  } */
+  app.use(Sentry.Handlers.errorHandler())
 }
