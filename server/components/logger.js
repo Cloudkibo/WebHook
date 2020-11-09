@@ -7,7 +7,7 @@ exports.serverLog = function (message, path, data, otherInfo, level = 'info') {
   const debug = require('debug')(namespace)
   if (config.env === 'development' || config.env === 'test') {
     debug(data)
-    console.log(`${namespace} - ${data}`)
+    console.log(`${namespace} - ${data} - ${message}`)
   } else {
     papertrail.sendLog(message, path, data, otherInfo, level)
     if (level === 'error') {
