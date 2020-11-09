@@ -25,7 +25,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
               if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                 payload.userRefIdForCheckBox = identifier
               }
-              let subscriberQueryPayload = {pageId: page._id}
+              let subscriberQueryPayload = {pageId: page._id, senderId}
               callApi(`subscribers/query`, 'post', subscriberQueryPayload, 'accounts')
                 .then(subscriberFound => {
                   if (subscriberFound.length === 0) {
