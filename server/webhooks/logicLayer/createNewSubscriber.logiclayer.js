@@ -252,6 +252,7 @@ exports.updateConversionCount = (postId) => {
 }
 exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId) => {
   payload.siteInfo = siteInfo
+  payload.source = 'chat_plugin'
   callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: { upsert: true }}, 'accounts')
     .then(updated => {
     })
