@@ -70,8 +70,6 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
   } else if (subscriberSource === 'chat_plugin') {
     payload.source = 'chat_plugin'
     payload.siteInfo = ref
-    payload.user_ref = senderId
-    payload.senderId = undefined
   } else if (subscriberSource === 'messaging_referrals') {
     payload.source = `https://m.me/${page._id}?ref=${ref}`
   } else if (subscriberSource === 'landing_page') {
@@ -227,8 +225,8 @@ exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
           needle('delete', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
             .then(response => {
               if (response.body.error) {
-                const message = response.body.error || 'failed to unassigned unsubscribe tag'
-                logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
+                const message = response.body.error ? response.body.error.message : 'failed to unassigned unsubscribe tag'
+                logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound, error: response.body.error}, 'error')
               } else {
                 logger.serverLog(`unsubscribe tag unassigned successfully!`, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'debug')
               }
@@ -279,10 +277,8 @@ exports.updateConversionCount = (postId) => {
       logger.serverLog(message, `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
     })
 }
-exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId, refId) => {
+exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId) => {
   payload.siteInfo = siteInfo
-  payload.user_ref = refId
-  payload.completeInfo = subscriber.completeInfo ? subscriber.completeInfo : false
   callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: { upsert: true }}, 'accounts')
     .then(updated => {
     })
@@ -297,7 +293,6 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
   if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.sendSecondMessage && subscriberFound.awaitingCommentReply.postId) {
     callApi(`comment_capture/query`, 'post', {_id: subscriberFound.awaitingCommentReply.postId}, 'accounts')
       .then(post => {
-        console.log('post found')
         post = post[0]
         if (post) {
           if (post.secondReply && post.secondReply.action === 'reply') {

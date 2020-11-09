@@ -261,8 +261,8 @@ function handleUnsubscribe (resp, req) {
                       needle('post', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, { 'user': req.sender.id })
                         .then(response => {
                           if (response.body.error) {
-                            const message = response.body.error || 'Failed to assign unsubscribeTag on Facebook'
-                            logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId, responseBody: response.body}, 'error')
+                            const message = response.body.error ? response.body.error.message : 'Failed to assign unsubscribeTag on Facebook'
+                            logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId, error: response.body.error}, 'error')
                           } else {
                             logger.serverLog('Unsubscribe tag assigned successfully', `${TAG}: exports.handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId, responseBody: response.body}, 'debug')
                           }
@@ -416,8 +416,8 @@ function sendResponseMessage (page, senderId, firstName, lastName, accessToken, 
                   logger.serverLog(message, `${TAG}: function::sendResponseMessage`, {}, {page, senderId}, 'error')
                 } else {
                   if (res.statusCode !== 200) {
-                    const message = res.body.error || 'Error send message jsonAd response'
-                    logger.serverLog(message, `${TAG}: function::sendResponseMessage`, {}, {page, senderId}, 'error')
+                    const message = res.body && res.body.error ? res.body.error.message : 'Error send message jsonAd response'
+                    logger.serverLog(message, `${TAG}: function::sendResponseMessage`, {}, {page, senderId, error: res.body.error}, 'error')
                   }
                 }
               })

@@ -38,5 +38,5 @@ module.exports = {
 
   CHAT_DBLAYER: `http://104.248.240.146/api/v1/`,
 
-  papertrail_log_levels: process.env.PAPERTRAIL_LOG_LEVELS
+  papertrail_log_levels: process.env.PAPERTRAIL_LOG_LEVELS || 'error'
 }
