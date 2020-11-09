@@ -43,8 +43,6 @@ exports.prepareNewSubscriberPayload = (subscriber, page, subscriberSource, phone
   } else if (subscriberSource === 'chat_plugin') {
     payload.source = 'chat_plugin'
     payload.siteInfo = ref
-    payload.user_ref = senderId
-    payload.senderId = undefined
   } else if (subscriberSource === 'messaging_referrals') {
     payload.source = `https://m.me/${page._id}?ref=${ref}`
   } else if (subscriberSource === 'landing_page') {
@@ -232,9 +230,9 @@ exports.addCompleteInfoOfSubscriber = (subscriber, payload) => {
     })
 }
 exports.updateConversionCount = (postId) => {
- let newPayloadConversionCount = { $inc: { conversionCount : 1 } }
- let newPayloadWaitingReply = { $inc: { waitingReply : -1 } }
- callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
+  let newPayloadConversionCount = { $inc: { conversionCount: 1 } }
+  let newPayloadWaitingReply = { $inc: { waitingReply: -1 } }
+  callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadConversionCount, options: {}}, 'accounts')
    .then(updated => {
      logger.serverLog('Conversion count updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'debug')
    })
@@ -252,10 +250,8 @@ exports.updateConversionCount = (postId) => {
       logger.serverLog(message, `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
     })
 }
-exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId, refId) => {
+exports.addSiteInfoForSubscriber = (subscriber, payload, siteInfo, senderId) => {
   payload.siteInfo = siteInfo
-  payload.user_ref = refId
-  payload.completeInfo = subscriber.completeInfo ? subscriber.completeInfo : false
   callApi(`subscribers/update`, 'put', {query: { _id: subscriber._id }, newPayload: payload, options: { upsert: true }}, 'accounts')
     .then(updated => {
     })
@@ -270,7 +266,6 @@ exports.checkCommentReply = (subscriberFound, page, payload, body) => {
   if (subscriberFound.awaitingCommentReply && subscriberFound.awaitingCommentReply.sendSecondMessage && subscriberFound.awaitingCommentReply.postId) {
     callApi(`comment_capture/query`, 'post', {_id: subscriberFound.awaitingCommentReply.postId}, 'accounts')
       .then(post => {
-        console.log('post found')
         post = post[0]
         if (post) {
           if (post.secondReply && post.secondReply.action === 'reply') {
