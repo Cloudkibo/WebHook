@@ -48,21 +48,17 @@ module.exports = function (app, httpapp, config) {
   }
 
   server.listen(config.port, config.ip, () => {
-    logger.serverLog(TAG, `KiboPush server STARTED on ${
-      config.port} in ${config.env} mode`)
-    console.log('KiboHook server STARTED on %s in %s mode', config.port, config.env)
+    logger.serverLog(`KiboPush server STARTED on ${
+      config.port} in ${config.env} mode`, TAG, {}, { port: config.port, env: config.env }, 'info')
   })
 
   httpsServer.listen(config.secure_port, () => {
-    logger.serverLog(TAG, `KiboPush server STARTED on ${
-      config.secure_port} in ${config.env} mode`)
-    console.log('KiboHook server STARTED on %s in %s mode', config.secure_port, config.env)
+    logger.serverLog(`KiboPush server STARTED on ${
+      config.secure_port} in ${config.env} mode`, TAG, {}, { secure_port: config.secure_port, env: config.env }, 'info')
   })
 
   if (config.env === 'production' || config.env === 'staging') {
-    logger.serverLog(TAG, `Webhook server STARTED on ${
-      config.secure_port} in ${config.env} mode`)
-    // console.log('KiboHook server STARTED on %s in %s mode', config.port, config.env)
-    //  initWebhooks.registeryInit()
+    logger.serverLog(`Webhook server STARTED on ${
+      config.secure_port} in ${config.env} mode`, TAG, {}, { port: config.port, env: config.env }, 'info')
   }
 }
