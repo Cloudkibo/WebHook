@@ -29,7 +29,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
               callApi(`subscribers/query`, 'post', subscriberQueryPayload, 'accounts')
                 .then(subscriberFound => {
                   if (subscriberFound.length === 0) {
-                    callApi(`subscribers`, 'post', payload, 'accounts')
+                    LogicLayer.createSubscriber(payload, page)
                       .then(subscriberCreated => {
                         // if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                         LogicLayer.sendWebhookForNewSubscriber(
