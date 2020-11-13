@@ -23,7 +23,6 @@ const appObj = (config.env === 'production' || config.env === 'staging') ? app :
 if (config.env === 'production' || config.env === 'staging') {
   Sentry.init({
     dsn: 'https://6c7958e0570f455381d6f17122fbd117@o132281.ingest.sentry.io/292307',
-    release: 'Webhook@1.0.0',
     debug: true,
     environment: config.env,
     serverName: 'Webhook'
