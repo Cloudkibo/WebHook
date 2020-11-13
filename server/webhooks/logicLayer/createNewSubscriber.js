@@ -18,7 +18,11 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
           .then(response => {
             if (response.body.error) {
               const message = response.body.error ? response.body.error.message : 'Error occured while fetching subscriber details from facebook'
-              logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event, pageId, senderId, error: response.body.error}, 'error')
+              let severity = 'error'
+              if (response.body.error.code && response.body.error.code === 190) {
+                severity = 'info'
+              }
+              logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event, pageId, senderId, error: response.body.error}, severity)
             } else {
               const subscriber = response.body
               const payload = LogicLayer.prepareNewSubscriberPayload(subscriber, page, subscriberSource, identifier, senderId, ref)
