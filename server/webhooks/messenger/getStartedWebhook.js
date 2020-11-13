@@ -17,6 +17,25 @@ exports.getStartedWebhook = (payload) => {
   }
 }
 
+function _sendWelcomeMessage(payload) {
+  callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
+  .then((response) => {
+    logger.serverLog('Response from KiboEngage', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
+  })
+  .catch((err) => {
+    const message = err || 'Error response from KiboEngage'
+    logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
+  })
+  callApi('messengerEvents/welcomeMessage', 'post', payload, 'kibochat')
+  .then((response) => {
+    logger.serverLog('Response from KiboChat', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
+  })
+  .catch((err) => {
+    const message = err || 'Error response from KiboChat'
+    logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
+  })
+}
+
 function sendWelcomeMessage (payload) {
   const sender = payload.entry[0].messaging[0].sender.id
   const pageId = payload.entry[0].messaging[0].recipient.id
@@ -29,27 +48,18 @@ function sendWelcomeMessage (payload) {
             subscriber = subscriber[0]
             if (!subscriber) {
               newSubscriberWebhook(prepareSubscriberPayload(sender, pageId))
+              .then(sub => {
+                _sendWelcomeMessage(payload)
+              }).catch((err) => {
+                const message = err || 'Error response from Account'
+                logger.serverLog(message, `${TAG}: exports.newSubscriberWebhook`, {}, {payload}, 'error')
+              })
             }
-            callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
-              .then((response) => {
-                logger.serverLog('Response from KiboEngage', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
-              })
-              .catch((err) => {
-                const message = err || 'Error response from KiboEngage'
-                logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
-              })
-            // sending both page and subscriber to kibochat to save
-            // two DB queries for these on kibochat server
-            payload.subscriber = subscriber
-            payload.page = page
-            callApi('messengerEvents/welcomeMessage', 'post', payload, 'kibochat')
-              .then((response) => {
-                logger.serverLog('Response from KiboChat', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
-              })
-              .catch((err) => {
-                const message = err || 'Error response from KiboChat'
-                logger.serverLog(message, `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'error')
-              })
+            else {
+              payload.subscriber = subscriber
+              payload.page = page
+              _sendWelcomeMessage(payload)
+            }
           })
           .catch(err => {
             const message = err || 'Failed to fetch subscriber'
