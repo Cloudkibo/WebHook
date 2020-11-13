@@ -73,6 +73,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                           })
                         })
                         .catch(err => {
+                          reject(err)
                           const message = err || 'Failed to create subscriber'
                           logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
                         })
