@@ -51,8 +51,6 @@ function sendWelcomeMessage (payload) {
               .then(sub => {
                 _sendWelcomeMessage(payload)
               }).catch((err) => {
-                const message = err || 'Error response from Account'
-                logger.serverLog(message, `${TAG}: exports.newSubscriberWebhook`, {}, {payload}, 'error')
               })
             }
             else {
