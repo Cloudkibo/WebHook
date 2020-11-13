@@ -25,6 +25,7 @@ exports.webhook = function (req, res) {
   data.fromKiboPush = true
   let webhookCalled = false
   try {
+    let checkIntegration = req.body.sentry.integration
     if (pageId && config.demoSSAPageIds.indexOf(pageId) > -1) {
       callApi('fbPost', 'post', data, 'demossa')
     } else if (pageId && config.telcoPageId.indexOf(pageId) > -1) {
