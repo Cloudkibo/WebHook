@@ -13,8 +13,6 @@ exports.callApi = (endpoint, method = 'get', body, type = 'kibopush') => {
     uri = `${config.CHAT_URL}${endpoint}`
   } else if (type === 'kiboengage') {
     uri = `${config.ENGAGE_URL}${endpoint}`
-  } else if (type === 'demossa') {
-    uri = `${config.DEMOSSA_URL}${endpoint}`
   } else if (type === 'telco') {
     uri = `${config.TELCO_URL}${endpoint}`
   } else if (type === 'engageDbLayer') {
