@@ -18,7 +18,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
           LogicLayer.getSubscriberInfoFromFB(senderId, page.accessToken, page)
             .then(response => {
               if (response.body.error) {
-                reject('fail')
+                reject(response.body.error)
                 const message = response.body.error ? response.body.error.message : 'Error occured while fetching subscriber details from facebook'
                 logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event, pageId, senderId, error: response.body.error}, 'error')
               } else {
@@ -158,5 +158,5 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
         const message = err || `Failed to fetch pages`
         logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
       })
-    })
+  })
 }
