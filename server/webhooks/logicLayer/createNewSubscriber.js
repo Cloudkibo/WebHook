@@ -18,8 +18,13 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
           LogicLayer.getSubscriberInfoFromFB(senderId, page.accessToken, page)
             .then(response => {
               if (response.body.error) {
+                reject(response.body.error)
                 const message = response.body.error ? response.body.error.message : 'Error occured while fetching subscriber details from facebook'
-                logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event, pageId, senderId, error: response.body.error}, 'error')
+                let severity = 'error'
+                if (response.body.error.code && response.body.error.code === 190) {
+                  severity = 'info'
+                }
+                logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event, pageId, senderId, error: response.body.error}, severity)
               } else {
                 const subscriber = response.body
                 const payload = LogicLayer.prepareNewSubscriberPayload(subscriber, page, subscriberSource, identifier, senderId, ref)
@@ -32,7 +37,6 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                     if (subscriberFound.length === 0) {
                       callApi(`subscribers`, 'post', payload, 'accounts')
                         .then(subscriberCreated => {
-
                           resolve('resolve')
                           // if (subscriberSource === 'checkbox_plugin' || subscriberSource === 'shopify') {
                           LogicLayer.sendWebhookForNewSubscriber(
@@ -136,20 +140,25 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                     }
                   })
                   .catch(err => {
+                    reject(err)
                     const message = err || `Failed to fetch subscriber`
                     logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
                   })
               }
             })
             .catch(err => {
+              reject(err)
               const message = err || `Failed to fetch subscriber details`
               logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
             })
+        } else {
+          reject('fail')
         }
       })
       .catch(err => {
+        reject(err)
         const message = err || `Failed to fetch pages`
         logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event: event, pageId: pageId}, 'error')
       })
-    })
+  })
 }
