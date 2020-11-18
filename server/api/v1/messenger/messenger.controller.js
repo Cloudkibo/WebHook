@@ -25,22 +25,9 @@ exports.webhook = function (req, res) {
   data.fromKiboPush = true
   let webhookCalled = false
   try {
-    if (pageId && config.demoSSAPageIds.indexOf(pageId) > -1) {
-      callApi('fbPost', 'post', data, 'demossa')
-    } else if (pageId && config.telcoPageId.indexOf(pageId) > -1) {
+    if (pageId && config.telcoPageId.indexOf(pageId) > -1) {
       callApi('fbPost', 'post', data, 'telco')
     } else {
-      // doing deliberatly so that we also save subscribers from these bots - sojharo
-      if (pageId && config.covid19PageId.indexOf(pageId) > -1) {
-        callApi('fbPost', 'post', data, 'demossa')
-      }
-      // health alert me - getting chatbot of covidalert
-      if (pageId && config.healthAlertMePageId.indexOf(pageId) > -1) {
-        callApi('fbPost', 'post', data, 'demossa')
-      }
-      if (pageId && config.covid19PkPageId.indexOf(pageId) > -1) {
-        callApi('fbPost', 'post', data, 'demossa')
-      }
       webhookCalled = webhookHandler(req.body)
     }
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
