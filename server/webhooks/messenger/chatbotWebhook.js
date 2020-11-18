@@ -25,7 +25,7 @@ exports.chatbotWebhook = (payload) => {
             payload.subscriberInfo = subscriberInfo
             callApi('messengerEvents/chatbotOptin', 'post', payload, 'kibochat')
               .then((response) => {
-                logger.serverLog('Response from KiboChat', `${TAG}: exports.chatbotWebhook`, {}, {payload, response}, 'error')
+                logger.serverLog('Response from KiboChat', `${TAG}: exports.chatbotWebhook`, {}, {payload, response}, 'info')
               })
               .catch((err) => {
                 const message = err || 'Error from KiboChat'
