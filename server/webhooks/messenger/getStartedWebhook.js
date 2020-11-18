@@ -17,7 +17,7 @@ exports.getStartedWebhook = (payload) => {
   }
 }
 
-function _sendWelcomeMessage (payload) {
+function _sendWelcomeMessage(payload) {
   callApi('messengerEvents/welcomeMessage', 'post', payload, 'kiboengage')
   .then((response) => {
     logger.serverLog('Response from KiboEngage', `${TAG}: exports.sendWelcomeMessage`, {}, {payload}, 'debug')
