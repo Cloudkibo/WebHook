@@ -51,6 +51,13 @@ function sendWelcomeMessage (payload) {
               .then(sub => {
                 _sendWelcomeMessage(payload)
               }).catch((err) => {
+                let severity = 'error'
+                if (err.code && err.code === 190) {
+                  err = err.message ? err.message : err
+                  severity = 'info'
+                }
+                const message = err || 'Error in setting up welcome message'
+                logger.serverLog(message, `${TAG}: exports.newSubscriberWebhook`, {}, {payload}, severity)
               })
             }
             else {
