@@ -15,8 +15,6 @@ const methodOverride = require('method-override')
 const cookieParser = require('cookie-parser')
 const errorHandler = require('errorhandler')
 const helmet = require('helmet')
-const logger = require('../components/logger')
-const TAG = 'server/config/express.js'
 
 module.exports = function (app) {
   const env = app.get('env')
@@ -45,27 +43,6 @@ module.exports = function (app) {
      */
     app.use(helmet())
   }
-
-    /*
-    Setup a general error handler for JsonSchemaValidation errors.
-  */
-  app.use(function (err, req, res, next) {
-    if (err.name === 'JsonSchemaValidation') {
-      const responseData = {
-        statusText: 'Bad Request',
-        jsonSchemaValidation: true,
-        validations: err.validations
-      }
-
-      const message = err || `JsonSchemaValidation error`
-      logger.serverLog(message, `${TAG}: ${req.path ? req.path : req.originalUrl}`, req.body, {responseData}, 'error')
-
-      res.status(400).json(responseData)
-    } else {
-  // pass error to next error middleware handler
-      next(err)
-    }
-  })
 
   if (env === 'development' || env === 'test') {
     /**
