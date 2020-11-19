@@ -26,7 +26,8 @@ if (config.env === 'production' || config.env === 'staging') {
     release: 'Webhook@1.0.0',
     debug: true,
     environment: config.env,
-    serverName: 'Webhook'
+    serverName: 'Webhook',
+    sendDefaultPii: true
   })
 }
 
