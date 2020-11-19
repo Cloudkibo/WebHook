@@ -253,28 +253,6 @@ function handleUnsubscribe (resp, req) {
                 .then(subscribers => {
                   let subscriber = subscribers[0]
                   handleNewsSubscription(subscriber)
-                  callApi(`tags/query`, 'post', { tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId }, 'accounts')
-                    .then(unsubscribeTag => {
-                      unsubscribeTag = unsubscribeTag[0]
-                      // assign tag
-                      needle('post', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?access_token=${page.accessToken}`, { 'user': req.sender.id })
-                        .then(response => {
-                          if (response.body.error) {
-                            const message = response.body.error ? response.body.error.message : 'Failed to assign unsubscribeTag on Facebook'
-                            logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId, error: response.body.error}, 'error')
-                          } else {
-                            logger.serverLog('Unsubscribe tag assigned successfully', `${TAG}: exports.handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId, responseBody: response.body}, 'debug')
-                          }
-                        })
-                        .catch(err => {
-                          const message = err || 'Failed to assign unsubscribeTag on Facebook'
-                          logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId}, 'error')
-                        })
-                    })
-                    .catch(err => {
-                      const message = err || 'Failed to fetch tag'
-                      logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {pageId: page.pageId, companyId: page.companyId}, 'error')
-                    })
                   callApi('featureUsage/updateCompany', 'put', { query: { companyId: subscriber.companyId }, newPayload: { $inc: { subscribers: -1 } }, options: {} }, 'accounts')
                     .then(updated => {
                       logger.serverLog('Company Usage updated successfully', `${TAG}: function::handleUnsubscribe`, {}, {companyId: subscriber.companyId}, 'debug')

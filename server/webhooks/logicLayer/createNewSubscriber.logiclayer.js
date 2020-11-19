@@ -192,27 +192,7 @@ exports.updateList = (phoneNumber, sender, page) => {
 exports.handleSubscribeAgain = (sender, page, subscriberFound) => {
   callApi(`subscribers/update`, 'put', {query: { senderId: sender }, newPayload: {isSubscribed: true, isEnabledByPage: true}, options: {}}, 'accounts')
     .then(subscriber => {
-      callApi(`tags/query`, 'post', {tag: `_${page.pageId}_unsubscribe`, defaultTag: true, companyId: page.companyId}, 'accounts')
-        .then(unsubscribeTag => {
-          unsubscribeTag = unsubscribeTag[0]
-          needle('delete', `https://graph.facebook.com/v6.0/${unsubscribeTag.labelFbId}/label?user=${subscriberFound.senderId}&access_token=${page.accessToken}`)
-            .then(response => {
-              if (response.body.error) {
-                const message = response.body.error ? response.body.error.message : 'failed to unassigned unsubscribe tag'
-                logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound, error: response.body.error}, 'error')
-              } else {
-                logger.serverLog(`unsubscribe tag unassigned successfully!`, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'debug')
-              }
-            })
-            .catch((err) => {
-              const message = err || 'failed to unassigned unsubscribe tag'
-              logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
-            })
-        })
-        .catch((err) => {
-          const message = err || 'failed to fetch unsubscribe tag'
-          logger.serverLog(message, `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'error')
-        })
+      logger.serverLog('Subcriber isSubscribed Updated', `${TAG}: exports.handleSubscribeAgain`, {}, {sender, page, subscriber: subscriberFound}, 'info')
     })
     .catch((err) => {
       const message = err || 'failed to update subscriber'
