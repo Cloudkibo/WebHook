@@ -15,6 +15,12 @@ exports.checkboxPluginWebhook = (payload) => {
     additionalWorkForShopify({ event, senderId, pageId, identifier })
   }
   createNewSubscriber(pageId, senderId, source, identifier, null, event)
+    .then(response => {})
+    .catch(err => {
+      // err would have been sent to sentry before coming to this catch.
+      // So, we don't need to send the error to sentry here.
+      console.log(err)
+    })
 }
 
 function additionalWorkForShopify (payload) {
