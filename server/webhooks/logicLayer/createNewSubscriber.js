@@ -21,7 +21,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                 reject(response.body.error)
                 const message = response.body.error ? response.body.error.message : 'Error occured while fetching subscriber details from facebook'
                 let severity = 'error'
-                if (response.body.error.code && response.body.error.code === 190) {
+                if (response.body.error.code && (response.body.error.code === 190 || response.body.error.code === 100)) {
                   severity = 'info'
                 }
                 logger.serverLog(message, `${TAG}: exports.createNewSubscriber`, {}, {event, pageId, senderId, error: response.body.error}, severity)
