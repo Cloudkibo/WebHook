@@ -253,15 +253,17 @@ function handleUnsubscribe (resp, req) {
               callApi(`subscribers/query`, 'post', { senderId: req.sender.id, pageId: page._id }, 'accounts')
                 .then(subscribers => {
                   let subscriber = subscribers[0]
-                  handleNewsSubscription(subscriber)
-                  callApi('featureUsage/updateCompany', 'put', { query: { companyId: subscriber.companyId }, newPayload: { $inc: { subscribers: -1 } }, options: {} }, 'accounts')
-                    .then(updated => {
-                      logger.serverLog('Company Usage updated successfully', `${TAG}: function::handleUnsubscribe`, {}, {companyId: subscriber.companyId}, 'debug')
-                    })
-                    .catch(err => {
-                      const message = err || 'Failed to update company usage'
-                      logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {companyId: subscriber.companyId}, 'error')
-                    })
+                  if (subscriber) {
+                    handleNewsSubscription(subscriber)
+                    callApi('featureUsage/updateCompany', 'put', { query: { companyId: subscriber.companyId }, newPayload: { $inc: { subscribers: -1 } }, options: {} }, 'accounts')
+                      .then(updated => {
+                        logger.serverLog('Company Usage updated successfully', `${TAG}: function::handleUnsubscribe`, {}, {companyId: subscriber.companyId}, 'debug')
+                      })
+                      .catch(err => {
+                        const message = err || 'Failed to update company usage'
+                        logger.serverLog(message, `${TAG}: function::handleUnsubscribe`, {}, {companyId: subscriber.companyId}, 'error')
+                      })
+                  }
                 })
                 .catch(err => {
                   const message = err || 'Failed to fetch subscriber'
