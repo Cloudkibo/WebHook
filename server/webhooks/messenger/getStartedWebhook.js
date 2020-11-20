@@ -43,8 +43,9 @@ function _sendWelcomeMessage (payload) {
 }
 
 function sendWelcomeMessage (payload) {
-  const sender = payload.entry[0].messaging[0].sender.id
-  const pageId = payload.entry[0].messaging[0].recipient.id
+  const event = payload.entry[0].messaging[0]
+  const sender = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
+  const pageId = event.message && event.message.is_echo ? event.sender.id : event.recipient.id
   callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
     .then(page => {
       page = page[0]
@@ -53,7 +54,7 @@ function sendWelcomeMessage (payload) {
           .then(subscriber => {
             subscriber = subscriber[0]
             if (!subscriber) {
-              newSubscriberWebhook(prepareSubscriberPayload(sender, pageId))
+              createNewSubscriber(pageId, sender, 'direct_message', '', null, event, payload)
               .then(sub => {
                 _sendWelcomeMessage(payload)
               }).catch((err) => {
