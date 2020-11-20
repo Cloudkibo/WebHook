@@ -54,6 +54,12 @@ exports.optinWebhook = (payload) => {
   const senderId = event.message && event.message.is_echo ? event.recipient.id : event.sender.id
   const pageId = event.message && event.message.is_echo ? event.sender.id : event.recipient.id
   createNewSubscriber(pageId, senderId, 'landing_page', '', null, event)
+    .then(response => {})
+    .catch(err => {
+      // err would have been sent to sentry before coming to this catch.
+      // So, we don't need to send the error to sentry here.
+      console.log(err)
+    })
   let ref = event.optin.ref.split('__')
   if (ref.length === 2 && ref[1] === 'kibopush_test_broadcast_') {
     event.optin.ref = ref[0]
