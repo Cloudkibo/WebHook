@@ -6,7 +6,7 @@
 const config = require('./config/environment/index')
 // const Raven = require('raven')
 const Sentry = require('@sentry/node')
-const logger = require('../components/logger')
+const logger = require('../server/components/logger')
 const TAG = 'server/routes.js'
 
 module.exports = function (app) {
