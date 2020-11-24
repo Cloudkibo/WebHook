@@ -5,7 +5,7 @@ const validator = new Validator()
 const logger = require('../../../components/logger')
 const TAG = '/server/api/v1/webhooks/webhooks.controller.js'
 const { callApi } = require('../../../utility/api.caller.service')
-// const config = require('../../../config/environment')
+const config = require('../../../config/environment')
 const { sendSuccessResponse, sendErrorResponse } = require('../../../global/global.js')
 
 exports.verifyHook = function (req, res) {
