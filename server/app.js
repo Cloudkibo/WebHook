@@ -12,18 +12,18 @@ const httpApp = express()
 
 const appObj = (config.env === 'production' || config.env === 'staging') ? app : httpApp
 
-/*if (config.env === 'production' || config.env === 'staging') {
+ /* if (config.env === 'production' || config.env === 'staging') {
   const Raven = require('raven')
   Raven.config('https://6c7958e0570f455381d6f17122fbd117:d2041f4406ff4b3cb51290d9b8661a7d@sentry.io/292307', {
     environment: config.env,
     parseUser: ['name', 'email', 'domain', 'role', 'emailVerified']
   }).install()
   appObj.use(Raven.requestHandler())
-}*/
+} */
 if (config.env === 'production' || config.env === 'staging') {
   Sentry.init({
     dsn: 'https://6c7958e0570f455381d6f17122fbd117@o132281.ingest.sentry.io/292307',
-    release: 'Webhook@1.0.0',
+    release: `Webhook-${config.env}@1.0.0`,
     debug: true,
     environment: config.env,
     serverName: 'Webhook',
