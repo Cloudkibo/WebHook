@@ -118,7 +118,7 @@ exports.createNewSubscriber = (pageId, senderId, subscriberSource, identifier, r
                         // subscribing the subscriber again in case he
                         // or she unsubscribed and removed chat
                         var messageText = ''
-                        if (event.message) {
+                        if (event.message && event.message.text) {
                           messageText = event.message.text
                         }
                         if (
