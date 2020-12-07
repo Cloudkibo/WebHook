@@ -9,6 +9,7 @@ const logger = require('../../components/logger')
 const TAG = 'config/integrations/twitter.js'
 
 const callApi = require('../../utility/api.caller.service')
+const { sendSuccessResponse } = require('../../global/global.js')
 
 // test twitter ids : [2616186000, 1430793200]
 
@@ -94,10 +95,11 @@ function connect () {
   })
 }
 
-function restart () {
+function restart (req, res) {
   logger.serverLog('KiboPush called me', `${TAG}: function::restart`, {}, {}, 'debug')
   if (stream) stream.stop()
   connect()
+  sendSuccessResponse(200, 'restarted successfully', res)
 }
 
 exports.connect = connect
