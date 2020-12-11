@@ -19,14 +19,36 @@ exports.pollResponseWebhook = (payload) => {
       logger.serverLog(message, `${TAG}: exports.pollResponseWebhook`, {}, {payload}, 'error')
     })
   if (typeof resp === 'string') {
-    callApi('messengerEvents/welcomeMessage/emailNumberQuickReply', 'post', payload, 'kiboengage')
-      .then((response) => {
-        logger.serverLog('Response from KiboEngage', `${TAG}: exports.pollResponseWebhook`, {}, {payload, response}, 'debug')
-      })
-      .catch((err) => {
-        const message = err || 'Error response from KiboEngage'
-        logger.serverLog(message, `${TAG}: exports.pollResponseWebhook`, {}, {payload}, 'error')
-      })
+    var pageId = payload.entry[0].messaging[0].recipient.id
+    var sender = payload.entry[0].messaging[0].sender.id
+    callApi(`pages/query`, 'post', { pageId: pageId, connected: true }, 'accounts')
+    .then(page => {
+      page = page[0]
+      if (page) {
+        callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender, companyId: page.companyId }, 'accounts')
+          .then(subscriber => {
+            subscriber = subscriber[0]
+            if (!subscriber.awaitingQuickReplyPayload) {
+              callApi('messengerEvents/welcomeMessage/emailNumberQuickReply', 'post', payload, 'kiboengage')
+                .then((response) => {
+                  logger.serverLog('Response from KiboEngage', `${TAG}: exports.pollResponseWebhook`, {}, {payload, response}, 'debug')
+                })
+                .catch((err) => {
+                  const message = err || 'Error response from KiboEngage'
+                  logger.serverLog(message, `${TAG}: exports.pollResponseWebhook`, {}, {payload}, 'error')
+                })
+              }
+            })
+          .catch(err => {
+            const message = err || 'Unable to fetch subscriber'
+            logger.serverLog(message, `${TAG}: exports.pollResponseWebhook`, {}, {payload}, 'error')
+          })
+      }
+    })
+    .catch(err => {
+      const message = err || 'Unable to fetch page'
+      logger.serverLog(message, `${TAG}: exports.pollResponseWebhook`, {}, {payload}, 'error')
+    })
   } else {
     if (resp[0]) {
       for (let i = 0; i < resp.length; i++) {
