@@ -253,7 +253,7 @@ function handleUnsubscribe (resp, req) {
                 .then(subscribers => {
                   let subscriber = subscribers[0]
                   if (subscriber) {
-                    callApi('messengerEvents/postback', 'post', subscriber, 'kibochat')
+                    callApi('messengerEvents/unsubscribe', 'post', subscriber, 'kibochat')
                       .then((response) => {
                       })
                       .catch((err) => {
