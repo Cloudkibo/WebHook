@@ -253,6 +253,13 @@ function handleUnsubscribe (resp, req) {
                 .then(subscribers => {
                   let subscriber = subscribers[0]
                   if (subscriber) {
+                    callApi('messengerEvents/unsubscribe', 'post', subscriber, 'kibochat')
+                      .then((response) => {
+                      })
+                      .catch((err) => {
+                        const message = err || 'Error response from KiboChat'
+                        logger.serverLog(message, `${TAG}: exports.handleUnsubscribe`, {}, {resp, req}, 'error')
+                      })
                     handleNewsSubscription(subscriber)
                     callApi('featureUsage/updateCompany', 'put', { query: { companyId: subscriber.companyId }, newPayload: { $inc: { subscribers: -1 } }, options: {} }, 'accounts')
                       .then(updated => {
