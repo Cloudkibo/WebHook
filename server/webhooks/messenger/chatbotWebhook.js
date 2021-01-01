@@ -7,16 +7,28 @@ exports.chatbotWebhook = (payload) => {
   const event = payload.entry[0].messaging[0]
   const pageId = payload.entry[0].messaging[0].recipient.id
   const senderId = payload.entry[0].messaging[0].sender.id
+  let ref = payload.entry[0].messaging[0].optin.ref
   createNewSubscriber(pageId, senderId, 'direct_message', '', null, event)
     .then(response => {
-      callApi('messengerEvents/chatbotOptin', 'post', payload, 'kibochat')
-      .then((response) => {
-        logger.serverLog('Response from KiboChat', `${TAG}: exports.chatbotWebhook`, {}, {payload, response}, 'info')
-      })
-      .catch((err) => {
-        const message = err || 'Error from KiboChat'
-        logger.serverLog(message, `${TAG}: exports.chatbotWebhook`, {}, {payload}, 'error')
-      })
+      if (ref === 'notify-me') {
+        callApi('messengerEvents/messageAlertsOptin', 'post', payload, 'kibochat')
+        .then((response) => {
+          logger.serverLog('Response from KiboChat', `${TAG}: exports.chatbotWebhook`, {}, {payload, response}, 'info')
+        })
+        .catch((err) => {
+          const message = err || 'Error from KiboChat'
+          logger.serverLog(message, `${TAG}: exports.chatbotWebhook`, {}, {payload}, 'error')
+        })
+      } else {
+        callApi('messengerEvents/chatbotOptin', 'post', payload, 'kibochat')
+        .then((response) => {
+          logger.serverLog('Response from KiboChat', `${TAG}: exports.chatbotWebhook`, {}, {payload, response}, 'info')
+        })
+        .catch((err) => {
+          const message = err || 'Error from KiboChat'
+          logger.serverLog(message, `${TAG}: exports.chatbotWebhook`, {}, {payload}, 'error')
+        })
+      }
     })
     .catch(err => {
       // err would have been sent to sentry before coming to this catch.
