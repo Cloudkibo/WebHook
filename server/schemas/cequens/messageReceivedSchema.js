@@ -56,10 +56,14 @@ exports.messageReceivedSchema = {
           ]
         }
       ]
+    },
+    'businessNumber': {
+      'type': 'string'
     }
   },
   'required': [
     'contacts',
-    'messages'
+    'messages',
+    'businessNumber'
   ]
 }

@@ -3,6 +3,6 @@ const router = express.Router()
 
 const controller = require('./cequens.controller')
 
-router.post('/', controller.webhook)
+router.post('/:number', controller.webhook)
 
 module.exports = router

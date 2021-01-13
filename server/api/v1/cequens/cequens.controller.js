@@ -9,6 +9,7 @@ const { sendSuccessResponse, sendErrorResponse } = require('../../../global/glob
 exports.webhook = function (req, res) {
   logger.serverLog('Cequens event received', `${TAG}: exports.webhook`, JSON.stringify(req.body), {}, 'debug')
   let webhookCalled = false
+  req.body.businessNumber = req.params.number
   try {
     webhookCalled = webhookHandler(req.body)
     let responseMessage = webhookCalled ? 'Webhook event received successfully' : 'No webhook for the given request schema'
