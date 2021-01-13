@@ -1,13 +1,40 @@
 exports.messageStatusSchema = {
-  type: 'object',
-  properties: {
-    id: {
-      type: 'string',
-      required: true
+  'type': 'object',
+  'properties': {
+    'statuses': {
+      'type': 'array',
+      'items': [
+        {
+          'type': 'object',
+          'properties': {
+            'id': {
+              'type': 'string'
+            },
+            'recipient_id': {
+              'type': 'string'
+            },
+            'status': {
+              'type': 'string'
+            },
+            'timestamp': {
+              'type': 'string'
+            }
+          },
+          'required': [
+            'id',
+            'recipient_id',
+            'status',
+            'timestamp'
+          ]
+        }
+      ]
     },
-    status: {
-      type: 'string',
-      required: true
+    'businessNumber': {
+      'type': 'string'
     }
-  }
+  },
+  'required': [
+    'statuses',
+    'businessNumber'
+  ]
 }
