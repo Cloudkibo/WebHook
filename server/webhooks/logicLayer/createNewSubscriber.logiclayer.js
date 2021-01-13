@@ -12,10 +12,10 @@ exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
       method: 'GET'
     }
     needle.get(options.url, options, (error, response) => {
-      logger.serverLog(`Subscriber response git from facebook`, `${TAG}: exports.getSubscriberInfoFromFB`, {}, {response: response.body, page: page}, 'debug')
       if (error) {
         reject(error)
       } else {
+        logger.serverLog(`Subscriber response git from facebook`, `${TAG}: exports.getSubscriberInfoFromFB`, {}, {response: response.body, page: page}, 'debug')
         resolve(response)
       }
     })
