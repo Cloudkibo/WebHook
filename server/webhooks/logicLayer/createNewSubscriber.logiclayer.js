@@ -223,7 +223,7 @@ exports.updateConversionCount = (postId) => {
 
   callApi(`comment_capture/update`, 'put', {query: { _id: postId }, newPayload: newPayloadWaitingReply, options: {}}, 'accounts')
     .then(updated => {
-      logger.serverLog('Waiting Reply updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'error')
+      logger.serverLog('Waiting Reply updated', `${TAG}: exports.updateConversionCount`, {}, {postId}, 'debug')
     })
     .catch(err => {
       const message = err || 'failed to update waiting reply'
