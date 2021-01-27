@@ -21,6 +21,7 @@ module.exports = function (app) {
   app.use('/webhooks/zoom', require('./api/v1/zoom'))
   app.use('/webhooks/flockSend', require('./api/v1/flockSend'))
   app.use('/webhooks/cequens', require('./api/v1/cequens'))
+  app.use('/webhooks/gupshup', require('./api/v1/gupshup'))
 
   app.route('/:url(api|auth)/*').get((req, res) => {
     res.status(404).send({url: `${req.originalUrl} not found`})
