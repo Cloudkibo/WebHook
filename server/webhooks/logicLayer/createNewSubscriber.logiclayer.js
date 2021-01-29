@@ -15,8 +15,19 @@ exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
       if (error) {
         reject(error)
       } else {
-        logger.serverLog(`Subscriber response git from facebook`, `${TAG}: exports.getSubscriberInfoFromFB`, {}, {response: response.body, page: page}, 'debug')
-        resolve(response)
+        // handling "This action was not submitted due to new privacy rules in Europe." error
+        if (response.body.error && response.body.error.code === 10 && response.body.error.subcode === 2018336) {
+          options.url = `https://graph.facebook.com/v6.0/${sender}?fields=gender,first_name,last_name,locale,timezone&access_token=${pageAccessToken}`
+          needle.get(options.url, options, (error, response) => {
+            if (error) {
+              reject(error)
+            } else {
+              resolve(response)
+            }
+          })
+        } else {
+          resolve(response)
+        }
       }
     })
   })
