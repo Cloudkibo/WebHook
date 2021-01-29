@@ -26,9 +26,10 @@ exports.postCommentSchema = {
                         },
                         'comment_id': {'type': 'string'},
                         'sender_id': {'type': 'string'},
-                        'post_id': {'type': 'string'}
+                        'post_id': {'type': 'string'},
+                        'from': {'type': 'object'}
                       },
-                      'required': ['item', 'verb', 'comment_id', 'post_id']
+                      'required': ['item', 'verb', 'comment_id', 'post_id', 'from']
                     }
                   },
                   'required': ['value']

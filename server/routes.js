@@ -20,6 +20,7 @@ module.exports = function (app) {
   app.use('/webhooks/twilio', require('./api/v1/twilio'))
   app.use('/webhooks/zoom', require('./api/v1/zoom'))
   app.use('/webhooks/flockSend', require('./api/v1/flockSend'))
+  app.use('/webhooks/cequens', require('./api/v1/cequens'))
 
   app.route('/:url(api|auth)/*').get((req, res) => {
     res.status(404).send({url: `${req.originalUrl} not found`})
@@ -63,7 +64,7 @@ module.exports = function (app) {
   })
 
   if (config.env === 'production' || config.env === 'staging') {
-    app.use(Sentry.Handlers.requestHandler())
+    app.use(Sentry.Handlers.requestHandler()) 
     app.use(Sentry.Handlers.errorHandler())
   }
 }
