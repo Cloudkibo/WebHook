@@ -3,6 +3,7 @@ const { callApi } = require('../../utility/api.caller.service')
 const TAG = 'LogicLayer/createNewSubscriber.logiclayer.js'
 const logger = require('../../components/logger')
 const config = require('../../config/environment/index')
+const { updateCompanyUsage } = require('../../global/billingPricing')
 
 exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
   return new Promise((resolve, reject) => {
@@ -30,6 +31,32 @@ exports.getSubscriberInfoFromFB = (sender, pageAccessToken, page) => {
         }
       }
     })
+  })
+}
+
+exports.createSubscriber = (payload, page) => {
+  return new Promise((resolve, reject) => {
+    callApi('companyprofile/query', 'post', {_id: page.companyId}, 'accounts')
+      .then(company => {
+        const planUsagePromise = callApi('featureUsage/planQuery', 'post', {planId: company.planId._id}, 'accounts')
+        const companyUsagePromise = callApi('featureUsage/companyQuery', 'post', {companyId: company._id}, 'accounts')
+        Promise.all([planUsagePromise, companyUsagePromise])
+          .then(results => {
+            const planUsage = results[0][0]
+            const companyUsage = results[1][0]
+            if (companyUsage.subscribers >= planUsage.subscribers) {
+              payload.disabledByPlan = true
+            }
+            callApi(`subscribers`, 'post', payload, 'accounts')
+              .then(subscriberCreated => {
+                updateCompanyUsage(page.companyId, 'subscribers', 1)
+                resolve(subscriberCreated)
+              })
+              .catch(err => reject(err))
+          })
+          .catch(err => reject(err))
+      })
+      .catch(err => reject(err))
   })
 }
 
