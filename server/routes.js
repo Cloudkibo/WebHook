@@ -65,7 +65,7 @@ module.exports = function (app) {
   })
 
   if (config.env === 'production' || config.env === 'staging') {
-    app.use(Sentry.Handlers.requestHandler())
+    app.use(Sentry.Handlers.requestHandler()) 
     app.use(Sentry.Handlers.errorHandler())
   }
 }
