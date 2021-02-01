@@ -3,6 +3,6 @@ const router = express.Router()
 
 const controller = require('./gupshup.controller')
 
-router.post('/:number', controller.webhook)
+router.post('/', controller.webhook)
 
 module.exports = router
