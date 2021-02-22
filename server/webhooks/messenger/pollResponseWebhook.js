@@ -28,7 +28,7 @@ exports.pollResponseWebhook = (payload) => {
         callApi(`subscribers/query`, 'post', { pageId: page._id, senderId: sender, companyId: page.companyId }, 'accounts')
           .then(subscriber => {
             subscriber = subscriber[0]
-            if (!subscriber.awaitingQuickReplyPayload) {
+            if (subscriber && !subscriber.awaitingQuickReplyPayload) {
               callApi('messengerEvents/welcomeMessage/emailNumberQuickReply', 'post', payload, 'kiboengage')
                 .then((response) => {
                   logger.serverLog('Response from KiboEngage', `${TAG}: exports.pollResponseWebhook`, {}, {payload, response}, 'debug')
